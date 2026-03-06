@@ -9,6 +9,10 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <!-- Google Fonts: Inter para fallback premium no iOS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -21,7 +25,11 @@
                         'win-accent': '#0078d4',
                         'win-border': '#2a2a2a',
                     },
-                    borderRadius: { 'win': '4px' }
+                    borderRadius: { 'win': '4px' },
+                    fontFamily: {
+                        'segoe-black': ['"Segoe UI Black"', 'Inter', '"Segoe UI"', 'sans-serif'],
+                        'segoe': ['"Segoe UI"', 'Inter', 'sans-serif'],
+                    }
                 }
             }
         }

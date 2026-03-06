@@ -5,6 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyncro - Host Monitor</title>
+    <!-- Google Fonts: Inter para fallback premium no iOS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
     <!-- Tailwind CSS (usando via CDN para simplificar no MVP, mas configurado localmente se necessário) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -20,6 +24,10 @@
                     },
                     borderRadius: {
                         'win': '4px', // O segredo para não ficar "arredondado demais"
+                    },
+                    fontFamily: {
+                        'segoe-black': ['"Segoe UI Black"', 'Inter', '"Segoe UI"', 'sans-serif'],
+                        'segoe': ['"Segoe UI"', 'Inter', 'sans-serif'],
                     }
                 }
             }
@@ -165,8 +173,9 @@
     <header class="flex justify-between items-center mb-8 border-b border-win-border pb-5">
         <div class="flex items-center gap-4">
             <div class="flex flex-col">
-                <h1 class="text-3xl font-[900] italic tracking-[-0.02em] text-white leading-none uppercase"
-                    style="font-family: 'Segoe UI Black', 'Segoe UI', Tahoma, sans-serif;">LYNCRO</h1>
+                <h1
+                    class="text-3xl font-segoe-black font-[900] italic tracking-[-0.02em] text-white leading-none uppercase">
+                    LYNCRO</h1>
                 <span class="text-[10px] font-bold text-win-accent tracking-[0.3em] mt-1 uppercase">Host Monitor</span>
             </div>
         </div>
