@@ -9,6 +9,7 @@ let ws;
 let myId;
 let isMicOn = companionOf ? false : true; // Companion começa sempre mudo
 let isVideoOn = true;
+let isHostMuted = false;
 let audioContext;
 let analyser;
 let processedStream = null; // Stream pós-IA (se ativo)
@@ -465,7 +466,13 @@ function setupWebSocket() {
                 break;
             case 'media-control':
                 if (data.mediaType === 'audio') {
-                    setMicEnabled(!isMicOn);
+                    if (data.action === 'mute') {
+                        isHostMuted = true;
+                        setMicEnabled(false, true); // force mute
+                    } else if (data.action === 'unmute') {
+                        isHostMuted = false;
+                        setMicEnabled(true, true); // force unmute
+                    }
                 } else if (data.mediaType === 'video') {
                     setVideoEnabled(!isVideoOn);
                 }
@@ -547,8 +554,36 @@ function handleIceCandidate(targetId, candidate) {
 }
 
 // 3. Controles de Mídia
-function broadcastMediaStatus() {
-    if (ws && ws.readyState === WebSocket.OPEN) {
+function setMicEnabled(enabled, forceHostOverride = false) {
+    if (isHostMuted && !forceHostOverride) {
+        // Se o Host mutou rigidamente via sistema e a tentativa é de desmutar localmente
+        if (enabled) {
+            showToast("O Produtor mutou seu microfone.", "error");
+            return;
+        }
+    }
+
+    isMicOn = enabled;
+    if (localStream && localStream.getAudioTracks().length > 0) {
+        localStream.getAudioTracks()[0].enabled = isMicOn;
+    }
+
+    // UI Update
+    const micBtn = document.getElementById('toggleMic');
+    micBtn.classList.toggle('bg-red-600/20', !isMicOn);
+    micBtn.classList.toggle('text-red-500', !isMicOn);
+
+    // Update icon (show lock if host muted)
+    if (isHostMuted) {
+        micBtn.innerHTML = `<i class="ph ph-lock text-2xl"></i>`;
+        micBtn.classList.add('opacity-50', 'cursor-not-allowed');
+    } else {
+        micBtn.innerHTML = `<i class="ph ${isMicOn ? 'ph-microphone' : 'ph-microphone-slash'} text-2xl"></i>`;
+        micBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+
+    // Only broadcast tracking if this was an actual local interaction (not forced by the host's own command overriding)
+    if (!forceHostOverride && ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({
             type: 'media-status-change',
             roomId: roomName,
@@ -556,17 +591,6 @@ function broadcastMediaStatus() {
             videoMuted: !isVideoOn
         }));
     }
-}
-
-function setMicEnabled(enabled) {
-    isMicOn = enabled;
-    if (localStream && localStream.getAudioTracks().length > 0) {
-        localStream.getAudioTracks()[0].enabled = isMicOn;
-    }
-    document.getElementById('toggleMic').classList.toggle('bg-red-600/20', !isMicOn);
-    document.getElementById('toggleMic').classList.toggle('text-red-500', !isMicOn);
-    document.getElementById('toggleMic').innerHTML = `<i class="ph ${isMicOn ? 'ph-microphone' : 'ph-microphone-slash'} text-2xl"></i>`;
-    broadcastMediaStatus();
 }
 
 function setVideoEnabled(enabled) {
@@ -578,7 +602,15 @@ function setVideoEnabled(enabled) {
     btn.classList.toggle('bg-red-600/20', !isVideoOn);
     btn.classList.toggle('text-red-500', !isVideoOn);
     btn.innerHTML = `<i class="ph ${isVideoOn ? 'ph-video-camera' : 'ph-video-camera-slash'} text-2xl"></i>`;
-    broadcastMediaStatus();
+
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'media-status-change',
+            roomId: roomName,
+            audioMuted: !isMicOn,
+            videoMuted: !isVideoOn
+        }));
+    }
 }
 
 document.getElementById('toggleMic').onclick = () => setMicEnabled(!isMicOn);

@@ -93,6 +93,23 @@ function setupSignaling(server) {
                     case 'media-control':
                         const rm = roomManager.getRoom(normalizedRoomId);
                         if (rm && rm.host === participantId) {
+                            const targetParticipant = rm.participants.find(p => p.id === data.targetId);
+                            if (targetParticipant && data.mediaType === 'audio') {
+                                if (data.action === 'mute') {
+                                    roomManager.updateParticipant(normalizedRoomId, data.targetId, { hostMuted: true });
+                                } else if (data.action === 'unmute') {
+                                    // if the guest muted themselves, the host cannot unmute them
+                                    if (targetParticipant.guestMutedSelf) {
+                                        sendToParticipant(normalizedRoomId, participantId, {
+                                            type: 'error',
+                                            message: 'O convidado silenciou o próprio microfone por privacidade.'
+                                        });
+                                        return; // Intercept command
+                                    }
+                                    roomManager.updateParticipant(normalizedRoomId, data.targetId, { hostMuted: false });
+                                }
+                            }
+
                             sendToParticipant(normalizedRoomId, data.targetId, {
                                 type: 'media-control',
                                 mediaType: data.mediaType,
@@ -119,10 +136,16 @@ function setupSignaling(server) {
                         break;
 
                     case 'media-status-change':
-                        roomManager.updateParticipant(normalizedRoomId, participantId, {
+                        const updates = {
                             audioMuted: data.audioMuted,
                             videoMuted: data.videoMuted
-                        });
+                        };
+                        // Track if the guest muted themselves voluntarily
+                        if (data.audioMuted !== undefined) {
+                            updates.guestMutedSelf = data.audioMuted;
+                        }
+
+                        roomManager.updateParticipant(normalizedRoomId, participantId, updates);
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
                             participants: roomManager.getRoom(normalizedRoomId).participants

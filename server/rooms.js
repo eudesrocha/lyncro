@@ -33,6 +33,8 @@ class RoomManager {
             muted: false,
             audioMuted: false,
             videoMuted: false,
+            hostMuted: false,
+            guestMutedSelf: false,
             isScreenSharing: false,
             ...participantData
         };

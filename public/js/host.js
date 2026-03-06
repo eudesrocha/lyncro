@@ -836,14 +836,20 @@ window.toggleOverlay = (pId) => {
 
 window.remoteMute = (pId) => {
     const p = currentParticipants.find(part => part.id === pId);
-    if (p) { p.audioMuted = !p.audioMuted; updateParticipantStatus(p); }
-    ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'audio', action: 'toggle' }));
+    if (p) {
+        p.audioMuted = !p.audioMuted;
+        updateParticipantStatus(p);
+        ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'audio', action: p.audioMuted ? 'mute' : 'unmute' }));
+    }
 };
 
 window.remoteMuteVideo = (pId) => {
     const p = currentParticipants.find(part => part.id === pId);
-    if (p) { p.videoMuted = !p.videoMuted; updateParticipantStatus(p); }
-    ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'video', action: 'toggle' }));
+    if (p) {
+        p.videoMuted = !p.videoMuted;
+        updateParticipantStatus(p);
+        ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'video', action: p.videoMuted ? 'mute' : 'unmute' }));
+    }
 };
 
 window.copyCleanFeed = (pId, type = 'camera') => {

@@ -11,9 +11,14 @@ class VirtualBackground {
         this.sourceVideo.autoplay = true;
         this.sourceVideo.playsInline = true;
         this.sourceVideo.muted = true;
+        this.sourceVideo.style.cssText = 'position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; z-index: -9999; left: -100px;';
+        document.body.appendChild(this.sourceVideo);
 
         this.canvas = document.createElement('canvas');
-        this.ctx = this.canvas.getContext('2d');
+        this.canvas.style.cssText = 'position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px; z-index: -9999; left: -100px;';
+        document.body.appendChild(this.canvas);
+
+        this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
 
         this.segmentation = null;
         this.isModelLoaded = false;
