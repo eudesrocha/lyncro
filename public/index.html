@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyncro - Sincronia Total. Latência Zero.</title>
+    <title>LYNCRO - Sincronia Total. Latência Zero.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -72,6 +72,40 @@
             }
         }
 
+        /* Motion Design: Staggered Reveal */
+        @keyframes revealUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-reveal {
+            opacity: 0;
+            animation: revealUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+
+        .delay-1 {
+            animation-delay: 0.1s;
+        }
+
+        .delay-2 {
+            animation-delay: 0.3s;
+        }
+
+        .delay-3 {
+            animation-delay: 0.5s;
+        }
+
+        .delay-4 {
+            animation-delay: 0.7s;
+        }
+
         .tab-active {
             color: #fff;
             border-bottom: 3px solid #0078d4;
@@ -82,7 +116,6 @@
             border-bottom: 3px solid transparent;
         }
 
-        /* Glass Elevation Shadow */
         .glass-shadow {
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.05);
@@ -95,9 +128,9 @@
 <body class="font-segoe selection:bg-win-accent selection:text-white">
 
     <!-- Header / Logo -->
-    <header class="fixed top-0 left-0 w-full p-8 z-50">
+    <header class="fixed top-0 left-0 w-full p-8 z-50 animate-reveal">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <h1 class="text-3xl font-segoe-black italic tracking-tighter select-none">LYNCRO</h1>
+            <h1 class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase">LYNCRO</h1>
             <div class="hidden md:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
                 <span>Real-Time WebRTC</span>
                 <div class="w-1 h-1 bg-white rounded-full"></div>
@@ -111,29 +144,31 @@
 
         <!-- Lado Esquerdo: Narrativa -->
         <section class="flex-1 text-center lg:text-left">
-            <h2 class="text-5xl lg:text-7xl font-segoe-black leading-tight mb-6">
-                Sincronia Total.<br>
-                <span class="text-win-accent">Latência Zero.</span>
-            </h2>
-            <p class="text-lg lg:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed">
-                A ponte definitiva entre seus convidados e o seu OBS. Gere links de <span
-                    class="text-white font-bold">Clean Feed</span> instantâneos e transmita com qualidade de estúdio
-                direto pelo navegador.
-            </p>
+            <div class="animate-reveal delay-1">
+                <h2 class="text-5xl lg:text-7xl font-segoe-black leading-tight mb-6 uppercase tracking-tight">
+                    Sincronia Total.<br>
+                    <span class="text-win-accent">Latência Zero.</span>
+                </h2>
+                <p class="text-lg lg:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed">
+                    A ponte definitiva entre seus convidados e o seu OBS. Gere links de <span
+                        class="text-white font-bold">Clean Feed</span> instantâneos e transmita com qualidade de estúdio
+                    direto pelo navegador.
+                </p>
+            </div>
 
             <!-- Pilares -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-80">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-80 animate-reveal delay-2">
                 <div class="flex flex-col items-center lg:items-start gap-2">
                     <i class="ph ph-broadcast text-win-accent text-3xl"></i>
                     <h3 class="font-bold text-xs uppercase tracking-widest text-white">Clean Feed Nativo</h3>
                     <p class="text-[11px] text-gray-500">Vídeo e áudio puros para sua Fonte de Navegador.</p>
                 </div>
-                <div class="flex flex-col items-center lg:items-start gap-2">
+                <div class="flex flex-col items-center lg:items-start gap-2 border-l border-white/5 pl-0 lg:pl-4">
                     <i class="ph ph-device-mobile text-win-accent text-3xl"></i>
                     <h3 class="font-bold text-xs uppercase tracking-widest text-white">Mobile-First</h3>
                     <p class="text-[11px] text-gray-500">Seu convidado entra pelo celular com um clique.</p>
                 </div>
-                <div class="flex flex-col items-center lg:items-start gap-2">
+                <div class="flex flex-col items-center lg:items-start gap-2 border-l border-white/5 pl-0 lg:pl-4">
                     <i class="ph ph-gauge text-win-accent text-3xl"></i>
                     <h3 class="font-bold text-xs uppercase tracking-widest text-white">Produção Integrada</h3>
                     <p class="text-[11px] text-gray-500">Controle Lower Thirds e chat em tempo real.</p>
@@ -142,7 +177,7 @@
         </section>
 
         <!-- Lado Direito: Ação (Glass Box) -->
-        <section class="w-full max-w-md relative">
+        <section class="w-full max-w-md relative animate-reveal delay-3">
             <div class="mica-effect glass-shadow p-2 rounded-2xl overflow-hidden">
                 <!-- Tabs -->
                 <div class="flex border-b border-win-border">
@@ -152,7 +187,7 @@
                     </button>
                     <button id="tab-join" onclick="switchTab('join')"
                         class="flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-inactive transition-all">
-                        Entrar na Sala
+                        Entrar
                     </button>
                 </div>
 
@@ -189,11 +224,12 @@
                         <div id="create-success-state" class="hidden space-y-6 animate-[fadeIn_0.5s_ease-out]">
                             <div class="bg-win-accent/10 border border-win-accent/30 p-6 rounded-win text-center">
                                 <i class="ph ph-check-circle text-win-accent text-5xl mb-4 block"></i>
-                                <h4 class="text-xl font-bold text-white mb-2">Sala Criada!</h4>
-                                <p class="text-xs text-gray-400">Sua transmissão está pronta para começar.</p>
+                                <h4 class="text-xl font-bold text-white mb-2">SALA LANÇADA</h4>
+                                <p class="text-xs text-gray-400 uppercase tracking-widest">Sua transmissão está
+                                    configurada.</p>
                             </div>
 
-                            <div class="space-y-2">
+                            <div class="space-y-2 text-left">
                                 <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Link
                                     de Convite</label>
                                 <div class="flex gap-2">
@@ -209,11 +245,11 @@
                             <div class="grid grid-cols-2 gap-3">
                                 <button onclick="goToHost()"
                                     class="w-full bg-win-accent text-white font-bold py-4 rounded-win text-[10px] uppercase tracking-widest shadow-lg">
-                                    Abrir Host
+                                    Abrir Painel
                                 </button>
                                 <button onclick="window.location.reload()"
                                     class="w-full bg-white/5 border border-win-border text-white font-bold py-4 rounded-win text-[10px] uppercase tracking-widest hover:bg-white/10">
-                                    Criar Outra
+                                    Nova Sala
                                 </button>
                             </div>
                         </div>
@@ -235,9 +271,20 @@
                         </div>
                         <button onclick="handleJoinRoom()"
                             class="w-full bg-white/10 hover:bg-white/15 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] border border-white/10 shadow-lg transition-all active:scale-[0.98] mt-4">
-                            Entrar como Convidado
+                            Acessar Sessão
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- Mobile Focus Badge -->
+            <div
+                class="mt-8 flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-win-accent/5 border border-win-accent/10 text-gray-400 animate-reveal delay-4">
+                <i class="ph ph-rss-simple text-win-accent text-xl animate-pulse"></i>
+                <div class="text-left">
+                    <p class="text-[10px] font-bold uppercase tracking-widest text-win-accent">Conectividade Mobile
+                        Instantânea</p>
+                    <p class="text-[9px] text-gray-500">Seus convidados atendem pelo celular sem baixar nada.</p>
                 </div>
             </div>
         </section>
@@ -256,7 +303,8 @@
                     <span class="text-[9px] font-bold uppercase tracking-widest">OBS Optimized</span>
                 </div>
             </div>
-            <span class="text-[9px] font-bold uppercase tracking-widest">Lyncro Live v3.0</span>
+            <span class="text-[9px] font-bold uppercase tracking-widest font-segoe-black tracking-[0.2em]">LYNCRO CORE
+                v3.0</span>
         </div>
     </footer>
 
@@ -296,7 +344,6 @@
             const text = document.getElementById('btn-create-text');
             const loader = document.getElementById('btn-create-loader');
 
-            // UI Loading
             btn.disabled = true;
             text.classList.add('hidden');
             loader.classList.remove('hidden');
@@ -318,11 +365,9 @@
                 }
                 localStorage.setItem('sv_last_name', userName);
 
-                // Gerar link de convite
                 const inviteUrl = `${window.location.origin}/index.html?room=${data.roomId}`;
                 document.getElementById('invite-link-input').value = inviteUrl;
 
-                // Transição de Estado sem recarregar
                 setTimeout(() => {
                     document.getElementById('create-initial-state').classList.add('hidden');
                     document.getElementById('create-success-state').classList.remove('hidden');
@@ -366,7 +411,6 @@
             }
         }
 
-        // Auto-fill and Prefill
         const urlParams = new URLSearchParams(window.location.search);
         const prefillRoom = urlParams.get('room');
         if (prefillRoom) {
@@ -380,7 +424,6 @@
             document.getElementById('userNameGuest').value = lastName;
         }
 
-        // Estilo de animação FadeIn
         const style = document.createElement('style');
         style.textContent = `
             @keyframes fadeIn {
