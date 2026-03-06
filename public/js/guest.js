@@ -58,7 +58,7 @@ if (qualitySelectEl) {
     qualitySelectEl.addEventListener('change', () => {
         const val = qualitySelectEl.value;
         localStorage.setItem('lyncro_video_quality', val);
-        const label = val === '720' ? 'Alta Definição (720p)' : val === '480' ? 'Média (480p)' : 'Baixa (360p)';
+        const label = val === '720' ? '720p HD' : val === '480' ? '480p SD' : '360p LQ';
         const display = document.getElementById('quality-display-name');
         if (display) display.innerText = label;
 
@@ -137,7 +137,7 @@ async function enumeratePreCallDevices() {
                 camMenu.innerHTML += `
                     <div class="custom-select-option ${isSelected ? 'text-win-accent font-bold' : ''}" 
                          onclick="switchDevice('${device.deviceId}', 'video')">
-                        ${device.label || 'Câmera ' + (camMenu.children.length + 1)}
+                        ${device.label || 'V-Cam ' + (camMenu.children.length + 1)}
                     </div>`;
             } else if (device.kind === 'audioinput') {
                 const isSelected = device.deviceId === currentMicId;
@@ -145,7 +145,7 @@ async function enumeratePreCallDevices() {
                 micMenu.innerHTML += `
                     <div class="custom-select-option ${isSelected ? 'text-win-accent font-bold' : ''}" 
                          onclick="switchDevice('${device.deviceId}', 'audio')">
-                        ${device.label || 'Microfone ' + (micMenu.children.length + 1)}
+                        ${device.label || 'A-Mic ' + (micMenu.children.length + 1)}
                     </div>`;
             }
         });

@@ -26,6 +26,7 @@
             }
         }
     </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         /* Custom Dropdown Styles */
         .custom-select-trigger {
@@ -195,58 +196,58 @@
             </div>
 
             <!-- Device Selectors -->
-            <div class="w-full space-y-4 mb-6">
-                <!-- Camera Select -->
-                <div class="relative">
-                    <label
-                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5 block ml-1">Câmera</label>
-                    <div id="cam-select-trigger" class="custom-select-trigger">
-                        <div class="flex items-center gap-2">
-                            <i class="ph ph-video-camera text-win-accent"></i>
-                            <span id="cam-display-name">Carregando câmeras...</span>
+            <div class="w-full space-y-3 mb-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Camera Select -->
+                    <div class="relative">
+                        <label
+                            class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1 block ml-1">Câmera</label>
+                        <div id="cam-select-trigger" class="custom-select-trigger !py-2.5">
+                            <div class="flex items-center gap-2 truncate">
+                                <i class="ph ph-video-camera text-win-accent shrink-0"></i>
+                                <span id="cam-display-name" class="truncate text-[11px]">Câmera...</span>
+                            </div>
+                            <i class="ph ph-caret-down text-gray-500 text-[10px] shrink-0"></i>
                         </div>
-                        <i class="ph ph-caret-down text-gray-500"></i>
+                        <div id="cam-select-menu" class="custom-select-menu">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
-                    <div id="cam-select-menu" class="custom-select-menu">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
 
-                <!-- Mic Select -->
-                <div class="relative">
-                    <label
-                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5 block ml-1">Microfone</label>
-                    <div id="mic-select-trigger" class="custom-select-trigger">
-                        <div class="flex items-center gap-2">
-                            <i class="ph ph-microphone text-win-accent"></i>
-                            <span id="mic-display-name">Carregando microfones...</span>
+                    <!-- Mic Select -->
+                    <div class="relative">
+                        <label
+                            class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1 block ml-1">Microfone</label>
+                        <div id="mic-select-trigger" class="custom-select-trigger !py-2.5">
+                            <div class="flex items-center gap-2 truncate">
+                                <i class="ph ph-microphone text-win-accent shrink-0"></i>
+                                <span id="mic-display-name" class="truncate text-[11px]">Micro...</span>
+                            </div>
+                            <i class="ph ph-caret-down text-gray-500 text-[10px] shrink-0"></i>
                         </div>
-                        <i class="ph ph-caret-down text-gray-500"></i>
-                    </div>
-                    <div id="mic-select-menu" class="custom-select-menu">
-                        <!-- Populated by JS -->
+                        <div id="mic-select-menu" class="custom-select-menu">
+                            <!-- Populated by JS -->
+                        </div>
                     </div>
                 </div>
 
                 <!-- Quality Select -->
                 <div class="relative">
                     <label
-                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5 block ml-1">Qualidade
-                        de Vídeo (Upload)</label>
-                    <div id="quality-select-trigger" class="custom-select-trigger">
+                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1 block ml-1">Qualidade
+                        Video</label>
+                    <div id="quality-select-trigger" class="custom-select-trigger !py-2.5">
                         <div class="flex items-center gap-2">
-                            <i class="ph ph-broadcast text-win-accent"></i>
-                            <span id="quality-display-name">Alta Definição (720p)</span>
+                            <i class="ph ph-broadcast text-win-accent shrink-0"></i>
+                            <span id="quality-display-name" class="text-[11px]">720p HD</span>
                         </div>
-                        <i class="ph ph-caret-down text-gray-500"></i>
+                        <i class="ph ph-caret-down text-gray-500 text-[10px]"></i>
                     </div>
                     <div id="quality-select-menu" class="custom-select-menu">
-                        <div class="custom-select-option" onclick="selectQuality('720', 'Alta Definição (720p)')">Alta
-                            Definição (720p)</div>
-                        <div class="custom-select-option" onclick="selectQuality('480', 'Média (480p)')">Média (480p)
-                        </div>
-                        <div class="custom-select-option" onclick="selectQuality('360', 'Baixa (360p)')">Baixa (360p)
-                        </div>
+                        <div class="custom-select-option" onclick="selectQuality('720', 'Alta Definição (720p)')">720p
+                            HD</div>
+                        <div class="custom-select-option" onclick="selectQuality('480', 'Média (480p)')">480p SD</div>
+                        <div class="custom-select-option" onclick="selectQuality('360', 'Baixa (360p)')">360p LQ</div>
                     </div>
                     <select id="video-quality" class="hidden">
                         <option value="720" selected>720p</option>
@@ -256,11 +257,11 @@
                 </div>
             </div>
 
-            <div class="w-full mb-6">
-                <label class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1.5 block ml-1">Senha
-                    da Sala (se houver)</label>
-                <input type="password" id="room-password" placeholder="Digite a senha da sessão"
-                    class="w-full bg-black/30 border border-win-border rounded-lg text-sm p-3 outline-none focus:border-win-accent text-white shadow-inner transition-all">
+            <div class="w-full mb-4">
+                <label class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Senha
+                    opcional</label>
+                <input type="password" id="room-password" placeholder="Digite se houver"
+                    class="w-full bg-black/30 border border-win-border rounded-lg text-sm p-2.5 outline-none focus:border-win-accent text-white shadow-inner transition-all">
             </div>
 
             <button id="join-btn"
