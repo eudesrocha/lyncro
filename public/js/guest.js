@@ -683,13 +683,15 @@ async function stopScreenShare() {
     }
 }
 
-// 4. Seleção Avançada de Dispositivos (Chevrons UI)
+// 4. Seleção Avançada de Dispositivos (Chevrons UI) e Settings
 const micMenu = document.getElementById('mic-menu');
 const camMenu = document.getElementById('cam-menu');
+const settingsPanel = document.getElementById('settings-panel');
 
 document.getElementById('btn-mic-menu').onclick = async (e) => {
     e.stopPropagation();
     camMenu.classList.add('hidden');
+    if (settingsPanel) settingsPanel.classList.add('hidden');
     micMenu.classList.toggle('hidden');
     if (!micMenu.classList.contains('hidden')) await loadDevices();
 };
@@ -697,13 +699,49 @@ document.getElementById('btn-mic-menu').onclick = async (e) => {
 document.getElementById('btn-cam-menu').onclick = async (e) => {
     e.stopPropagation();
     micMenu.classList.add('hidden');
+    if (settingsPanel) settingsPanel.classList.add('hidden');
     camMenu.classList.toggle('hidden');
     if (!camMenu.classList.contains('hidden')) await loadDevices();
 };
 
-document.addEventListener('click', () => {
+const toggleSettingsBtn = document.getElementById('toggleSettings');
+const closeSettingsBtn = document.getElementById('closeSettings');
+
+if (toggleSettingsBtn && closeSettingsBtn && settingsPanel) {
+    toggleSettingsBtn.onclick = (e) => {
+        e.stopPropagation();
+        micMenu.classList.add('hidden');
+        camMenu.classList.add('hidden');
+        settingsPanel.classList.remove('hidden');
+        settingsPanel.classList.remove('overlay-animated-out');
+        settingsPanel.classList.add('overlay-animated-in');
+    };
+
+    closeSettingsBtn.onclick = () => {
+        settingsPanel.classList.remove('overlay-animated-in');
+        settingsPanel.classList.add('overlay-animated-out');
+        setTimeout(() => {
+            if (settingsPanel.classList.contains('overlay-animated-out')) {
+                settingsPanel.classList.add('hidden');
+            }
+        }, 400);
+    };
+}
+
+document.addEventListener('click', (e) => {
     micMenu.classList.add('hidden');
     camMenu.classList.add('hidden');
+
+    // Fechar settings clickando fora
+    if (settingsPanel && !settingsPanel.classList.contains('hidden') && !settingsPanel.contains(e.target) && (!toggleSettingsBtn || !toggleSettingsBtn.contains(e.target))) {
+        settingsPanel.classList.remove('overlay-animated-in');
+        settingsPanel.classList.add('overlay-animated-out');
+        setTimeout(() => {
+            if (settingsPanel.classList.contains('overlay-animated-out')) {
+                settingsPanel.classList.add('hidden');
+            }
+        }, 400);
+    }
 });
 
 const mediaDropBtn = document.getElementById('mediaDrop');

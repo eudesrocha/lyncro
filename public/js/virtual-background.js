@@ -87,6 +87,16 @@ class VirtualBackground {
 
         // Configurar vídeo de origem
         this.sourceVideo.srcObject = new MediaStream([videoTrack]);
+
+        // Listen for orientation/resolution changes on the source video
+        this.sourceVideo.addEventListener('resize', () => {
+            if (this.active && this.sourceVideo.videoWidth > 0 && this.sourceVideo.videoHeight > 0) {
+                console.log(`[VirtualBackground] Video resized: ${this.sourceVideo.videoWidth}x${this.sourceVideo.videoHeight}`);
+                this.canvas.width = this.sourceVideo.videoWidth;
+                this.canvas.height = this.sourceVideo.videoHeight;
+            }
+        });
+
         await new Promise(resolve => {
             this.sourceVideo.onloadedmetadata = () => {
                 this.sourceVideo.play();
@@ -147,8 +157,8 @@ class VirtualBackground {
                 if (this.mode === 'none') {
                     // Sem IA, apenas desenha o vídeo original no canvas
                     this.ctx.drawImage(this.sourceVideo, 0, 0, this.canvas.width, this.canvas.height);
-                } else {
-                    // Passa frame para a IA
+                } else if (this.mode === 'blur' || (this.mode === 'image' && this.backgroundImage) || this.mode.startsWith('anim-')) {
+                    // Passa frame para a IA de segmentação
                     await this.segmentation.send({ image: this.sourceVideo });
                 }
             } catch (err) {

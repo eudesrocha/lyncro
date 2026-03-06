@@ -290,80 +290,7 @@
                     class="w-full bg-black/30 border border-win-border rounded-lg text-sm p-2.5 outline-none focus:border-win-accent text-white shadow-inner transition-all">
             </div>
 
-            <!-- Virtual Background Selector -->
-            <div class="w-full mb-6">
-                <label
-                    class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-2 block ml-1 flex items-center gap-1">
-                    <i class="ph ph-sparkle text-win-accent"></i> Fundo Virtual (IA)
-                </label>
-
-                <div class="flex overflow-x-auto gap-2 pb-2 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory">
-                    <!-- Controls -->
-                    <button onclick="setVirtualBackground('none', null, this.id)" id="vb-btn-none"
-                        class="flex-none snap-start flex flex-col items-center justify-center w-16 h-12 rounded-xl bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer">
-                        <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span>
-                    </button>
-                    <button onclick="setVirtualBackground('blur', null, this.id)" id="vb-btn-blur"
-                        class="flex-none snap-start flex flex-col items-center justify-center w-16 h-12 rounded-xl bg-black/40 border border-win-border/40 transition-all hover:bg-white/5 cursor-pointer">
-                        <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
-                    </button>
-
-                    <!-- Animated -->
-                    <button onclick="setVirtualBackground('anim-window', 'img/bg-window-tree.png', this.id)"
-                        id="vb-btn-anim-window"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12">
-                        <img src="img/bg-window-tree.png" alt="Window" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                        <div
-                            class="absolute bottom-0 inset-x-0 bg-blue-600/90 text-[7px] font-black uppercase tracking-widest text-center py-0.5 text-white">
-                            Animado</div>
-                    </button>
-                    <button onclick="setVirtualBackground('anim-studio', null, this.id)" id="vb-btn-anim-studio"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12 bg-gradient-to-br from-blue-900 to-black relative">
-                        <i class="ph ph-film-strip text-white/40 text-lg absolute top-3"></i>
-                        <div
-                            class="absolute bottom-0 inset-x-0 bg-blue-600/90 text-[7px] font-black uppercase tracking-widest text-center py-0.5 text-white">
-                            Animado</div>
-                    </button>
-                    <button onclick="setVirtualBackground('anim-particles', null, this.id)" id="vb-btn-anim-particles"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12 bg-gradient-to-tr from-purple-900 to-[#1a0a1f] relative">
-                        <i class="ph ph-sparkle text-white/40 text-lg absolute top-3"></i>
-                        <div
-                            class="absolute bottom-0 inset-x-0 bg-blue-600/90 text-[7px] font-black uppercase tracking-widest text-center py-0.5 text-white">
-                            Animado</div>
-                    </button>
-
-                    <!-- Static Images (5) -->
-                    <button onclick="setVirtualBackground('image', 'img/bg-living-room.png', this.id)"
-                        id="vb-btn-living"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12">
-                        <img src="img/bg-living-room.png" alt="Living" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-office-premium.png', this.id)"
-                        id="vb-btn-office-premium"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12">
-                        <img src="img/bg-office-premium.png" alt="Office" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-studio-pro.png', this.id)"
-                        id="vb-btn-studio-pro"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12">
-                        <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-loft.png', this.id)" id="vb-btn-loft"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12">
-                        <img src="img/bg-loft.png" alt="Loft" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-abstract.png', this.id)" id="vb-btn-abstract"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-12">
-                        <img src="img/bg-abstract.png" alt="Abstract" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                </div>
-            </div>
+            <!-- Virtual Background Selector (Moved to Call Screen Settings) -->
 
             <button id="join-btn"
                 class="w-full bg-win-accent hover:bg-opacity-90 text-white font-semibold py-4 rounded-xl text-lg shadow-lg active:scale-95 transition-all">
@@ -427,6 +354,97 @@
                     class="bg-win-accent text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-opacity-80">
                     <i class="ph ph-paper-plane-right"></i>
                 </button>
+            </div>
+        </div>
+
+        <!-- Config Menu Overlay -->
+        <div id="settings-panel"
+            class="hidden absolute bottom-32 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-win-card/95 backdrop-blur-xl border border-win-border rounded-2xl flex flex-col shadow-2xl z-50 overflow-hidden transform transition-transform duration-300">
+            <div
+                class="p-4 bg-black/40 border-b border-win-border font-semibold flex items-center justify-between text-sm">
+                <span class="flex items-center gap-2"><i class="ph ph-gear text-win-accent"></i> Configurações</span>
+                <button id="closeSettings" class="text-gray-400 hover:text-white"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="p-4 flex flex-col gap-4">
+                <!-- Virtual Background Selector -->
+                <div class="w-full">
+                    <label
+                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-2 block ml-1 flex items-center gap-1">
+                        <i class="ph ph-sparkle text-win-accent"></i> Alterar Fundo Virtual
+                    </label>
+
+                    <div
+                        class="flex overflow-x-auto gap-2 pb-2 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory">
+                        <!-- Controls -->
+                        <button onclick="setVirtualBackground('none', null, this.id)" id="vb-btn-none"
+                            class="flex-none snap-start flex flex-col items-center justify-center w-[5.5rem] h-16 rounded-xl bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer">
+                            <i class="ph ph-prohibit text-xl text-gray-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span>
+                        </button>
+                        <button onclick="setVirtualBackground('blur', null, this.id)" id="vb-btn-blur"
+                            class="flex-none snap-start flex flex-col items-center justify-center w-[5.5rem] h-16 rounded-xl bg-black/40 border border-win-border/40 transition-all hover:bg-white/5 cursor-pointer">
+                            <i class="ph ph-drop text-xl text-blue-400 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
+                        </button>
+
+                        <!-- Animated -->
+                        <button onclick="setVirtualBackground('anim-window', 'img/bg-window-tree.png', this.id)"
+                            id="vb-btn-anim-window"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-window-tree.png" alt="Window" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
+                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
+                        </button>
+                        <button onclick="setVirtualBackground('anim-studio', null, this.id)" id="vb-btn-anim-studio"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-br from-blue-900 to-black relative">
+                            <i class="ph ph-film-strip text-white/40 text-lg absolute top-3"></i>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
+                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Premium</span>
+                        </button>
+                        <button onclick="setVirtualBackground('anim-particles', null, this.id)"
+                            id="vb-btn-anim-particles"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-tr from-purple-900 to-[#1a0a1f] relative">
+                            <i class="ph ph-sparkle text-white/40 text-lg absolute top-3"></i>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
+                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span
+                                class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Partículas</span>
+                        </button>
+
+                        <!-- Static Images (5) -->
+                        <button onclick="setVirtualBackground('image', 'img/bg-living-room.png', this.id)"
+                            id="vb-btn-living"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-living-room.png" alt="Living" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-office-premium.png', this.id)"
+                            id="vb-btn-office-premium"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-office-premium.png" alt="Office" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-studio-pro.png', this.id)"
+                            id="vb-btn-studio-pro"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-loft.png', this.id)" id="vb-btn-loft"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-loft.png" alt="Loft" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-abstract.png', this.id)"
+                            id="vb-btn-abstract"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-abstract.png" alt="Abstract" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -531,11 +549,10 @@
                 <input type="file" id="fileInput" class="hidden">
             </button>
 
-            <!-- Lyncro Cam (Roxo) -->
-            <button id="shareScreen"
-                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-purple-600/20 border border-purple-500/40 text-purple-400 transition-all active:scale-90 shadow-lg"
-                title="Lyncro Cam (Compartilhar Tela)">
-                <i class="ph ph-screencast text-2xl"></i>
+            <button id="toggleSettings"
+                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all active:scale-90 shadow-lg"
+                title="Configurações">
+                <i class="ph ph-gear text-2xl"></i>
             </button>
         </div>
     </div>
