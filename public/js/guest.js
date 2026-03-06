@@ -285,21 +285,69 @@ joinBtn.onclick = () => {
 };
 
 function handleRemoteTrack(targetId, stream) {
-    console.log('Receiving remote track from:', targetId);
-    // No Guest side, só esperamos áudio dele (o Mix-Minus/Program do Host)
+    console.log('Receiving remote track from:', targetId, '| Tracks:', stream.getTracks().map(t => t.kind));
+
+    const remoteContainer = document.getElementById('remote-videos');
+
+    // --- Áudio: sempre tocar ---
     const audioTrack = stream.getAudioTracks()[0];
     if (audioTrack) {
-        console.log('Receiving Return Audio (Mix-Minus) from Host');
-        // Criar ou reusar elemento de áudio
-        let returnAudio = document.getElementById('return-audio-element');
-        if (!returnAudio) {
-            returnAudio = document.createElement('audio');
-            returnAudio.id = 'return-audio-element';
-            returnAudio.autoplay = true;
-            document.body.appendChild(returnAudio);
+        console.log('Playing remote audio from:', targetId);
+        let audioEl = document.getElementById(`remote-audio-${targetId}`);
+        if (!audioEl) {
+            audioEl = document.createElement('audio');
+            audioEl.id = `remote-audio-${targetId}`;
+            audioEl.autoplay = true;
+            audioEl.playsInline = true;
+            document.body.appendChild(audioEl);
         }
-        returnAudio.srcObject = stream;
-        returnAudio.play().catch(e => console.error('Falha ao tocar áudio de retorno:', e));
+        audioEl.srcObject = stream;
+        audioEl.play().catch(e => console.error('Erro ao tocar áudio remoto:', e));
+    }
+
+    // --- Vídeo: renderizar como PiP ---
+    const videoTrack = stream.getVideoTracks()[0];
+    if (videoTrack && remoteContainer) {
+        console.log('Rendering remote video PiP from:', targetId);
+        let card = document.getElementById(`remote-card-${targetId}`);
+        if (!card) {
+            card = document.createElement('div');
+            card.id = `remote-card-${targetId}`;
+            card.className = 'relative w-36 h-24 rounded-lg overflow-hidden border border-white/20 shadow-2xl bg-black/80 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer';
+            card.innerHTML = `
+                <video autoplay playsinline muted class="w-full h-full object-cover"></video>
+                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
+                    <span class="text-[8px] font-bold uppercase tracking-widest text-white/80" id="remote-name-${targetId}">Participante</span>
+                </div>
+            `;
+            remoteContainer.appendChild(card);
+        }
+        const videoEl = card.querySelector('video');
+        videoEl.srcObject = stream;
+    }
+}
+
+// Mapeia nomes dos participantes remotos para suas cards
+function updateRemoteNames(participants) {
+    if (!participants) return;
+    participants.forEach(p => {
+        const nameEl = document.getElementById(`remote-name-${p.id}`);
+        if (nameEl) nameEl.textContent = p.name || 'Participante';
+    });
+
+    // Limpar cards de participantes que saíram
+    const remoteContainer = document.getElementById('remote-videos');
+    if (remoteContainer) {
+        const currentIds = participants.map(p => p.id);
+        Array.from(remoteContainer.children).forEach(card => {
+            const cardId = card.id.replace('remote-card-', '');
+            if (!currentIds.includes(cardId)) {
+                card.remove();
+                // Remover áudio também
+                const audioEl = document.getElementById(`remote-audio-${cardId}`);
+                if (audioEl) audioEl.remove();
+            }
+        });
     }
 }
 
@@ -420,6 +468,8 @@ function setupWebSocket() {
 
                 // --- Room Status: Contagem + Host Online ---
                 updateRoomStatus(data.participants);
+                // --- Atualizar nomes e limpar cards PiP de quem saiu ---
+                updateRemoteNames(data.participants);
                 break;
             case 'chat-typing':
                 handleTypingIndicator(data.name, data.isTyping);
