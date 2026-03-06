@@ -130,7 +130,7 @@
     <!-- Header / Logo -->
     <header id="main-header" class="fixed top-0 left-0 w-full p-8 z-50 animate-reveal">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <h1 class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase">LYNCRO</h1>
+            <h1 class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase text-white">LYNCRO</h1>
             <div id="header-extra"
                 class="hidden md:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
                 <span>Real-Time WebRTC</span>
@@ -455,6 +455,13 @@
             if (headerExtra) headerExtra.classList.add('hidden');
             if (footer) footer.classList.add('hidden');
             if (mobileBadge) mobileBadge.classList.add('hidden');
+
+            // Garantir que o header seja visível imediatamente no modo link
+            const mainHeader = document.getElementById('main-header');
+            if (mainHeader) {
+                mainHeader.classList.remove('opacity-0');
+                mainHeader.style.opacity = '1';
+            }
 
             // Centralizar o Card
             const mainContent = document.querySelector('main');

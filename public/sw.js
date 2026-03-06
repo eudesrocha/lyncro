@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sv-guest-v1';
+const CACHE_NAME = 'sv-guest-v2';
 const urlsToCache = [
     '/guest.html',
     '/css/shared.css',
