@@ -19,17 +19,73 @@
                         'win-card': '#2b2b2b',
                         'win-surface': '#323232',
                         'win-accent': '#0078d4',
-                        'win-border': 'rgba(255, 255, 255, 0.1)',
+                        'win-border': '#2a2a2a',
                     },
                     borderRadius: { 'win': '4px' }
                 }
             }
         }
     </script>
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="js/config.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
+        /* Custom Dropdown Styles */
+        .custom-select-trigger {
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            padding: 0.75rem;
+            outline: none;
+            transition: all 0.2s;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .custom-select-trigger:hover {
+            border-color: #0078d480;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .custom-select-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            margin-top: 0.25rem;
+            background-color: #2b2b2b;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            z-index: 110;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+        }
+
+        .custom-select-option {
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            border-bottom: 1px solid rgba(42, 42, 42, 0.3);
+        }
+
+        .custom-select-option:last-child {
+            border-bottom: 0;
+        }
+
+        .custom-select-option:hover {
+            background-color: rgba(0, 120, 212, 0.2);
+            color: #ffffff;
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
         body,
         html {
             height: 100%;
@@ -138,24 +194,73 @@
                 </div>
             </div>
 
-            <div class="w-full mb-4">
-                <label
-                    class="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-2 block text-center">Qualidade
-                    de Vídeo (Upload)</label>
-                <select id="video-quality"
-                    class="w-full bg-win-surface border border-win-border rounded-lg text-sm p-3 outline-none focus:border-win-accent text-white cursor-pointer shadow-inner">
-                    <option value="720" selected>Alta Definição (720p) - Ideal</option>
-                    <option value="480">Média (480p) - Economiza Internet</option>
-                    <option value="360">Baixa (360p) - Para redes 3G lentas</option>
-                </select>
+            <!-- Device Selectors -->
+            <div class="w-full space-y-4 mb-6">
+                <!-- Camera Select -->
+                <div class="relative">
+                    <label
+                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5 block ml-1">Câmera</label>
+                    <div id="cam-select-trigger" class="custom-select-trigger">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-video-camera text-win-accent"></i>
+                            <span id="cam-display-name">Carregando câmeras...</span>
+                        </div>
+                        <i class="ph ph-caret-down text-gray-500"></i>
+                    </div>
+                    <div id="cam-select-menu" class="custom-select-menu">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Mic Select -->
+                <div class="relative">
+                    <label
+                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5 block ml-1">Microfone</label>
+                    <div id="mic-select-trigger" class="custom-select-trigger">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-microphone text-win-accent"></i>
+                            <span id="mic-display-name">Carregando microfones...</span>
+                        </div>
+                        <i class="ph ph-caret-down text-gray-500"></i>
+                    </div>
+                    <div id="mic-select-menu" class="custom-select-menu">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Quality Select -->
+                <div class="relative">
+                    <label
+                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1.5 block ml-1">Qualidade
+                        de Vídeo (Upload)</label>
+                    <div id="quality-select-trigger" class="custom-select-trigger">
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-broadcast text-win-accent"></i>
+                            <span id="quality-display-name">Alta Definição (720p)</span>
+                        </div>
+                        <i class="ph ph-caret-down text-gray-500"></i>
+                    </div>
+                    <div id="quality-select-menu" class="custom-select-menu">
+                        <div class="custom-select-option" onclick="selectQuality('720', 'Alta Definição (720p)')">Alta
+                            Definição (720p)</div>
+                        <div class="custom-select-option" onclick="selectQuality('480', 'Média (480p)')">Média (480p)
+                        </div>
+                        <div class="custom-select-option" onclick="selectQuality('360', 'Baixa (360p)')">Baixa (360p)
+                        </div>
+                    </div>
+                    <select id="video-quality" class="hidden">
+                        <option value="720" selected>720p</option>
+                        <option value="480">480p</option>
+                        <option value="360">360p</option>
+                    </select>
+                </div>
             </div>
 
             <div class="w-full mb-6">
-                <label
-                    class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-2 block text-center">Senha
+                <label class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1.5 block ml-1">Senha
                     da Sala (se houver)</label>
-                <input type="password" id="room-password" placeholder="Digite a senha"
-                    class="w-full bg-win-surface border border-win-border rounded-lg text-sm p-3 outline-none focus:border-win-accent text-white shadow-inner">
+                <input type="password" id="room-password" placeholder="Digite a senha da sessão"
+                    class="w-full bg-black/30 border border-win-border rounded-lg text-sm p-3 outline-none focus:border-win-accent text-white shadow-inner transition-all">
             </div>
 
             <button id="join-btn"

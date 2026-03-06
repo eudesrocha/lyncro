@@ -84,18 +84,39 @@
             <div class="space-y-1.5">
                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Papel na
                     Sessão</label>
-                <div class="relative flex items-center">
-                    <div class="absolute left-4 pointer-events-none text-win-accent">
-                        <i id="role-icon" class="ph ph-user text-sm"></i>
+                <div class="relative">
+                    <!-- Dropdown Trigger -->
+                    <div id="role-dropdown-trigger"
+                        class="w-full bg-black/30 border border-win-border rounded-win pl-11 pr-4 py-3 text-sm focus-within:border-win-accent focus-within:bg-black/50 outline-none transition-all cursor-pointer flex items-center relative z-10">
+                        <div class="absolute left-4 pointer-events-none text-win-accent">
+                            <i id="role-icon" class="ph ph-user text-sm"></i>
+                        </div>
+                        <span id="role-display" class="text-sm">Convidado (Guest)</span>
+                        <div class="absolute right-4 pointer-events-none text-gray-500">
+                            <i id="dropdown-chevron" class="ph ph-caret-down transition-transform duration-200"></i>
+                        </div>
                     </div>
-                    <select id="role" onchange="updateRoleIcon(this.value)"
-                        class="w-full bg-black/30 border border-win-border rounded-win pl-11 pr-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all appearance-none cursor-pointer">
-                        <option value="guest">Convidado (Guest)</option>
-                        <option value="host">Monitor do Host (Admin)</option>
+
+                    <!-- Dropdown Menu -->
+                    <div id="role-dropdown-menu"
+                        class="hidden absolute top-full left-0 w-full mt-1 bg-win-card border border-win-border rounded-win shadow-2xl z-50 overflow-hidden backdrop-blur-md">
+                        <div onclick="selectRole('guest')"
+                            class="px-5 py-3 text-sm hover:bg-win-accent/20 hover:text-white cursor-pointer transition-colors flex items-center gap-3 border-b border-win-border/30">
+                            <i class="ph ph-user text-win-accent"></i>
+                            <span>Convidado (Guest)</span>
+                        </div>
+                        <div onclick="selectRole('host')"
+                            class="px-5 py-3 text-sm hover:bg-win-accent/20 hover:text-white cursor-pointer transition-colors flex items-center gap-3">
+                            <i class="ph ph-monitor-play text-win-accent"></i>
+                            <span>Monitor do Host (Admin)</span>
+                        </div>
+                    </div>
+
+                    <!-- Hidden Real Select -->
+                    <select id="role" class="hidden">
+                        <option value="guest" selected>Guest</option>
+                        <option value="host">Host</option>
                     </select>
-                    <div class="absolute right-4 pointer-events-none text-gray-500">
-                        <i class="ph ph-caret-down"></i>
-                    </div>
                 </div>
             </div>
 
@@ -154,14 +175,41 @@
             }
         }
 
-        function updateRoleIcon(role) {
-            const icon = document.getElementById('role-icon');
+        const dropdownTrigger = document.getElementById('role-dropdown-trigger');
+        const dropdownMenu = document.getElementById('role-dropdown-menu');
+        const dropdownChevron = document.getElementById('dropdown-chevron');
+
+        dropdownTrigger.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('hidden');
+            dropdownChevron.classList.toggle('rotate-180');
+        });
+
+        function selectRole(role) {
+            const roleSelect = document.getElementById('role');
+            const roleDisplay = document.getElementById('role-display');
+            const roleIcon = document.getElementById('role-icon');
+
+            roleSelect.value = role;
+
             if (role === 'host') {
-                icon.className = 'ph ph-monitor-play text-sm';
+                roleDisplay.innerText = 'Monitor do Host (Admin)';
+                roleIcon.className = 'ph ph-monitor-play text-sm';
             } else {
-                icon.className = 'ph ph-user text-sm';
+                roleDisplay.innerText = 'Convidado (Guest)';
+                roleIcon.className = 'ph ph-user text-sm';
             }
+
+            dropdownMenu.classList.add('hidden');
+            dropdownChevron.classList.remove('rotate-180');
         }
+
+        // Close dropdown when clicking outside
+        window.onclick = (event) => {
+            if (!dropdownTrigger.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+                dropdownChevron.classList.remove('rotate-180');
+            }
+        };
 
         function copyLink() {
             const room = document.getElementById('hostRoomId').value.trim();

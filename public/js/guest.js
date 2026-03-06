@@ -56,12 +56,102 @@ async function startPreCall() {
 const qualitySelectEl = document.getElementById('video-quality');
 if (qualitySelectEl) {
     qualitySelectEl.addEventListener('change', () => {
-        localStorage.setItem('lyncro_video_quality', qualitySelectEl.value);
+        const val = qualitySelectEl.value;
+        localStorage.setItem('lyncro_video_quality', val);
+        const label = val === '720' ? 'Alta Definição (720p)' : val === '480' ? 'Média (480p)' : 'Baixa (360p)';
+        const display = document.getElementById('quality-display-name');
+        if (display) display.innerText = label;
+
         if (localStream) {
             localStream.getTracks().forEach(t => t.stop());
         }
         startPreCall();
     });
+}
+
+window.selectQuality = (val, label) => {
+    const el = document.getElementById('video-quality');
+    if (el) {
+        el.value = val;
+        el.dispatchEvent(new Event('change'));
+    }
+    const menu = document.getElementById('quality-select-menu');
+    if (menu) menu.style.display = 'none';
+};
+
+// Dropdowns Customizados (Toggle)
+function setupCustomDropdowns() {
+    const list = [
+        { trigger: 'cam-select-trigger', menu: 'cam-select-menu' },
+        { trigger: 'mic-select-trigger', menu: 'mic-select-menu' },
+        { trigger: 'quality-select-trigger', menu: 'quality-select-menu' }
+    ];
+
+    list.forEach(item => {
+        const trigger = document.getElementById(item.trigger);
+        const menu = document.getElementById(item.menu);
+        if (trigger && menu) {
+            trigger.onclick = (e) => {
+                e.stopPropagation();
+                // Close others
+                list.forEach(other => {
+                    if (other.menu !== item.menu) {
+                        const m = document.getElementById(other.menu);
+                        if (m) m.style.display = 'none';
+                    }
+                });
+                const isHidden = menu.style.display === 'none' || menu.style.display === '';
+                menu.style.display = isHidden ? 'block' : 'none';
+            };
+        }
+    });
+
+    document.addEventListener('click', () => {
+        list.forEach(item => {
+            const m = document.getElementById(item.menu);
+            if (m) m.style.display = 'none';
+        });
+    });
+}
+
+async function enumeratePreCallDevices() {
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const camMenu = document.getElementById('cam-select-menu');
+        const micMenu = document.getElementById('mic-select-menu');
+        const camDisplay = document.getElementById('cam-display-name');
+        const micDisplay = document.getElementById('mic-display-name');
+
+        if (!camMenu || !micMenu) return;
+
+        camMenu.innerHTML = '';
+        micMenu.innerHTML = '';
+
+        let currentCamId = localStream ? (localStream.getVideoTracks()[0]?.getSettings().deviceId || '') : '';
+        let currentMicId = localStream ? (localStream.getAudioTracks()[0]?.getSettings().deviceId || '') : '';
+
+        devices.forEach(device => {
+            if (device.kind === 'videoinput') {
+                const isSelected = device.deviceId === currentCamId;
+                if (isSelected && camDisplay) camDisplay.innerText = device.label || 'Câmera';
+                camMenu.innerHTML += `
+                    <div class="custom-select-option ${isSelected ? 'text-win-accent font-bold' : ''}" 
+                         onclick="switchDevice('${device.deviceId}', 'video')">
+                        ${device.label || 'Câmera ' + (camMenu.children.length + 1)}
+                    </div>`;
+            } else if (device.kind === 'audioinput') {
+                const isSelected = device.deviceId === currentMicId;
+                if (isSelected && micDisplay) micDisplay.innerText = device.label || 'Microfone';
+                micMenu.innerHTML += `
+                    <div class="custom-select-option ${isSelected ? 'text-win-accent font-bold' : ''}" 
+                         onclick="switchDevice('${device.deviceId}', 'audio')">
+                        ${device.label || 'Microfone ' + (micMenu.children.length + 1)}
+                    </div>`;
+            }
+        });
+    } catch (e) {
+        console.error('Erro ao enumerar dispositivos no pré-chamada:', e);
+    }
 }
 
 function setupAudioMonitor(stream) {
@@ -674,9 +764,12 @@ window.switchDevice = async (deviceId, kind) => {
 
         // Atualiza vídeo local (se for câmera)
         if (kind === 'video') {
-            mainVideo.srcObject = localStream;
-            preVideo.srcObject = localStream;
+            if (mainVideo) mainVideo.srcObject = localStream;
+            if (preVideo) preVideo.srcObject = localStream;
         }
+
+        // Atualizar lista de dispositivos para refletir a nova seleção no UI customizado
+        await enumeratePreCallDevices();
 
         console.log(`Dispositivo de ${kind} trocado com sucesso para ${deviceId}`);
     } catch (e) {
@@ -691,7 +784,12 @@ if (window.location.protocol !== 'https:' && window.location.hostname !== 'local
         accessMsg.innerHTML = '<b class="text-red-500">⚠️ iPhone detectado via IP:</b> A câmera do iOS só funciona via HTTPS. <br>Use o modo Túnel ou HTTPS para habilitar a câmera.';
     }
 }
-startPreCall();
+
+// Inicialização
+setupCustomDropdowns();
+startPreCall().then(() => {
+    enumeratePreCallDevices();
+});
 
 // 5. Chat Privado (Convidado)
 const chatPanel = document.getElementById('chat-panel');
