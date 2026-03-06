@@ -789,6 +789,14 @@ if (window.location.protocol !== 'https:' && window.location.hostname !== 'local
 setupCustomDropdowns();
 startPreCall().then(() => {
     enumeratePreCallDevices();
+
+    // Scroll automático para mobile para focar nos campos/botão
+    if (window.innerWidth < 768) {
+        setTimeout(() => {
+            const btn = document.getElementById('join-btn');
+            if (btn) btn.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }, 1000);
+    }
 });
 
 // 5. Chat Privado (Convidado)

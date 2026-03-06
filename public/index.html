@@ -459,10 +459,19 @@
             const mainContent = document.querySelector('main');
             if (mainContent) {
                 mainContent.className = "min-h-screen flex items-center justify-center p-6";
+                mainContent.style.paddingTop = "env(safe-area-inset-top)"; // Suporte para iPhone
             }
 
             switchTab('join');
             document.getElementById('joinRoomId').value = prefillRoom;
+
+            // Scroll suave automático para o card
+            setTimeout(() => {
+                const card = document.getElementById('card-lobby');
+                if (card) {
+                    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 500);
         }
 
         const lastName = localStorage.getItem('sv_last_name');
