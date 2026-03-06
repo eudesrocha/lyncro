@@ -72,8 +72,8 @@ async function enumerateDevices() {
         const videoInputs = devices.filter(device => device.kind === 'videoinput');
         const audioInputs = devices.filter(device => device.kind === 'audioinput');
 
-        const videoSelect = document.getElementById('video-device-select');
-        const audioSelect = document.getElementById('audio-device-select');
+        const videoSelect = document.getElementById('local-video-device-select');
+        const audioSelect = document.getElementById('local-audio-device-select');
         const returnSelect = document.getElementById('return-audio-select');
 
         // Preencher Vídeo
@@ -90,7 +90,7 @@ async function enumerateDevices() {
 
         // Preencher Áudio
         if (audioSelect) {
-            audioSelect.innerHTML = '<option value="">Microfone</option>';
+            audioSelect.innerHTML = '<option value="">Mic</option>';
             audioInputs.forEach(device => {
                 const option = document.createElement('option');
                 option.value = device.deviceId;
@@ -311,7 +311,7 @@ function renderWaitingParticipant(participant) {
 
     const card = document.createElement('div');
     card.id = `queue-card-${participant.id}`;
-    card.className = "bg-white/5 border border-win-border/40 rounded-win p-2.5 flex items-center justify-between group hover:bg-white/10 transition-all";
+    card.className = "bg-white/5 border border-win-border rounded-win p-2.5 flex items-center justify-between group hover:bg-white/10 transition-all";
 
     card.innerHTML = `
         <div class="flex items-center gap-3">
@@ -370,34 +370,41 @@ function renderParticipantCard(participant, isLocal = false) {
           ` : ''}
         </div>
         
-        <div class="absolute top-2.5 right-2.5 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded border border-win-border/40 min-w-[70px] justify-center">
+        <div class="absolute top-2.5 right-2.5 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded border border-win-border min-w-[70px] justify-center">
           <div id="tally-dot-${participant.id}" class="w-1.5 h-1.5 rounded-full ${participant.tallyState === 'program' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]' : participant.tallyState === 'preview' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-gray-600'}"></div>
           <span id="tally-text-${participant.id}" class="text-[9px] font-black tracking-widest uppercase text-white/90">${participant.tallyState === 'program' ? 'No Ar' : participant.tallyState === 'preview' ? 'Preview' : 'Ready'}</span>
         </div>
 
-        <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold border border-win-border/20 text-white/70">
+        <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold border border-win-border text-white/70">
           ${participant.name} ${isLocal ? '(Host)' : ''}
         </div>
       </div>
 
-      <div class="p-3 flex justify-between items-center bg-white/5 border-t border-win-border/20">
-        <div class="flex gap-2">
-          <button id="btn-audio-${participant.id}" class="${participant.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all" onclick="remoteMute('${participant.id}')">
-             <i class="ph ${participant.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>
-          </button>
-          <button id="btn-video-${participant.id}" class="${participant.videoMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-win transition-all" onclick="remoteMuteVideo('${participant.id}')">
-             <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>
-          </button>
+      <div class="p-3 flex justify-between items-center bg-white/5 border-t border-win-border">
+        <div class="flex gap-2 items-center">
+          <div class="flex items-center gap-1.5">
+            <button id="btn-audio-${participant.id}" class="${participant.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all" onclick="remoteMute('${participant.id}')">
+                <i class="ph ${participant.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>
+            </button>
+            ${isLocal ? `<select id="local-audio-device-select" class="device-select-compact"></select>` : ''}
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button id="btn-video-${participant.id}" class="${participant.videoMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-win transition-all" onclick="remoteMuteVideo('${participant.id}')">
+                <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>
+            </button>
+            ${isLocal ? `<select id="local-video-device-select" class="device-select-compact"></select>` : ''}
+          </div>
         </div>
 
         ${isLocal ? '' : `
         <div class="flex items-center gap-1">
           <button id="btn-prv-${participant.id}" onclick="handleTallyChange('${participant.id}', 'preview', '${participant.name}')" 
-            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}">PRV</button>
+            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">PRV</button>
           <button id="btn-pgm-${participant.id}" onclick="handleTallyChange('${participant.id}', 'program', '${participant.name}')" 
-            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}">PGM</button>
+            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">PGM</button>
           <button id="btn-off-${participant.id}" onclick="handleTallyChange('${participant.id}', 'off', '${participant.name}')" 
-            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}">OFF</button>
+            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">OFF</button>
         </div>
         `}
       </div>
@@ -413,7 +420,7 @@ function renderParticipantCard(participant, isLocal = false) {
               </button>
               `}
               <button id="btn-ov-toggle-${participant.id}" onclick="toggleOverlay('${participant.id}')" 
-                class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border/20'}">
+                class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}">
                 ${participant.overlayActive ? 'Ocultar' : 'Disparar'}
               </button>
             </div>
@@ -515,14 +522,14 @@ function updateParticipantStatus(p) {
     const btnPgm = document.getElementById(`btn-pgm-${p.id}`);
     const btnOff = document.getElementById(`btn-off-${p.id}`);
     if (btnPrv && btnPgm && btnOff) {
-        btnPrv.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}`;
-        btnPgm.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}`;
-        btnOff.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}`;
+        btnPrv.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}`;
+        btnPgm.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}`;
+        btnOff.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}`;
     }
 
     const btnOv = document.getElementById(`btn-ov-toggle-${p.id}`);
     if (btnOv) {
-        btnOv.className = `text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${p.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border/20'}`;
+        btnOv.className = `text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${p.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}`;
         btnOv.textContent = p.overlayActive ? 'Ocultar' : 'Disparar';
     }
 }
