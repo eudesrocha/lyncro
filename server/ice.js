@@ -13,14 +13,16 @@ async function getIceServers() {
     ];
 
     if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-        console.warn('Twilio credentials not found. Using default STUN servers only.');
+        console.warn('⚠️  [ICE] Twilio credentials NOT found. Using default STUN servers ONLY.');
         return defaultIce;
     }
 
     try {
+        console.log('🌐 [ICE] Fetching dynamic TURN credentials from Twilio...');
         const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
         const token = await client.tokens.create();
 
+        console.log(`✅ [ICE] Successfully generated ${token.iceServers.length} ICE candidates from Twilio.`);
         // Retorna a lista completa (STUN + TURN dinâmico)
         return [
             ...defaultIce,
