@@ -176,8 +176,8 @@ class VirtualBackground {
         this.ctx.globalCompositeOperation = 'destination-over';
 
         if (this.mode === 'blur') {
-            // Aplicar desfoque ao vídeo original
-            this.ctx.filter = 'blur(15px) saturate(1.2)';
+            // Aplicar desfoque ao vídeo original (reduzido de 15px para 8px)
+            this.ctx.filter = 'blur(8px) saturate(1.2)';
             this.ctx.drawImage(results.image, 0, 0, this.canvas.width, this.canvas.height);
             this.ctx.filter = 'none';
         } else if (this.mode === 'image' && this.backgroundImage && this.backgroundImage.complete) {
@@ -192,6 +192,70 @@ class VirtualBackground {
 
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.backgroundImage.width, this.backgroundImage.height,
                 centerShift_x, centerShift_y, this.backgroundImage.width * ratio, this.backgroundImage.height * ratio);
+        } else if (this.mode === 'anim-window' && this.backgroundImage && this.backgroundImage.complete) {
+            // Desenhar imagem base da janela
+            const hRatio = this.canvas.width / this.backgroundImage.width;
+            const vRatio = this.canvas.height / this.backgroundImage.height;
+            const ratio = Math.max(hRatio, vRatio);
+            const centerShift_x = (this.canvas.width - this.backgroundImage.width * ratio) / 2;
+            const centerShift_y = (this.canvas.height - this.backgroundImage.height * ratio) / 2;
+            this.ctx.drawImage(this.backgroundImage, 0, 0, this.backgroundImage.width, this.backgroundImage.height,
+                centerShift_x, centerShift_y, this.backgroundImage.width * ratio, this.backgroundImage.height * ratio);
+
+            // Adicionar animação sutil (Brisa de vento / sombras oscilantes)
+            const time = performance.now() * 0.001;
+            this.ctx.fillStyle = `rgba(10, 30, 15, ${0.05 + Math.sin(time) * 0.02})`;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // Um pequeno brilho solar que se move
+            const gradient = this.ctx.createRadialGradient(
+                this.canvas.width * 0.8 + Math.sin(time * 0.5) * 50,
+                this.canvas.height * 0.2 + Math.cos(time * 0.3) * 30,
+                10,
+                this.canvas.width * 0.8,
+                this.canvas.height * 0.2,
+                300
+            );
+            gradient.addColorStop(0, 'rgba(255, 255, 230, 0.15)');
+            gradient.addColorStop(1, 'rgba(255, 255, 230, 0)');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        } else if (this.mode === 'anim-studio') {
+            // Fundo animado Studio Pulse (cinemático, escuro com pulsação de luz)
+            const time = performance.now() * 0.001;
+            this.ctx.fillStyle = '#111116';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            const pulse = Math.sin(time * 0.5) * 0.5 + 0.5; // 0 a 1
+            const gradient = this.ctx.createRadialGradient(
+                this.canvas.width * 0.5, this.canvas.height * 0.2, 10,
+                this.canvas.width * 0.5, this.canvas.height * 0.5, this.canvas.width * 0.8
+            );
+            gradient.addColorStop(0, `rgba(20, 60, 150, ${0.1 + pulse * 0.15})`);
+            gradient.addColorStop(1, 'rgba(10, 10, 15, 0.9)');
+
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        } else if (this.mode === 'anim-particles') {
+            // Gradiente com partículas premium flutuantes
+            const time = performance.now() * 0.001;
+            const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+            gradient.addColorStop(0, '#0a0a2a');
+            gradient.addColorStop(1, '#1a0a1f');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            for (let i = 0; i < 30; i++) {
+                const x = (Math.sin(i * 123.45 + time * 0.2) * 0.5 + 0.5) * this.canvas.width;
+                const y = ((i * 321.12 - time * 20) % this.canvas.height + this.canvas.height) % this.canvas.height;
+                const size = (Math.sin(i) * 0.5 + 0.5) * 2 + 0.5;
+                this.ctx.beginPath();
+                this.ctx.arc(x, y, size, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
         } else {
             // Fallback (fundo verde ou preto caso a imagem falhe)
             this.ctx.fillStyle = '#1c1c1c';

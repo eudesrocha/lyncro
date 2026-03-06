@@ -14,6 +14,7 @@ let analyser;
 let processedStream = null; // Stream pós-IA (se ativo)
 let currentVbMode = 'none';
 let currentVbImage = null;
+let currentVbBtnId = 'vb-btn-none';
 
 const preVideo = document.getElementById('pre-localVideo');
 const mainVideo = document.getElementById('localVideo');
@@ -53,7 +54,7 @@ async function startPreCall() {
 
         // Aplicar processamento de Fundo Virtual (se ativo)
         if (currentVbMode !== 'none') {
-            const btn = document.getElementById(`vb-btn-${currentVbMode === 'image' ? (currentVbImage.includes('office') ? 'office' : 'studio') : currentVbMode}`);
+            const btn = document.getElementById(currentVbBtnId);
             if (btn) btn.classList.add('opacity-50', 'pointer-events-none'); // Disable during load
 
             try {
@@ -97,22 +98,25 @@ if (qualitySelectEl) {
 }
 
 // Funcao exposta pro HTML para selecionar Fundo
-window.setVirtualBackground = async (mode, imageUrl = null) => {
+window.setVirtualBackground = async (mode, imageUrl = null, btnId = null) => {
     currentVbMode = mode;
     currentVbImage = imageUrl;
 
-    // Reset UI styling
-    ['none', 'blur', 'office', 'studio'].forEach(id => {
-        const el = document.getElementById(`vb-btn-${id}`);
-        if (el) {
-            el.classList.remove('border-win-accent', 'bg-win-accent/10');
-            el.classList.add('border-transparent');
-        }
+    if (btnId) {
+        currentVbBtnId = btnId;
+    } else {
+        // Fallback
+        currentVbBtnId = `vb-btn-${mode === 'image' ? (imageUrl?.includes('office') ? 'office' : 'studio') : mode}`;
+    }
+
+    // Reset UI styling for all background buttons
+    document.querySelectorAll('[id^="vb-btn-"]').forEach(el => {
+        el.classList.remove('border-win-accent', 'bg-win-accent/10');
+        el.classList.add('border-transparent');
     });
 
     // Highlight selected
-    const activeId = mode === 'image' ? (imageUrl.includes('office') ? 'office' : 'studio') : mode;
-    const activeEl = document.getElementById(`vb-btn-${activeId}`);
+    const activeEl = document.getElementById(currentVbBtnId);
     if (activeEl) {
         activeEl.classList.remove('border-transparent');
         activeEl.classList.add('border-win-accent', 'bg-win-accent/10');
