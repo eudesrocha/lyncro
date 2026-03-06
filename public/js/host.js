@@ -293,6 +293,9 @@ function setupWebSocket() {
             case 'chat':
                 appendChatMessage(data.name, data.text, data.timestamp);
                 break;
+            case 'chat-typing':
+                handleTypingIndicator(data.name, data.isTyping);
+                break;
         }
     };
 }
@@ -895,6 +898,43 @@ function sendChatMessage() {
 
 if (sendChatBtn) sendChatBtn.onclick = sendChatMessage;
 if (chatInput) chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendChatMessage(); };
+
+// --- Typing Indicator ---
+let typingTimeout = null;
+const typingIndicatorEl = document.getElementById('typing-indicator');
+const typingUsers = new Set();
+
+if (chatInput) {
+    chatInput.addEventListener('input', () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: 'Produção (Host)', isTyping: true }));
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: 'Produção (Host)', isTyping: false }));
+            }
+        }, 1500);
+    });
+}
+
+function handleTypingIndicator(name, isTyping) {
+    if (name === 'Produção (Host)') return; // Ignore own typing
+    if (isTyping) {
+        typingUsers.add(name);
+    } else {
+        typingUsers.delete(name);
+    }
+    if (typingIndicatorEl) {
+        if (typingUsers.size > 0) {
+            const names = Array.from(typingUsers).join(', ');
+            typingIndicatorEl.textContent = `${names} está digitando...`;
+            typingIndicatorEl.classList.remove('hidden');
+        } else {
+            typingIndicatorEl.classList.add('hidden');
+        }
+    }
+}
 
 function appendChatMessage(name, text, time) {
     if (!chatMessages) return;

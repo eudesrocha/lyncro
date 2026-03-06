@@ -78,6 +78,14 @@ function setupSignaling(server) {
                         });
                         break;
 
+                    case 'chat-typing':
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'chat-typing',
+                            name: data.name,
+                            isTyping: data.isTyping
+                        });
+                        break;
+
                     case 'tally-change':
                         const room = roomManager.getRoom(normalizedRoomId);
                         if (room.host === participantId) {

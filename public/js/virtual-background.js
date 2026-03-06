@@ -193,10 +193,22 @@ class VirtualBackground {
         this.ctx.globalCompositeOperation = 'destination-over';
 
         if (this.mode === 'blur') {
-            // Aplicar desfoque ao vídeo original (reduzido de 15px para 8px)
-            this.ctx.filter = 'blur(8px) saturate(1.2)';
-            this.ctx.drawImage(results.image, 0, 0, this.canvas.width, this.canvas.height);
-            this.ctx.filter = 'none';
+            // Criar um canvas offscreen se não existir (corrige bug iOS Canvas Filter + destination-over)
+            if (!this.offscreenCanvas) {
+                this.offscreenCanvas = document.createElement('canvas');
+                this.offscreenCtx = this.offscreenCanvas.getContext('2d');
+            }
+            if (this.offscreenCanvas.width !== this.canvas.width || this.offscreenCanvas.height !== this.canvas.height) {
+                this.offscreenCanvas.width = this.canvas.width;
+                this.offscreenCanvas.height = this.canvas.height;
+            }
+
+            // Aplicar desfoque ao vídeo original no canvas offscreen
+            this.offscreenCtx.filter = 'blur(8px) saturate(1.2)';
+            this.offscreenCtx.drawImage(results.image, 0, 0, this.canvas.width, this.canvas.height);
+
+            // Desenhar o resultado do offscreen no canvas principal
+            this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width, this.canvas.height);
         } else if (this.mode === 'image' && this.backgroundImage && this.backgroundImage.complete) {
             // Desenhar imagem de fundo
 
@@ -210,21 +222,9 @@ class VirtualBackground {
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.backgroundImage.width, this.backgroundImage.height,
                 centerShift_x, centerShift_y, this.backgroundImage.width * ratio, this.backgroundImage.height * ratio);
         } else if (this.mode === 'anim-window' && this.backgroundImage && this.backgroundImage.complete) {
-            // Desenhar imagem base da janela
-            const hRatio = this.canvas.width / this.backgroundImage.width;
-            const vRatio = this.canvas.height / this.backgroundImage.height;
-            const ratio = Math.max(hRatio, vRatio);
-            const centerShift_x = (this.canvas.width - this.backgroundImage.width * ratio) / 2;
-            const centerShift_y = (this.canvas.height - this.backgroundImage.height * ratio) / 2;
-            this.ctx.drawImage(this.backgroundImage, 0, 0, this.backgroundImage.width, this.backgroundImage.height,
-                centerShift_x, centerShift_y, this.backgroundImage.width * ratio, this.backgroundImage.height * ratio);
-
-            // Adicionar animação sutil (Brisa de vento / sombras oscilantes)
             const time = performance.now() * 0.001;
-            this.ctx.fillStyle = `rgba(10, 30, 15, ${0.05 + Math.sin(time) * 0.02})`;
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-            // Um pequeno brilho solar que se move
+            // 1. Um pequeno brilho solar que se move (Frente - desenhado primeiro com destination-over)
             const gradient = this.ctx.createRadialGradient(
                 this.canvas.width * 0.8 + Math.sin(time * 0.5) * 50,
                 this.canvas.height * 0.2 + Math.cos(time * 0.3) * 30,
@@ -238,12 +238,24 @@ class VirtualBackground {
             this.ctx.fillStyle = gradient;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+            // 2. Adicionar animação sutil (Brisa de vento / sombras oscilantes) (Meio)
+            this.ctx.fillStyle = `rgba(10, 30, 15, ${0.05 + Math.sin(time) * 0.02})`;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+            // 3. Desenhar imagem base da janela (Fundo - desenhado por último)
+            const hRatio = this.canvas.width / this.backgroundImage.width;
+            const vRatio = this.canvas.height / this.backgroundImage.height;
+            const ratio = Math.max(hRatio, vRatio);
+            const centerShift_x = (this.canvas.width - this.backgroundImage.width * ratio) / 2;
+            const centerShift_y = (this.canvas.height - this.backgroundImage.height * ratio) / 2;
+            this.ctx.drawImage(this.backgroundImage, 0, 0, this.backgroundImage.width, this.backgroundImage.height,
+                centerShift_x, centerShift_y, this.backgroundImage.width * ratio, this.backgroundImage.height * ratio);
+
         } else if (this.mode === 'anim-studio') {
             // Fundo animado Studio Pulse (cinemático, escuro com pulsação de luz)
             const time = performance.now() * 0.001;
-            this.ctx.fillStyle = '#111116';
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+            // 1. Pulsação de luz (Frente)
             const pulse = Math.sin(time * 0.5) * 0.5 + 0.5; // 0 a 1
             const gradient = this.ctx.createRadialGradient(
                 this.canvas.width * 0.5, this.canvas.height * 0.2, 10,
@@ -255,15 +267,15 @@ class VirtualBackground {
             this.ctx.fillStyle = gradient;
             this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+            // 2. Cor de Fundo Escuro (Fundo)
+            this.ctx.fillStyle = '#111116';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
         } else if (this.mode === 'anim-particles') {
             // Gradiente com partículas premium flutuantes
             const time = performance.now() * 0.001;
-            const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
-            gradient.addColorStop(0, '#0a0a2a');
-            gradient.addColorStop(1, '#1a0a1f');
-            this.ctx.fillStyle = gradient;
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
+            // 1. Partículas (Frente)
             this.ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
             for (let i = 0; i < 30; i++) {
                 const x = (Math.sin(i * 123.45 + time * 0.2) * 0.5 + 0.5) * this.canvas.width;
@@ -273,6 +285,13 @@ class VirtualBackground {
                 this.ctx.arc(x, y, size, 0, Math.PI * 2);
                 this.ctx.fill();
             }
+
+            // 2. Gradiente (Fundo)
+            const gradient = this.ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+            gradient.addColorStop(0, '#0a0a2a');
+            gradient.addColorStop(1, '#1a0a1f');
+            this.ctx.fillStyle = gradient;
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         } else {
             // Fallback (fundo verde ou preto caso a imagem falhe)
             this.ctx.fillStyle = '#1c1c1c';

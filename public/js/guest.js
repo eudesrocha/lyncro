@@ -264,6 +264,8 @@ function setupAudioMonitor(stream) {
     updateMeter();
 }
 
+
+
 // 2. Lógica de Entrada
 joinBtn.onclick = () => {
     console.log('Botão Entrar clicado');
@@ -415,6 +417,12 @@ function setupWebSocket() {
                         }
                     });
                 }
+
+                // --- Room Status: Contagem + Host Online ---
+                updateRoomStatus(data.participants);
+                break;
+            case 'chat-typing':
+                handleTypingIndicator(data.name, data.isTyping);
                 break;
             case 'admission-result':
                 console.log('Resultado da admissão recebido:', data.status);
@@ -983,6 +991,72 @@ function sendChatMessage() {
 
 if (sendChatBtn) sendChatBtn.onclick = sendChatMessage;
 if (chatInput) chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendChatMessage(); };
+
+// --- Typing Indicator (Guest) ---
+let typingTimeout = null;
+const typingIndicatorEl = document.getElementById('typing-indicator');
+const typingUsers = new Set();
+
+if (chatInput) {
+    chatInput.addEventListener('input', () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: userName, isTyping: true }));
+        }
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: userName, isTyping: false }));
+            }
+        }, 1500);
+    });
+}
+
+function handleTypingIndicator(name, isTyping) {
+    if (name === userName) return; // Ignore own typing
+    if (isTyping) {
+        typingUsers.add(name);
+    } else {
+        typingUsers.delete(name);
+    }
+    if (typingIndicatorEl) {
+        if (typingUsers.size > 0) {
+            const names = Array.from(typingUsers).join(', ');
+            typingIndicatorEl.textContent = `${names} está digitando...`;
+            typingIndicatorEl.classList.remove('hidden');
+        } else {
+            typingIndicatorEl.classList.add('hidden');
+        }
+    }
+}
+
+// --- Room Status (Contagem de participantes + Host Offline) ---
+let hadHostBefore = false;
+function updateRoomStatus(participants) {
+    const countEl = document.getElementById('room-count');
+    const badgeEl = document.getElementById('room-status-badge');
+    const visibleParticipants = participants.filter(p => p.role !== 'observer');
+
+    if (countEl) countEl.textContent = visibleParticipants.length;
+
+    const hostPresent = visibleParticipants.some(p => p.role === 'host');
+
+    if (badgeEl) {
+        if (hostPresent) {
+            badgeEl.classList.remove('text-red-400');
+            badgeEl.classList.add('text-gray-300');
+            badgeEl.title = 'Participantes na sala';
+            hadHostBefore = true;
+        } else {
+            badgeEl.classList.remove('text-gray-300');
+            badgeEl.classList.add('text-red-400');
+            badgeEl.title = 'Produtor offline';
+
+            if (hadHostBefore) {
+                appendChatMessage('Sistema', '⚠️ O Produtor saiu da sala.', Date.now());
+            }
+        }
+    }
+}
 
 function appendChatMessage(name, text, time) {
     if (!chatMessages) return;

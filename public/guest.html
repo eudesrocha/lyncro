@@ -421,8 +421,14 @@
                 <span>Chat Produção</span>
                 <button id="closeChat" class="text-gray-400 hover:text-white"><i class="ph ph-x"></i></button>
             </div>
-            <div id="chat-messages" class="flex-1 p-3 overflow-y-auto flex flex-col gap-3 text-xs"></div>
-            <div class="p-2 border-t border-win-border bg-win-surface/80 flex items-center gap-2">
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 text-sm scrollbar-thin">
+                <!-- Mensagens do chat -->
+            </div>
+
+            <div id="typing-indicator" class="px-4 py-1 text-xs text-win-accent italic hidden bg-win-surface/90"></div>
+
+            <!-- Input -->
+            <div class="p-3 border-t border-win-border bg-win-surface/90 flex gap-2">
                 <input type="text" id="chat-input" placeholder="Mensagem..."
                     class="flex-1 bg-black/60 border border-win-border rounded-lg px-3 py-2 outline-none focus:border-win-accent transition-colors">
                 <button id="send-chat"
@@ -615,6 +621,14 @@
                 class="w-14 h-14 flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all active:scale-90 shadow-lg"
                 title="Inverter Câmera">
                 <i class="ph ph-camera-rotate text-2xl"></i>
+            </button>
+
+            <!-- Botão Lyncro Cam (Só visível em Desktop) -->
+            <button id="openMobileCam"
+                class="w-14 h-14 hidden md:flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all hover:bg-win-accent hover:border-win-accent group active:scale-90 shadow-lg"
+                title="Usar Celular como Câmera (Lyncro Cam)">
+                <i
+                    class="ph ph-device-mobile-camera text-2xl text-gray-400 group-hover:text-white transition-colors"></i>
             </button>
 
             <button id="mediaDrop"
