@@ -297,14 +297,18 @@ function updateUI(participants) {
     if (queueSection) {
         if (queueCount > 0) {
             queueSection.classList.remove('section-collapsed');
+            queueSection.classList.add('queue-alert-active');
             if (queueCountBadge) {
                 queueCountBadge.textContent = queueCount;
                 queueCountBadge.classList.remove('hidden');
+                queueCountBadge.classList.add('badge-pulse');
             }
         } else {
             queueSection.classList.add('section-collapsed');
+            queueSection.classList.remove('queue-alert-active');
             if (queueCountBadge) {
                 queueCountBadge.classList.add('hidden');
+                queueCountBadge.classList.remove('badge-pulse');
             }
         }
     }
