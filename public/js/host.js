@@ -48,20 +48,34 @@ const roomIdDisplay = document.getElementById('room-id-display');
 if (roomIdDisplay) roomIdDisplay.textContent = `Sala: ${roomName}`;
 
 async function init() {
+    // 1. Iniciar WebSocket imediatamente para ver a fila de espera
+    setupWebSocket();
+
+    // 2. Renderizar card local (vazio inicialmente)
+    renderParticipantCard({ id: 'local', name: `${userName} (Host)`, role: 'host' }, true);
+
+    // 3. Solicitar mídias em background
     try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
-        // Adicionar o Host no Grid
-        renderParticipantCard({ id: 'local', name: `${userName} (Host)`, role: 'host' }, true);
+        // Atualizar vídeo local
         const localVideoEl = document.querySelector('#video-card-local video');
         if (localVideoEl) localVideoEl.srcObject = localStream;
+
+        // Injetar stream no cliente RTC se ele já existir
+        if (rtcClient) {
+            rtcClient.setLocalStream(localStream);
+
+            // Adicionar trilhas aos peers já conectados (se houver)
+            localStream.getTracks().forEach(track => {
+                rtcClient.replaceTrack(track);
+            });
+        }
     } catch (err) {
         console.error('Falha ao iniciar mídia local:', err);
-        showToast('Aviso: Câmera/Mic do Host não iniciados (Timeout)', 'info');
-        renderParticipantCard({ id: 'local', name: `${userName} (Host)`, role: 'host' }, true);
+        showToast('Aviso: Câmera/Mic do Host não iniciados (Timeout/Negado)', 'info');
     }
 
-    setupWebSocket();
     await enumerateDevices();
 }
 
