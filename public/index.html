@@ -131,7 +131,8 @@
     <header id="main-header" class="fixed top-0 left-0 w-full p-8 z-50 animate-reveal">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <h1 class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase">LYNCRO</h1>
-            <div class="hidden md:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
+            <div id="header-extra"
+                class="hidden md:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
                 <span>Real-Time WebRTC</span>
                 <div class="w-1 h-1 bg-white rounded-full"></div>
                 <span>Broadcast Quality</span>
@@ -446,12 +447,12 @@
         if (prefillRoom) {
             // Modo "Link de Convidado": Focar apenas no card
             const narrative = document.getElementById('narrative-section');
-            const header = document.getElementById('main-header');
+            const headerExtra = document.getElementById('header-extra');
             const footer = document.getElementById('main-footer');
             const mobileBadge = document.querySelector('.mt-8.flex.items-center.justify-center'); // O badge mobile
 
             if (narrative) narrative.classList.add('hidden');
-            if (header) header.classList.add('hidden');
+            if (headerExtra) headerExtra.classList.add('hidden');
             if (footer) footer.classList.add('hidden');
             if (mobileBadge) mobileBadge.classList.add('hidden');
 
