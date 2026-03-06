@@ -80,16 +80,22 @@
     </footer>
 
     <script>
-        document.getElementById('lobby-form').onsubmit = (e) => {
+        document.getElementById('lobby-form').onsubmit = async (e) => {
             e.preventDefault();
-            const room = document.getElementById('roomName').value.trim();
+            const room = document.getElementById('hostRoomId').value.trim();
+            const password = document.getElementById('roomPassword').value.trim();
             const name = document.getElementById('userName').value.trim();
             const role = document.getElementById('role').value;
 
             localStorage.setItem('sv_last_name', name);
 
-            const dest = role === 'host' ? 'host.html' : 'guest.html';
-            window.location.href = `${dest}?room=${room}&name=${name}`;
+            if (role === 'host') {
+                // Se for Host, cria a sala na API primeiro
+                await createRoom();
+            } else {
+                // Se for Guest, apenas redireciona
+                window.location.href = `guest.html?room=${room}&name=${name}`;
+            }
         };
 
         async function createRoom() {
@@ -119,7 +125,7 @@
         }
 
         function copyLink() {
-            const room = document.getElementById('roomName').value.trim();
+            const room = document.getElementById('hostRoomId').value.trim();
             if (!room) {
                 alert('Digite o nome da sala primeiro!');
                 return;
@@ -133,7 +139,7 @@
         // Auto-fill from URL
         const urlParams = new URLSearchParams(window.location.search);
         const prefillRoom = urlParams.get('room');
-        if (prefillRoom) document.getElementById('roomName').value = prefillRoom;
+        if (prefillRoom) document.getElementById('hostRoomId').value = prefillRoom;
 
         // Auto-fill last name
         const lastName = localStorage.getItem('sv_last_name');
