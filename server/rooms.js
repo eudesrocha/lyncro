@@ -39,7 +39,18 @@ class RoomManager {
 
         room.participants.set(participantId, participant);
 
-        if (participant.role === 'host' && !room.host) {
+        if (participant.role === 'host') {
+            // Se já existia um host antigo (ex: aba duplicada), removemos ele para evitar fantasmas
+            if (room.host && room.host !== participantId) {
+                const oldHost = room.participants.get(room.host);
+                if (oldHost && oldHost.ws) {
+                    try {
+                        oldHost.ws.send(JSON.stringify({ type: 'error', message: 'Nova conexão de Host detectada. Esta sessão foi desconectada.' }));
+                        oldHost.ws.close();
+                    } catch (e) { }
+                }
+                room.participants.delete(room.host);
+            }
             room.host = participantId;
         }
 

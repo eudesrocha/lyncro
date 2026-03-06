@@ -312,6 +312,7 @@ function updateUI(participants) {
     participants.forEach(p => {
         if (p.role === 'observer' || (p.name && p.name.startsWith('OBS-'))) return;
         if (p.id === myId) return; // Não renderizar a si mesmo como remoto (evita card fantasma)
+        if (p.role === 'host' && p.id !== myId) return; // Não renderizar instâncias antigas de hosts (fantasma)
 
         if (p.status === 'waiting') {
             queueCount++;
@@ -504,19 +505,75 @@ function renderParticipantCard(participant, isLocal = false) {
       <div class="px-3 pb-3 bg-white/5 border-t border-win-border/10">
         <div class="flex flex-col gap-2 pt-3">
           <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none opacity-50 flex items-center gap-1"><i class="ph ph-sparkle text-purple-400"></i> Fundo Virtual</span>
-          <div class="grid grid-cols-4 gap-1.5">
-            <button onclick="setVirtualBackground('none')" id="vb-btn-none" class="flex flex-col items-center justify-center p-1.5 rounded bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer h-10">
-                <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span>
-            </button>
-            <button onclick="setVirtualBackground('blur')" id="vb-btn-blur" class="flex flex-col items-center justify-center p-1.5 rounded bg-white/5 border border-transparent transition-all hover:bg-white/10 cursor-pointer h-10">
-                <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
-            </button>
-            <button onclick="setVirtualBackground('image', 'img/bg-office.png')" id="vb-btn-office" class="flex flex-col items-center justify-center p-0 rounded border border-transparent overflow-hidden transition-all hover:border-win-accent/50 cursor-pointer h-10 relative">
-                <img src="img/bg-office.png" alt="Office" class="w-full h-full object-cover">
-            </button>
-            <button onclick="setVirtualBackground('image', 'img/bg-studio.png')" id="vb-btn-studio" class="flex flex-col items-center justify-center p-0 rounded border border-transparent overflow-hidden transition-all hover:border-win-accent/50 cursor-pointer h-10 relative">
-                <img src="img/bg-studio.png" alt="Studio" class="w-full h-full object-cover">
-            </button>
+          <div class="flex overflow-x-auto gap-2 pb-2 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory">
+                        <!-- Controls -->
+                        <button onclick="setVirtualBackground('none', null, this.id)" id="vb-btn-none"
+                            class="flex-none snap-start flex flex-col items-center justify-center w-[5.5rem] h-16 rounded-xl bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer">
+                            <i class="ph ph-prohibit text-xl text-gray-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span>
+                        </button>
+                        <button onclick="setVirtualBackground('blur', null, this.id)" id="vb-btn-blur"
+                            class="flex-none snap-start flex flex-col items-center justify-center w-[5.5rem] h-16 rounded-xl bg-black/40 border border-win-border/40 transition-all hover:bg-white/5 cursor-pointer">
+                            <i class="ph ph-drop text-xl text-blue-400 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
+                        </button>
+
+                        <!-- Static Images (5) -->
+                        <button onclick="setVirtualBackground('image', 'img/bg-living-room.png', this.id)"
+                            id="vb-btn-living"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-living-room.png" alt="Living" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-office-premium.png', this.id)"
+                            id="vb-btn-office-premium"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-office-premium.png" alt="Office" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-studio-pro.png', this.id)"
+                            id="vb-btn-studio-pro"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-loft.png', this.id)" id="vb-btn-loft"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-loft.png" alt="Loft" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-abstract.png', this.id)"
+                            id="vb-btn-abstract"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-abstract.png" alt="Abstract" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                        </button>
+
+                        <!-- Animated -->
+                        <button onclick="setVirtualBackground('anim-window', 'img/bg-window-tree.png', this.id)"
+                            id="vb-btn-anim-window"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
+                            <img src="img/bg-window-tree.png" alt="Window" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
+                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
+                        </button>
+                        <button onclick="setVirtualBackground('anim-studio', null, this.id)" id="vb-btn-anim-studio"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-br from-blue-900 to-black relative">
+                            <i class="ph ph-film-strip text-white/40 text-lg absolute top-3"></i>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
+                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Premium</span>
+                        </button>
+                        <button onclick="setVirtualBackground('anim-particles', null, this.id)"
+                            id="vb-btn-anim-particles"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-tr from-purple-900 to-[#1a0a1f] relative">
+                            <i class="ph ph-sparkle text-white/40 text-lg absolute top-3"></i>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
+                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span
+                                class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Partículas</span>
+                        </button>
           </div>
         </div>
       </div>
@@ -850,22 +907,23 @@ function appendChatMessage(name, text, time) {
 }
 
 // Funcao exposta pro HTML para selecionar Fundo (Host)
-window.setVirtualBackground = async (mode, imageUrl = null) => {
+window.setVirtualBackground = async (mode, imageUrl = null, btnId = null) => {
     currentVbMode = mode;
     currentVbImage = imageUrl;
 
+    let currentVbBtnId = btnId;
+    if (!currentVbBtnId) {
+        currentVbBtnId = `vb-btn-${mode === 'image' ? (imageUrl?.includes('office') ? 'office' : 'studio') : mode}`;
+    }
+
     // Reset UI styling
-    ['none', 'blur', 'office', 'studio'].forEach(id => {
-        const el = document.getElementById(`vb-btn-${id}`);
-        if (el) {
-            el.classList.remove('border-win-accent', 'bg-win-accent/10');
-            el.classList.add('border-transparent');
-        }
+    document.querySelectorAll('[id^="vb-btn-"]').forEach(el => {
+        el.classList.remove('border-win-accent', 'bg-win-accent/10');
+        el.classList.add('border-transparent');
     });
 
     // Highlight selected
-    const activeId = mode === 'image' ? (imageUrl.includes('office') ? 'office' : 'studio') : mode;
-    const activeEl = document.getElementById(`vb-btn-${activeId}`);
+    const activeEl = document.getElementById(currentVbBtnId);
     if (activeEl) {
         activeEl.classList.remove('border-transparent');
         activeEl.classList.add('border-win-accent', 'bg-win-accent/10');
