@@ -4,155 +4,303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lyncro - Lobby</title>
+    <title>Lyncro - Sincronia Total. Latência Zero.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        'win-bg': '#1c1c1c',
-                        'win-card': '#2b2b2b',
-                        'win-surface': '#323232',
+                        'win-bg': '#121212',
+                        'win-card': 'rgba(43, 43, 43, 0.4)',
                         'win-accent': '#0078d4',
-                        'win-border': '#2a2a2a',
+                        'win-border': 'rgba(255, 255, 255, 0.1)',
                     },
-                    borderRadius: { 'win': '4px' }
+                    borderRadius: { 'win': '8px' },
+                    fontFamily: {
+                        'segoe-black': ['"Segoe UI Black"', '"Segoe UI"', 'Tahoma', 'sans-serif'],
+                        'segoe': ['"Segoe UI"', 'Tahoma', 'sans-serif'],
+                    }
                 }
             }
         }
     </script>
     <style>
-        select option {
-            background-color: #2b2b2b !important;
-            color: #fff !important;
+        body {
+            background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
         }
 
-        select:focus {
-            border-color: #0078d4 !important;
+        .mica-effect {
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
+            background: rgba(43, 43, 43, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .win-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s cubic-bezier(0.1, 0.9, 0.2, 1);
+        }
+
+        .win-input:focus {
+            background: rgba(0, 0, 0, 0.5);
+            border-bottom-color: #0078d4;
             outline: none;
+        }
+
+        .win-loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .tab-active {
+            color: #fff;
+            border-bottom: 3px solid #0078d4;
+        }
+
+        .tab-inactive {
+            color: rgba(255, 255, 255, 0.5);
+            border-bottom: 3px solid transparent;
+        }
+
+        /* Glass Elevation Shadow */
+        .glass-shadow {
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8),
+                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
         }
     </style>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="js/config.js"></script>
 </head>
 
-<body
-    class="bg-win-bg text-gray-100 font-sans min-h-screen flex flex-col items-center justify-center p-6 selection:bg-win-accent">
+<body class="font-segoe selection:bg-win-accent selection:text-white">
 
-    <div
-        class="w-full max-w-sm bg-win-card border border-win-border p-10 rounded-win shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-sm relative overflow-hidden">
-        <!-- Detalhe estético de linha no topo -->
-        <div
-            class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-win-accent/50 to-transparent opacity-50">
+    <!-- Header / Logo -->
+    <header class="fixed top-0 left-0 w-full p-8 z-50">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <h1 class="text-3xl font-segoe-black italic tracking-tighter select-none">LYNCRO</h1>
+            <div class="hidden md:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
+                <span>Real-Time WebRTC</span>
+                <div class="w-1 h-1 bg-white rounded-full"></div>
+                <span>Broadcast Quality</span>
+            </div>
         </div>
+    </header>
 
-        <div class="flex flex-col items-center mb-10">
-            <h1 class="text-4xl font-[900] italic tracking-tight text-white select-none"
-                style="font-family: 'Segoe UI', Tahoma, sans-serif;">Lyncro</h1>
-            <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-bold mt-2 opacity-60">Transmissão Remota
+    <main
+        class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-24 lg:pt-0 max-w-7xl mx-auto gap-12 lg:gap-24">
+
+        <!-- Lado Esquerdo: Narrativa -->
+        <section class="flex-1 text-center lg:text-left">
+            <h2 class="text-5xl lg:text-7xl font-segoe-black leading-tight mb-6">
+                Sincronia Total.<br>
+                <span class="text-win-accent">Latência Zero.</span>
+            </h2>
+            <p class="text-lg lg:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed">
+                A ponte definitiva entre seus convidados e o seu OBS. Gere links de <span
+                    class="text-white font-bold">Clean Feed</span> instantâneos e transmita com qualidade de estúdio
+                direto pelo navegador.
             </p>
-        </div>
 
-        <form id="lobby-form" class="space-y-6">
-            <div class="space-y-1.5">
-                <div class="flex justify-between items-end">
-                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">ID da
-                        Sala</label>
-                    <button type="button" onclick="copyLink()" title="Copiar link de convite"
-                        class="text-[10px] text-win-accent hover:text-white transition-colors flex items-center gap-1 font-bold uppercase tracking-tighter">
-                        <i class="ph ph-link"></i> Copiar Link
+            <!-- Pilares -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-80">
+                <div class="flex flex-col items-center lg:items-start gap-2">
+                    <i class="ph ph-broadcast text-win-accent text-3xl"></i>
+                    <h3 class="font-bold text-xs uppercase tracking-widest text-white">Clean Feed Nativo</h3>
+                    <p class="text-[11px] text-gray-500">Vídeo e áudio puros para sua Fonte de Navegador.</p>
+                </div>
+                <div class="flex flex-col items-center lg:items-start gap-2">
+                    <i class="ph ph-device-mobile text-win-accent text-3xl"></i>
+                    <h3 class="font-bold text-xs uppercase tracking-widest text-white">Mobile-First</h3>
+                    <p class="text-[11px] text-gray-500">Seu convidado entra pelo celular com um clique.</p>
+                </div>
+                <div class="flex flex-col items-center lg:items-start gap-2">
+                    <i class="ph ph-gauge text-win-accent text-3xl"></i>
+                    <h3 class="font-bold text-xs uppercase tracking-widest text-white">Produção Integrada</h3>
+                    <p class="text-[11px] text-gray-500">Controle Lower Thirds e chat em tempo real.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Lado Direito: Ação (Glass Box) -->
+        <section class="w-full max-w-md relative">
+            <div class="mica-effect glass-shadow p-2 rounded-2xl overflow-hidden">
+                <!-- Tabs -->
+                <div class="flex border-b border-win-border">
+                    <button id="tab-create" onclick="switchTab('create')"
+                        class="flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active transition-all">
+                        Criar Sala
+                    </button>
+                    <button id="tab-join" onclick="switchTab('join')"
+                        class="flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-inactive transition-all">
+                        Entrar na Sala
                     </button>
                 </div>
-                <input type="text" id="hostRoomId" placeholder="Ex: sala-dos-feras"
-                    class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all placeholder:text-gray-600">
-            </div>
 
-            <div class="space-y-1.5">
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Senha da Sala
-                    (Opcional)</label>
-                <input type="password" id="roomPassword" placeholder="••••••••"
-                    class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all placeholder:text-gray-700">
-            </div>
-
-            <div class="space-y-1.5">
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Seu Nome</label>
-                <input type="text" id="userName" placeholder="Nome para o Tally" required
-                    class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all placeholder:text-gray-600">
-            </div>
-
-            <div class="space-y-1.5">
-                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Papel na
-                    Sessão</label>
-                <div class="relative">
-                    <!-- Dropdown Trigger -->
-                    <div id="role-dropdown-trigger"
-                        class="w-full bg-black/30 border border-win-border rounded-win pl-11 pr-4 py-3 text-sm focus-within:border-win-accent focus-within:bg-black/50 outline-none transition-all cursor-pointer flex items-center relative z-10">
-                        <div class="absolute left-4 pointer-events-none text-win-accent">
-                            <i id="role-icon" class="ph ph-user text-sm"></i>
+                <div class="p-8 pt-10">
+                    <!-- Aba Criar Sala -->
+                    <div id="panel-create" class="space-y-6">
+                        <div id="create-initial-state" class="space-y-6">
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">ID da
+                                    Sessão</label>
+                                <input type="text" id="hostRoomId" placeholder="Ex: podcast-semanal"
+                                    class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-700">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Senha
+                                    de Acesso (Opcional)</label>
+                                <input type="password" id="roomPassword" placeholder="••••••••"
+                                    class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-700">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Seu
+                                    Nome</label>
+                                <input type="text" id="userNameHost" placeholder="Nome do Host"
+                                    class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-700">
+                            </div>
+                            <button onclick="handleCreateRoom()" id="btn-create"
+                                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
+                                <span id="btn-create-text">Lançar Sessão</span>
+                                <div id="btn-create-loader" class="win-loader hidden"></div>
+                            </button>
                         </div>
-                        <span id="role-display" class="text-sm">Convidado (Guest)</span>
-                        <div class="absolute right-4 pointer-events-none text-gray-500">
-                            <i id="dropdown-chevron" class="ph ph-caret-down transition-transform duration-200"></i>
+
+                        <!-- Estado Pós-Criação (Sucesso) -->
+                        <div id="create-success-state" class="hidden space-y-6 animate-[fadeIn_0.5s_ease-out]">
+                            <div class="bg-win-accent/10 border border-win-accent/30 p-6 rounded-win text-center">
+                                <i class="ph ph-check-circle text-win-accent text-5xl mb-4 block"></i>
+                                <h4 class="text-xl font-bold text-white mb-2">Sala Criada!</h4>
+                                <p class="text-xs text-gray-400">Sua transmissão está pronta para começar.</p>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Link
+                                    de Convite</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="invite-link-input" readonly
+                                        class="flex-1 px-4 py-3 rounded-win bg-black/50 border border-win-border text-xs text-gray-300 outline-none">
+                                    <button onclick="copyInviteLink()"
+                                        class="px-4 bg-win-surface border border-win-border rounded-win hover:bg-white/5 transition-colors">
+                                        <i class="ph ph-copy text-white"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="goToHost()"
+                                    class="w-full bg-win-accent text-white font-bold py-4 rounded-win text-[10px] uppercase tracking-widest shadow-lg">
+                                    Abrir Host
+                                </button>
+                                <button onclick="window.location.reload()"
+                                    class="w-full bg-white/5 border border-win-border text-white font-bold py-4 rounded-win text-[10px] uppercase tracking-widest hover:bg-white/10">
+                                    Criar Outra
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Dropdown Menu -->
-                    <div id="role-dropdown-menu"
-                        class="hidden absolute top-full left-0 w-full mt-1 bg-win-card border border-win-border rounded-win shadow-2xl z-50 overflow-hidden backdrop-blur-md">
-                        <div onclick="selectRole('guest')"
-                            class="px-5 py-3 text-sm hover:bg-win-accent/20 hover:text-white cursor-pointer transition-colors flex items-center gap-3 border-b border-win-border/30">
-                            <i class="ph ph-user text-win-accent"></i>
-                            <span>Convidado (Guest)</span>
+                    <!-- Aba Entrar na Sala -->
+                    <div id="panel-join" class="hidden space-y-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">ID da
+                                Sala</label>
+                            <input type="text" id="joinRoomId" placeholder="ID fornecido pelo host"
+                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-700">
                         </div>
-                        <div onclick="selectRole('host')"
-                            class="px-5 py-3 text-sm hover:bg-win-accent/20 hover:text-white cursor-pointer transition-colors flex items-center gap-3">
-                            <i class="ph ph-monitor-play text-win-accent"></i>
-                            <span>Monitor do Host (Admin)</span>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Seu
+                                Nome</label>
+                            <input type="text" id="userNameGuest" placeholder="Como quer ser chamado?"
+                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-700">
                         </div>
+                        <button onclick="handleJoinRoom()"
+                            class="w-full bg-white/10 hover:bg-white/15 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] border border-white/10 shadow-lg transition-all active:scale-[0.98] mt-4">
+                            Entrar como Convidado
+                        </button>
                     </div>
-
-                    <!-- Hidden Real Select -->
-                    <select id="role" class="hidden">
-                        <option value="guest" selected>Guest</option>
-                        <option value="host">Host</option>
-                    </select>
                 </div>
             </div>
+        </section>
+    </main>
 
-            <button type="submit"
-                class="w-full bg-win-accent hover:bg-win-accent/80 text-white font-bold py-3.5 rounded-win text-xs uppercase tracking-widest shadow-xl shadow-win-accent/20 transition-all hover:scale-[1.01] active:scale-[0.98] mt-4">
-                Entrar na Sessão
-            </button>
-        </form>
-    </div>
-
-    <footer class="mt-12 text-[9px] opacity-20 uppercase tracking-[0.4em] font-medium">
-        Powered by Lyncro Core
+    <!-- Footer -->
+    <footer class="fixed bottom-0 left-0 w-full p-8 hidden md:block">
+        <div class="max-w-7xl mx-auto flex items-center justify-between opacity-30">
+            <div class="flex gap-8">
+                <div class="flex items-center gap-2">
+                    <i class="ph ph-device-mobile"></i>
+                    <span class="text-[9px] font-bold uppercase tracking-widest">Mobile Ready</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <i class="ph ph-monitor-play"></i>
+                    <span class="text-[9px] font-bold uppercase tracking-widest">OBS Optimized</span>
+                </div>
+            </div>
+            <span class="text-[9px] font-bold uppercase tracking-widest">Lyncro Live v3.0</span>
+        </div>
     </footer>
 
     <script>
-        document.getElementById('lobby-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const room = document.getElementById('hostRoomId').value.trim();
-            const password = document.getElementById('roomPassword').value.trim();
-            const name = document.getElementById('userName').value.trim();
-            const role = document.getElementById('role').value;
+        let currentRoomData = null;
 
-            localStorage.setItem('sv_last_name', name);
+        function switchTab(tab) {
+            const btnCreate = document.getElementById('tab-create');
+            const btnJoin = document.getElementById('tab-join');
+            const panelCreate = document.getElementById('panel-create');
+            const panelJoin = document.getElementById('panel-join');
 
-            if (role === 'host') {
-                // Se for Host, cria a sala na API primeiro
-                await createRoom();
+            if (tab === 'create') {
+                btnCreate.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active transition-all';
+                btnJoin.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-inactive transition-all';
+                panelCreate.classList.remove('hidden');
+                panelJoin.classList.add('hidden');
             } else {
-                // Se for Guest, apenas redireciona
-                window.location.href = `guest.html?room=${room}&name=${name}`;
+                btnCreate.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-inactive transition-all';
+                btnJoin.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active transition-all';
+                panelCreate.classList.add('hidden');
+                panelJoin.classList.remove('hidden');
             }
-        };
+        }
 
-        async function createRoom() {
+        async function handleCreateRoom() {
             const roomId = document.getElementById('hostRoomId').value.trim();
             const password = document.getElementById('roomPassword').value.trim();
+            const userName = document.getElementById('userNameHost').value.trim();
+
+            if (!roomId || !userName) {
+                alert('Preencha o ID da sala e seu nome!');
+                return;
+            }
+
+            const btn = document.getElementById('btn-create');
+            const text = document.getElementById('btn-create-text');
+            const loader = document.getElementById('btn-create-loader');
+
+            // UI Loading
+            btn.disabled = true;
+            text.classList.add('hidden');
+            loader.classList.remove('hidden');
+
             const payload = { name: roomId };
             if (password) payload.password = password;
 
@@ -163,74 +311,84 @@
                     body: JSON.stringify(payload)
                 });
                 const data = await res.json();
+                currentRoomData = data;
 
                 if (password) {
                     localStorage.setItem(`room_pwd_${data.roomId}`, password);
                 }
+                localStorage.setItem('sv_last_name', userName);
 
-                window.location.href = `host.html?room=${data.roomId}`;
+                // Gerar link de convite
+                const inviteUrl = `${window.location.origin}/index.html?room=${data.roomId}`;
+                document.getElementById('invite-link-input').value = inviteUrl;
+
+                // Transição de Estado sem recarregar
+                setTimeout(() => {
+                    document.getElementById('create-initial-state').classList.add('hidden');
+                    document.getElementById('create-success-state').classList.remove('hidden');
+                }, 800);
+
             } catch (err) {
                 console.error('Erro ao criar sala:', err);
-                alert('Erro ao criar sala');
+                alert('Erro ao criar sala. Verifique a conexão.');
+                btn.disabled = false;
+                text.classList.remove('hidden');
+                loader.classList.add('hidden');
             }
         }
 
-        const dropdownTrigger = document.getElementById('role-dropdown-trigger');
-        const dropdownMenu = document.getElementById('role-dropdown-menu');
-        const dropdownChevron = document.getElementById('dropdown-chevron');
+        function handleJoinRoom() {
+            const room = document.getElementById('joinRoomId').value.trim();
+            const name = document.getElementById('userNameGuest').value.trim();
 
-        dropdownTrigger.addEventListener('click', () => {
-            dropdownMenu.classList.toggle('hidden');
-            dropdownChevron.classList.toggle('rotate-180');
-        });
-
-        function selectRole(role) {
-            const roleSelect = document.getElementById('role');
-            const roleDisplay = document.getElementById('role-display');
-            const roleIcon = document.getElementById('role-icon');
-
-            roleSelect.value = role;
-
-            if (role === 'host') {
-                roleDisplay.innerText = 'Monitor do Host (Admin)';
-                roleIcon.className = 'ph ph-monitor-play text-sm';
-            } else {
-                roleDisplay.innerText = 'Convidado (Guest)';
-                roleIcon.className = 'ph ph-user text-sm';
-            }
-
-            dropdownMenu.classList.add('hidden');
-            dropdownChevron.classList.remove('rotate-180');
-        }
-
-        // Close dropdown when clicking outside
-        window.onclick = (event) => {
-            if (!dropdownTrigger.contains(event.target) && !dropdownMenu.contains(event.target)) {
-                dropdownMenu.classList.add('hidden');
-                dropdownChevron.classList.remove('rotate-180');
-            }
-        };
-
-        function copyLink() {
-            const room = document.getElementById('hostRoomId').value.trim();
-            if (!room) {
-                alert('Digite o nome da sala primeiro!');
+            if (!room || !name) {
+                alert('Preencha os campos!');
                 return;
             }
-            const url = `${window.location.origin}/index.html?room=${room}`;
-            navigator.clipboard.writeText(url).then(() => {
-                alert('Link de convite copiado!');
+
+            localStorage.setItem('sv_last_name', name);
+            window.location.href = `guest.html?room=${room}&name=${name}`;
+        }
+
+        function copyInviteLink() {
+            const input = document.getElementById('invite-link-input');
+            navigator.clipboard.writeText(input.value).then(() => {
+                const btn = event.currentTarget;
+                const icon = btn.querySelector('i');
+                icon.className = 'ph ph-check text-green-400';
+                setTimeout(() => icon.className = 'ph ph-copy text-white', 2000);
             });
         }
 
-        // Auto-fill from URL
+        function goToHost() {
+            if (currentRoomData) {
+                window.location.href = `host.html?room=${currentRoomData.roomId}`;
+            }
+        }
+
+        // Auto-fill and Prefill
         const urlParams = new URLSearchParams(window.location.search);
         const prefillRoom = urlParams.get('room');
-        if (prefillRoom) document.getElementById('hostRoomId').value = prefillRoom;
+        if (prefillRoom) {
+            switchTab('join');
+            document.getElementById('joinRoomId').value = prefillRoom;
+        }
 
-        // Auto-fill last name
         const lastName = localStorage.getItem('sv_last_name');
-        if (lastName) document.getElementById('userName').value = lastName;
+        if (lastName) {
+            document.getElementById('userNameHost').value = lastName;
+            document.getElementById('userNameGuest').value = lastName;
+        }
+
+        // Estilo de animação FadeIn
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 
