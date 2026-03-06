@@ -565,8 +565,8 @@ document.getElementById('shareScreen').onclick = async () => {
             mainVideo.style.objectFit = 'contain';
             mainVideo.classList.add('bg-black/90');
 
-            btn.classList.replace('bg-win-surface/80', 'bg-win-accent');
-            btn.classList.add('text-white');
+            btn.classList.replace('bg-purple-600/20', 'bg-purple-600');
+            btn.classList.replace('text-purple-400', 'text-white');
             isScreenSharing = true;
 
             // Notificar sistema sobre mudança de estado (opcional)
@@ -619,8 +619,8 @@ async function stopScreenShare() {
         mainVideo.classList.remove('bg-black/90');
 
         const btn = document.getElementById('shareScreen');
-        btn.classList.replace('bg-win-accent', 'bg-win-surface/80');
-        btn.classList.remove('text-white');
+        btn.classList.replace('bg-purple-600', 'bg-purple-600/20');
+        btn.classList.replace('text-white', 'text-purple-400');
         isScreenSharing = false;
 
         broadcastMediaStatus();
