@@ -247,57 +247,74 @@ class WebRTCClient {
         }
     }
 
-    async sendFile(targetId, file, onProgress) {
-        const dc = this.dataChannels.get(targetId);
-        if (!dc || dc.readyState !== 'open') {
-            throw new Error(`DataChannel with ${targetId} is not open`);
-        }
+    sendFile(targetId, file, onProgress) {
+        return new Promise((resolve, reject) => {
+            const dc = this.dataChannels.get(targetId);
+            if (!dc || dc.readyState !== 'open') {
+                return reject(new Error(`Canal de dados com ${targetId} não está aberto (Estado: ${dc ? dc.readyState : 'nulo'})`));
+            }
 
-        const CHUNK_SIZE = 16384; // 16KB
-        const meta = {
-            type: 'file-meta',
-            fileName: file.name,
-            fileSize: file.size,
-            fileType: file.type
-        };
+            const CHUNK_SIZE = 16384; // 16KB
+            const meta = {
+                type: 'file-meta',
+                fileName: file.name,
+                fileSize: file.size,
+                fileType: file.type
+            };
 
-        dc.send(JSON.stringify(meta));
+            try {
+                dc.send(JSON.stringify(meta));
+            } catch (e) {
+                return reject(new Error('Falha ao enviar meta-dados do arquivo: ' + e.message));
+            }
 
-        const reader = new FileReader();
-        let offset = 0;
+            const reader = new FileReader();
+            let offset = 0;
 
-        const readNextChunk = () => {
-            const slice = file.slice(offset, offset + CHUNK_SIZE);
-            reader.readAsArrayBuffer(slice);
-        };
+            const readNextChunk = () => {
+                const slice = file.slice(offset, offset + CHUNK_SIZE);
+                reader.readAsArrayBuffer(slice);
+            };
 
-        reader.onload = (e) => {
-            const buffer = e.target.result;
+            reader.onerror = (err) => reject(err);
+            reader.onload = (e) => {
+                const buffer = e.target.result;
 
-            if (dc.bufferedAmount > dc.bufferedAmountLowThreshold) {
-                dc.onbufferedamountlow = () => {
-                    dc.onbufferedamountlow = null;
-                    send();
+                const send = () => {
+                    if (dc.readyState !== 'open') {
+                        return reject(new Error('DataChannel fechado durante a transferência.'));
+                    }
+
+                    try {
+                        dc.send(buffer);
+                        offset += buffer.byteLength;
+
+                        if (onProgress) onProgress((offset / file.size) * 100);
+
+                        if (offset < file.size) {
+                            if (dc.bufferedAmount > dc.bufferedAmountLowThreshold) {
+                                dc.onbufferedamountlow = () => {
+                                    dc.onbufferedamountlow = null;
+                                    send();
+                                };
+                            } else {
+                                // Pequeno delay para não sobrecarregar o buffer em redes móveis
+                                setTimeout(readNextChunk, 1);
+                            }
+                        } else {
+                            dc.send(JSON.stringify({ type: 'file-end' }));
+                            resolve();
+                        }
+                    } catch (err) {
+                        reject(err);
+                    }
                 };
-            } else {
+
                 send();
-            }
+            };
 
-            function send() {
-                dc.send(buffer);
-                offset += buffer.byteLength;
-
-                if (onProgress) onProgress((offset / file.size) * 100);
-
-                if (offset < file.size) {
-                    readNextChunk();
-                } else {
-                    dc.send(JSON.stringify({ type: 'file-end' }));
-                }
-            }
-        };
-
-        readNextChunk();
+            readNextChunk();
+        });
     }
 
     async replaceTrack(newTrack) {

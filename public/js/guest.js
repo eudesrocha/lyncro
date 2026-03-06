@@ -552,8 +552,13 @@ if (mediaDropBtn && fileInput) {
                 progressEl.querySelector('.progress-text').textContent = `Enviando: ${file.name}`;
             }
 
-            // Enviar para o "Host" (geralmente o único peer de um guest)
-            for (const targetId of rtcClient.peers.keys()) {
+            // Enviar para os peers conectados
+            const peers = Array.from(rtcClient.peers.keys());
+            if (peers.length === 0) {
+                throw new Error('Ninguém conectado para receber o arquivo.');
+            }
+
+            for (const targetId of peers) {
                 await rtcClient.sendFile(targetId, file, (progress) => {
                     if (progressEl) {
                         progressEl.querySelector('.progress-fill').style.width = `${progress}%`;
@@ -567,9 +572,10 @@ if (mediaDropBtn && fileInput) {
             fileInput.value = ''; // Reset
         } catch (err) {
             console.error('Falha no Media Drop:', err);
-            alert('Erro ao enviar arquivo via P2P.');
+            alert(`Erro no P2P: ${err.message || 'Falha desconhecida'}`);
             const progressEl = document.getElementById('file-progress-overlay');
             if (progressEl) progressEl.classList.add('hidden');
+            fileInput.value = '';
         }
     };
 }
