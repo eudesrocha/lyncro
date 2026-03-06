@@ -29,53 +29,70 @@
 <body
     class="bg-win-bg text-gray-100 font-sans min-h-screen flex flex-col items-center justify-center p-6 selection:bg-win-accent">
 
-    <div class="w-full max-w-sm bg-win-card border border-win-border p-8 rounded-win shadow-2xl">
-        <div class="flex flex-col items-center mb-8">
-            <div class="w-12 h-12 bg-win-accent rounded-win flex items-center justify-center mb-4 shadow-lg">
-                <i class="ph ph-broadcast text-2xl text-white"></i>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight">Lyncro</h1>
-            <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Transmissão Remota</p>
+    <div
+        class="w-full max-w-sm bg-win-card border border-win-border p-10 rounded-win shadow-[0_20px_50px_rgba(0,0,0,0.5)] backdrop-blur-sm relative overflow-hidden">
+        <!-- Detalhe estético de linha no topo -->
+        <div
+            class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-win-accent/50 to-transparent opacity-50">
         </div>
 
-        <form id="lobby-form" class="space-y-4">
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Sala</label>
-                <div class="flex gap-2">
-                    <input type="text" id="hostRoomId" placeholder="ID da Sala (Opcional)"
-                        class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
-                    <input type="password" id="roomPassword" placeholder="Senha da Sala (Opcional)"
-                        class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
+        <div class="flex flex-col items-center mb-10">
+            <h1 class="text-4xl font-[900] italic tracking-tight text-white select-none"
+                style="font-family: 'Segoe UI', Tahoma, sans-serif;">Lyncro</h1>
+            <p class="text-[10px] text-gray-500 uppercase tracking-[0.3em] font-bold mt-2 opacity-60">Transmissão Remota
+            </p>
+        </div>
+
+        <form id="lobby-form" class="space-y-6">
+            <div class="space-y-1.5">
+                <div class="flex justify-between items-end">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">ID da
+                        Sala</label>
                     <button type="button" onclick="copyLink()" title="Copiar link de convite"
-                        class="bg-win-surface border border-win-border p-2 rounded-win hover:bg-win-accent/20 transition-all">
-                        <i class="ph ph-link"></i>
+                        class="text-[10px] text-win-accent hover:text-white transition-colors flex items-center gap-1 font-bold uppercase tracking-tighter">
+                        <i class="ph ph-link"></i> Copiar Link
                     </button>
+                </div>
+                <input type="text" id="hostRoomId" placeholder="Ex: sala-dos-feras"
+                    class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all placeholder:text-gray-600">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Senha da Sala
+                    (Opcional)</label>
+                <input type="password" id="roomPassword" placeholder="••••••••"
+                    class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all placeholder:text-gray-700">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Seu Nome</label>
+                <input type="text" id="userName" placeholder="Nome para o Tally" required
+                    class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all placeholder:text-gray-600">
+            </div>
+
+            <div class="space-y-1.5">
+                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Papel na
+                    Sessão</label>
+                <div class="relative">
+                    <select id="role"
+                        class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all appearance-none cursor-pointer">
+                        <option value="guest">💻 Convidado (Guest)</option>
+                        <option value="host">🎯 Monitor do Host (Admin)</option>
+                    </select>
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                        <i class="ph ph-caret-down"></i>
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Seu Nome</label>
-                <input type="text" id="userName" placeholder="Como você quer ser visto" required
-                    class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
-            </div>
-
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Papel</label>
-                <select id="role"
-                    class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
-                    <option value="guest">Convidado (Guest)</option>
-                    <option value="host">Monitor do Host (Admin)</option>
-                </select>
-            </div>
-
             <button type="submit"
-                class="w-full bg-win-accent hover:bg-opacity-90 text-white font-semibold py-2.5 rounded-win text-sm shadow-lg shadow-win-accent/20 transition-all mt-4">
+                class="w-full bg-win-accent hover:bg-win-accent/80 text-white font-bold py-3.5 rounded-win text-xs uppercase tracking-widest shadow-xl shadow-win-accent/20 transition-all hover:scale-[1.01] active:scale-[0.98] mt-4">
                 Entrar na Sessão
             </button>
         </form>
     </div>
 
-    <footer class="mt-12 text-[10px] opacity-20 uppercase tracking-widest">
+    <footer class="mt-12 text-[9px] opacity-20 uppercase tracking-[0.4em] font-medium">
         Powered by Lyncro Core
     </footer>
 
