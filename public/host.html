@@ -51,272 +51,268 @@
 
 <body
     class="min-h-screen dark:bg-win-bg bg-white dark:text-gray-100 text-gray-900 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
-    .video-label-accent {
-    background: rgba(0, 0, 0, 0.4);
-    border-radius: 2px;
-    }
+    <style>
+        .video-label-accent {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 2px;
+        }
 
-    .win-btn-hover:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-    background-color: rgba(255, 255, 255, 0.05);
-    }
+        .win-btn-hover:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
 
-    .media-muted-overlay {
-    background: rgba(0, 0, 0, 0.15);
-    /* Opacidade reduzida conforme solicitado */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    z-index: 10;
-    }
+        .media-muted-overlay {
+            background: rgba(0, 0, 0, 0.15);
+            /* Opacidade reduzida conforme solicitado */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            z-index: 10;
+        }
 
-    /* Ajuste para o fundo do dropdown (select options) */
-    select,
-    select option {
-    background-color: #1a1a1a !important;
-    color: #efefef !important;
-    }
+        /* Ajuste para o fundo do dropdown (select options) */
+        select,
+        select option {
+            background-color: #1a1a1a !important;
+            color: #efefef !important;
+        }
 
-    .device-select-compact {
-    appearance: none;
-    background-color: rgba(255, 255, 255, 0.03);
-    border: 1px solid #2a2a2a;
-    border-radius: 4px;
-    padding-right: 18px !important;
-    padding-left: 6px !important;
-    padding-top: 2px !important;
-    padding-bottom: 2px !important;
-    font-size: 8.5px;
-    font-weight: 600;
-    text-transform: uppercase;
-    color: #666;
-    cursor: pointer;
-    width: auto;
-    max-width: 70px;
-    transition: all 0.2s;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 256
-    256'%3E%3Cpath
-    d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 4px center;
-    background-size: 10px;
-    }
+        .device-select-compact {
+            appearance: none;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid #2a2a2a;
+            border-radius: 4px;
+            padding-right: 18px !important;
+            padding-left: 6px !important;
+            padding-top: 2px !important;
+            padding-bottom: 2px !important;
+            font-size: 8.5px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #666;
+            cursor: pointer;
+            width: auto;
+            max-width: 70px;
+            transition: all 0.2s;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 256
+ 256'%3E%3Cpath
+ d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z' %3E%3C/path%3E%3C/svg%3E");
+ background-repeat: no-repeat;
+                    background-position: right 4px center;
+                    background-size: 10px;
+            }
 
-    .device-select-compact:hover {
-    border-color: #0078d4;
-    color: #efefef;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230078d4' viewBox='0 0
-    256 256'%3E%3Cpath
-    d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
-    }
+            .device-select-compact:hover {
+                border-color: #0078d4;
+                color: #efefef;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230078d4' viewBox='0 0
+ 256 256'%3E%3Cpath
+ d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z' %3E%3C/path%3E%3C/svg%3E");
 
-    /* Animação para expansão suave da fila */
-    .section-expand {
-    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    max-height: 1000px;
-    opacity: 1;
-    }
+                }
 
-    .section-collapsed {
-    max-height: 0;
-    opacity: 0;
-    margin-bottom: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    border: none !important;
-    overflow: hidden;
-    }
+                /* Animação para expansão suave da fila */
+                .section-expand {
+                    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    max-height: 1000px;
+                    opacity: 1;
+                }
 
-    /* Alertas para a Fila */
-    @keyframes pulse-queue-border {
-    0% {
-    border-color: #2a2a2a;
-    box-shadow: 0 0 0 rgba(0, 120, 212, 0);
-    }
+                .section-collapsed {
+                    max-height: 0;
+                    opacity: 0;
+                    margin-bottom: 0 !important;
+                    padding-top: 0 !important;
+                    padding-bottom: 0 !important;
+                    border: none !important;
+                    overflow: hidden;
+                }
 
-    50% {
-    border-color: #0078d4;
-    box-shadow: 0 0 20px rgba(0, 120, 212, 0.4);
-    }
+                /* Alertas para a Fila */
+                @keyframes pulse-queue-border {
+                    0% {
+                        border-color: #2a2a2a;
+                        box-shadow: 0 0 0 rgba(0, 120, 212, 0);
+                    }
 
-    100% {
-    border-color: #2a2a2a;
-    box-shadow: 0 0 0 rgba(0, 120, 212, 0);
-    }
-    }
+                    50% {
+                        border-color: #0078d4;
+                        box-shadow: 0 0 20px rgba(0, 120, 212, 0.4);
+                    }
 
-    @keyframes pulse-badge {
-    0% {
-    transform: scale(1);
-    background-color: #dc2626;
-    }
+                    100% {
+                        border-color: #2a2a2a;
+                        box-shadow: 0 0 0 rgba(0, 120, 212, 0);
+                    }
+                }
 
-    50% {
-    transform: scale(1.15);
-    background-color: #ef4444;
-    }
+                @keyframes pulse-badge {
+                    0% {
+                        transform: scale(1);
+                        background-color: #dc2626;
+                    }
 
-    100% {
-    transform: scale(1);
-    background-color: #dc2626;
-    }
-    }
+                    50% {
+                        transform: scale(1.15);
+                        background-color: #ef4444;
+                    }
 
-    .queue-alert-active {
-    animation: pulse-queue-border 2s infinite ease-in-out;
-    border-color: #0078d480 !important;
-    }
+                    100% {
+                        transform: scale(1);
+                        background-color: #dc2626;
+                    }
+                }
 
-    .queue-alert-active header {
-    background: linear-gradient(90deg, rgba(0, 120, 212, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
-    }
+                .queue-alert-active {
+                    animation: pulse-queue-border 2s infinite ease-in-out;
+                    border-color: #0078d480 !important;
+                }
 
-    .queue-alert-active header i {
-    color: #ef4444 !important;
-    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
-    }
+                .queue-alert-active header {
+                    background: linear-gradient(90deg, rgba(0, 120, 212, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+                }
 
-    .badge-pulse {
-    animation: pulse-badge 1s infinite ease-in-out;
-    }
+                .queue-alert-active header i {
+                    color: #ef4444 !important;
+                    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+                }
+
+                .badge-pulse {
+                    animation: pulse-badge 1s infinite ease-in-out;
+                }
     </style>
-    </head>
 
-    <body class="min-h-screen bg-win-bg text-gray-100 font-sans p-6 selection:bg-win-accent flex flex-col">
-
-        <header class="flex justify-between items-center mb-8 border-b border-win-border pb-5">
-            <div class="flex items-center gap-4">
-                <div class="flex flex-col">
-                    <h1
-                        class="text-3xl font-segoe-black font-[900] italic tracking-[-0.02em] text-white leading-none uppercase">
-                        LYNCRO</h1>
-                    <span class="text-[10px] font-bold text-win-accent tracking-[0.3em] mt-1 uppercase">Host
-                        Monitor</span>
-                </div>
+    <header class="flex justify-between items-center mb-8 border-b border-win-border pb-5">
+        <div class="flex items-center gap-4">
+            <div class="flex flex-col">
+                <h1
+                    class="text-3xl font-segoe-black font-[900] italic tracking-[-0.02em] text-white leading-none uppercase">
+                    LYNCRO</h1>
+                <span class="text-[10px] font-bold text-win-accent tracking-[0.3em] mt-1 uppercase">Host
+                    Monitor</span>
             </div>
-
-            <div class="flex gap-4 items-center">
-                <div id="room-id-display"
-                    class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-1.5 rounded-sm border border-win-accent/20 shadow-inner">
-                </div>
-
-                <div class="flex items-center gap-1 bg-white/5 border border-win-border p-1 rounded-win">
-                    <button id="btn-mute-monitor" onclick="toggleMonitorMute()"
-                        class="flex items-center justify-center w-8 h-8 hover:bg-win-accent hover:text-white rounded-win transition-all text-gray-400 group"
-                        title="Silenciar Áudio Local (Monitor)">
-                        <i class="ph ph-speaker-high text-xl transition-colors"></i>
-                    </button>
-                    <div class="w-px h-4 bg-win-border mx-1"></div>
-                    <button id="openMobileCam"
-                        class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
-                        <i class="ph ph-camera text-sm text-win-accent group-hover:text-white transition-colors"></i>
-                        Lyncro Cam
-                    </button>
-                    <div class="w-px h-4 bg-win-border mx-1"></div>
-                    <button onclick="copyInviteLink()"
-                        class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
-                        <i class="ph ph-link text-sm text-win-accent group-hover:text-white transition-colors"></i>
-                        Convidar
-                    </button>
-                </div>
-
-                <select id="return-audio-select"
-                    class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-32 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
-                    <option value="">Sem Retorno</option>
-                    <!-- Preenchido via JS -->
-                </select>
-            </div>
-
-            <button onclick="window.location.href='index.html'"
-                class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win bg-red-600/5 hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
-                Encerrar
-            </button>
-            </div>
-        </header>
-
-        <div class="flex-1 flex gap-4 min-h-0 pl-4 pr-4 pb-4 h-full">
-            <main id="video-grid"
-                class="flex-1 grid grid-auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-2"
-                style="grid-auto-rows: min-content;">
-                <!-- O Card do Host (Você) é dinâmico. -->
-            </main>
-
-            <!-- Right Side Panel (Split: Fila & Chat) -->
-            <aside class="w-80 flex flex-col gap-4 flex-shrink-0 min-h-0">
-                <!-- Fila Section -->
-                <section id="queue-section"
-                    class="bg-win-card/40 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm section-expand overflow-hidden border border-win-border">
-                    <div class="px-5 py-4 border-b border-win-border flex items-center justify-between bg-white/5">
-                        <h2
-                            class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
-                            <i class="ph ph-users text-win-accent text-sm"></i> Fila de Espera
-                        </h2>
-                        <span id="queue-count"
-                            class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold hidden">0</span>
-                    </div>
-                    <div id="tab-content-queue" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
-                        <div id="waiting-list" class="flex flex-col gap-2">
-                            <!-- Cards de convidados aguardando entram aqui via JS -->
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Chat Section -->
-                <section
-                    class="flex-1 bg-win-card/40 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm border border-win-border">
-                    <div class="px-5 py-4 border-b border-win-border bg-white/5">
-                        <h2
-                            class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
-                            <i class="ph ph-chat-text text-win-accent text-sm"></i> Chat de Produção
-                        </h2>
-                    </div>
-                    <div id="tab-content-chat" class="flex-1 flex flex-col overflow-hidden">
-                        <div id="chat-messages"
-                            class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 text-xs scrollbar-thin">
-                            <!-- Mensagens aqui -->
-                        </div>
-                        <div class="p-3 border-t border-win-border bg-black/20 flex items-center gap-2 shrink-0">
-                            <input type="text" id="chat-input" placeholder="Mensagem..."
-                                class="flex-1 bg-black/40 border border-win-border/60 rounded px-3 py-2 outline-none focus:border-win-accent transition-colors text-sm placeholder:text-gray-700">
-                            <button id="send-chat"
-                                class="bg-win-accent text-white w-9 h-9 rounded flex items-center justify-center hover:bg-win-accent/80 transition-all active:scale-95 shadow-lg shadow-win-accent/10">
-                                <i class="ph ph-paper-plane-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </section>
-            </aside>
         </div>
 
-        <!-- Script de Tabs Removido -->
+        <div class="flex gap-4 items-center">
+            <div id="room-id-display"
+                class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-1.5 rounded-sm border border-win-accent/20 shadow-inner">
+            </div>
 
-        <!-- Modal QR Code Companion -->
-        <div id="qr-modal"
-            class="hidden fixed inset-0 z-[110] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-            <div
-                class="bg-win-surface border border-win-border rounded-xl p-6 shadow-2xl max-w-sm w-full relative text-gray-100">
-                <button id="close-qr-modal"
-                    class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
-                    <i class="ph ph-x text-xl"></i>
+            <div class="flex items-center gap-1 bg-white/5 border border-win-border p-1 rounded-win">
+                <button id="btn-mute-monitor" onclick="toggleMonitorMute()"
+                    class="flex items-center justify-center w-8 h-8 hover:bg-win-accent hover:text-white rounded-win transition-all text-gray-400 group"
+                    title="Silenciar Áudio Local (Monitor)">
+                    <i class="ph ph-speaker-high text-xl transition-colors"></i>
                 </button>
-                <h3 class="text-xl font-bold mb-2">Lyncro Camera</h3>
-                <p class="text-xs text-gray-400 mb-6 font-sans">Escaneie o código abaixo com a câmera do seu celular
-                    para
-                    ativá-lo como sua câmera secundária.</p>
-                <div class="bg-white p-4 rounded-lg inline-block mb-4">
-                    <div id="qrcode-container"></div>
-                </div>
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold font-sans">O celular entrará em
-                    modo
-                    cego automático</p>
+                <div class="w-px h-4 bg-win-border mx-1"></div>
+                <button id="openMobileCam"
+                    class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
+                    <i class="ph ph-camera text-sm text-win-accent group-hover:text-white transition-colors"></i>
+                    Lyncro Cam
+                </button>
+                <div class="w-px h-4 bg-win-border mx-1"></div>
+                <button onclick="copyInviteLink()"
+                    class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
+                    <i class="ph ph-link text-sm text-win-accent group-hover:text-white transition-colors"></i>
+                    Convidar
+                </button>
             </div>
+
+            <select id="return-audio-select"
+                class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-32 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
+                <option value="">Sem Retorno</option>
+                <!-- Preenchido via JS -->
+            </select>
         </div>
 
-        <script src="js/virtual-background.js"></script>
-        <script src="js/webrtc.js"></script>
-        <script src="js/host.js"></script>
-    </body>
+        <button onclick="window.location.href='index.html'"
+            class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win bg-red-600/5 hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
+            Encerrar
+        </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex gap-4 min-h-0 pl-4 pr-4 pb-4 h-full">
+        <main id="video-grid"
+            class="flex-1 grid grid-auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-2"
+            style="grid-auto-rows: min-content;">
+            <!-- O Card do Host (Você) é dinâmico. -->
+        </main>
+
+        <!-- Right Side Panel (Split: Fila & Chat) -->
+        <aside class="w-80 flex flex-col gap-4 flex-shrink-0 min-h-0">
+            <!-- Fila Section -->
+            <section id="queue-section"
+                class="bg-win-card/40 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm section-expand overflow-hidden border border-win-border">
+                <div class="px-5 py-4 border-b border-win-border flex items-center justify-between bg-white/5">
+                    <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
+                        <i class="ph ph-users text-win-accent text-sm"></i> Fila de Espera
+                    </h2>
+                    <span id="queue-count"
+                        class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold hidden">0</span>
+                </div>
+                <div id="tab-content-queue" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
+                    <div id="waiting-list" class="flex flex-col gap-2">
+                        <!-- Cards de convidados aguardando entram aqui via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Section -->
+            <section
+                class="flex-1 bg-win-card/40 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm border border-win-border">
+                <div class="px-5 py-4 border-b border-win-border bg-white/5">
+                    <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
+                        <i class="ph ph-chat-text text-win-accent text-sm"></i> Chat de Produção
+                    </h2>
+                </div>
+                <div id="tab-content-chat" class="flex-1 flex flex-col overflow-hidden">
+                    <div id="chat-messages"
+                        class="flex-1 p-4 overflow-y-auto flex flex-col gap-3 text-xs scrollbar-thin">
+                        <!-- Mensagens aqui -->
+                    </div>
+                    <div class="p-3 border-t border-win-border bg-black/20 flex items-center gap-2 shrink-0">
+                        <input type="text" id="chat-input" placeholder="Mensagem..."
+                            class="flex-1 bg-black/40 border border-win-border/60 rounded px-3 py-2 outline-none focus:border-win-accent transition-colors text-sm placeholder:text-gray-700">
+                        <button id="send-chat"
+                            class="bg-win-accent text-white w-9 h-9 rounded flex items-center justify-center hover:bg-win-accent/80 transition-all active:scale-95 shadow-lg shadow-win-accent/10">
+                            <i class="ph ph-paper-plane-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <!-- Script de Tabs Removido -->
+
+    <!-- Modal QR Code Companion -->
+    <div id="qr-modal"
+        class="hidden fixed inset-0 z-[110] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+        <div
+            class="bg-win-surface border border-win-border rounded-xl p-6 shadow-2xl max-w-sm w-full relative text-gray-100">
+            <button id="close-qr-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-2">Lyncro Camera</h3>
+            <p class="text-xs text-gray-400 mb-6 font-sans">Escaneie o código abaixo com a câmera do seu celular
+                para
+                ativá-lo como sua câmera secundária.</p>
+            <div class="bg-white p-4 rounded-lg inline-block mb-4">
+                <div id="qrcode-container"></div>
+            </div>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold font-sans">O celular entrará em
+                modo
+                cego automático</p>
+        </div>
+    </div>
+
+    <script src="js/virtual-background.js"></script>
+    <script src="js/webrtc.js"></script>
+    <script src="js/host.js"></script>
+</body>
 
 </html>
