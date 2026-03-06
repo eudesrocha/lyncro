@@ -47,6 +47,10 @@
     </script>
     <script src="js/config.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body
+    class="min-h-screen dark:bg-win-bg bg-white dark:text-gray-100 text-gray-900 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
     <style>
         .video-label-accent {
             background: rgba(0, 0, 0, 0.4);
@@ -60,6 +64,7 @@
 
         .media-muted-overlay {
             background: rgba(0, 0, 0, 0.15);
+            /* Opacidade reduzida conforme solicitado */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -68,6 +73,7 @@
             z-index: 10;
         }
 
+        /* Ajuste para o fundo do dropdown (select options) */
         select,
         select option {
             background-color: #1a1a1a !important;
@@ -91,90 +97,93 @@
             width: auto;
             max-width: 70px;
             transition: all 0.2s;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 4px center;
-            background-size: 10px;
-        }
-
-        .device-select-compact:hover {
-            border-color: #0078d4;
-            color: #efefef;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230078d4' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
-        }
-
-        .section-expand {
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            max-height: 1000px;
-            opacity: 1;
-        }
-
-        .section-collapsed {
-            max-height: 0;
-            opacity: 0;
-            margin-bottom: 0 !important;
-            padding-top: 0 !important;
-            padding-bottom: 0 !important;
-            border: none !important;
-            overflow: hidden;
-        }
-
-        @keyframes pulse-queue-border {
-            0% {
-                border-color: #2a2a2a;
-                box-shadow: 0 0 0 rgba(0, 120, 212, 0);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23666' viewBox='0 0 256
+ 256'%3E%3Cpath
+ d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z' %3E%3C/path%3E%3C/svg%3E");
+ background-repeat: no-repeat;
+                    background-position: right 4px center;
+                    background-size: 10px;
             }
 
-            50% {
+            .device-select-compact:hover {
                 border-color: #0078d4;
-                box-shadow: 0 0 20px rgba(0, 120, 212, 0.4);
-            }
+                color: #efefef;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%230078d4' viewBox='0 0
+ 256 256'%3E%3Cpath
+ d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z' %3E%3C/path%3E%3C/svg%3E");
 
-            100% {
-                border-color: #2a2a2a;
-                box-shadow: 0 0 0 rgba(0, 120, 212, 0);
-            }
-        }
+                }
 
-        @keyframes pulse-badge {
-            0% {
-                transform: scale(1);
-                background-color: #dc2626;
-            }
+                /* Animação para expansão suave da fila */
+                .section-expand {
+                    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                    max-height: 1000px;
+                    opacity: 1;
+                }
 
-            50% {
-                transform: scale(1.15);
-                background-color: #ef4444;
-            }
+                .section-collapsed {
+                    max-height: 0;
+                    opacity: 0;
+                    margin-bottom: 0 !important;
+                    padding-top: 0 !important;
+                    padding-bottom: 0 !important;
+                    border: none !important;
+                    overflow: hidden;
+                }
 
-            100% {
-                transform: scale(1);
-                background-color: #dc2626;
-            }
-        }
+                /* Alertas para a Fila */
+                @keyframes pulse-queue-border {
+                    0% {
+                        border-color: #2a2a2a;
+                        box-shadow: 0 0 0 rgba(0, 120, 212, 0);
+                    }
 
-        .queue-alert-active {
-            animation: pulse-queue-border 2s infinite ease-in-out;
-            border-color: #0078d480 !important;
-        }
+                    50% {
+                        border-color: #0078d4;
+                        box-shadow: 0 0 20px rgba(0, 120, 212, 0.4);
+                    }
 
-        .queue-alert-active header {
-            background: linear-gradient(90deg, rgba(0, 120, 212, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
-        }
+                    100% {
+                        border-color: #2a2a2a;
+                        box-shadow: 0 0 0 rgba(0, 120, 212, 0);
+                    }
+                }
 
-        .queue-alert-active header i {
-            color: #ef4444 !important;
-            filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
-        }
+                @keyframes pulse-badge {
+                    0% {
+                        transform: scale(1);
+                        background-color: #dc2626;
+                    }
 
-        .badge-pulse {
-            animation: pulse-badge 1s infinite ease-in-out;
-        }
+                    50% {
+                        transform: scale(1.15);
+                        background-color: #ef4444;
+                    }
+
+                    100% {
+                        transform: scale(1);
+                        background-color: #dc2626;
+                    }
+                }
+
+                .queue-alert-active {
+                    animation: pulse-queue-border 2s infinite ease-in-out;
+                    border-color: #0078d480 !important;
+                }
+
+                .queue-alert-active header {
+                    background: linear-gradient(90deg, rgba(0, 120, 212, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+                }
+
+                .queue-alert-active header i {
+                    color: #ef4444 !important;
+                    filter: drop-shadow(0 0 8px rgba(239, 68, 68, 0.5));
+                }
+
+                .badge-pulse {
+                    animation: pulse-badge 1s infinite ease-in-out;
+                }
     </style>
-</head>
-
-<body
-    class="min-h-screen dark:bg-win-bg bg-white dark:text-gray-100 text-gray-900 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
 
     <header class="flex justify-between items-center mb-8 border-b border-win-border pb-5">
         <div class="flex items-center gap-4">
