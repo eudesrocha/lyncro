@@ -242,9 +242,15 @@
 
                 <!-- Theme Switcher Capsule -->
                 <div class="theme-capsule mr-4">
-                    <button onclick="changeTheme('auto')" id="theme-auto" class="theme-btn">Auto</button>
-                    <button onclick="changeTheme('light')" id="theme-light" class="theme-btn">Claro</button>
-                    <button onclick="changeTheme('dark')" id="theme-dark" class="theme-btn">Escuro</button>
+                    <button onclick="changeTheme('auto')" id="theme-auto" class="theme-btn" title="Automático">
+                        <i class="ph ph-circle-half text-base"></i>
+                    </button>
+                    <button onclick="changeTheme('light')" id="theme-light" class="theme-btn" title="Modo Claro">
+                        <i class="ph ph-sun text-base"></i>
+                    </button>
+                    <button onclick="changeTheme('dark')" id="theme-dark" class="theme-btn" title="Modo Escuro">
+                        <i class="ph ph-moon text-base"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -340,13 +346,15 @@
 
                         <!-- Estado Não Autenticado: Botão de Login -->
                         <div id="state-no-auth" class="space-y-6 py-4 text-center">
-                            <i class="ph ph-lock-key text-5xl text-win-accent opacity-50 mb-4 inline-block"></i>
-                            <h3 class="font-segoe-black text-xl tracking-tighter uppercase">Acesso Restrito</h3>
-                            <p class="text-sm text-gray-500 leading-relaxed mb-6">A função de Host é exclusiva para
-                                usuários autorizados. Faça login para gerenciar suas transmissões.</p>
+                            <i
+                                class="ph ph-identification-card text-5xl text-win-accent opacity-50 mb-4 inline-block"></i>
+                            <h3 class="font-segoe-black text-xl tracking-tighter uppercase">Portaria do Host</h3>
+                            <p class="text-sm text-gray-400 dark:text-gray-500 leading-relaxed mb-6">Esta área é
+                                reservada para produtores. Por favor, identifique-se para começar a gerenciar sua
+                                transmissão.</p>
                             <button onclick="window.location.href='login.html'"
                                 class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all active:scale-[0.98]">
-                                Login do Host
+                                Identificar-se agora
                             </button>
                         </div>
 

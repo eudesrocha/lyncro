@@ -1,6 +1,6 @@
 // Configurações do Supabase extraídas da imagem enviada pelo usuário
 const SUPABASE_URL = "https://wcdmvhxixqqnsqudshru.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_mCigqoBeN0bJg3Lnr6lrwg_PJ0pceGl";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndjZG12aHhpeHFxbnNxdWRzaHJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MDE2NjAsImV4cCI6MjA4ODM3NzY2MH0.7UTJVJGEvb09Isrto7FX4gDyr41TdA-ZwLO-Mv92VZw";
 
 // Importante: sb_publishable é a chave recomendada para novos projetos.
 // Se precisar da Anon Key (legacy), o usuário pode trocar depois, 
