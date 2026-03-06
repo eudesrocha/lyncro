@@ -128,7 +128,7 @@
 <body class="font-segoe selection:bg-win-accent selection:text-white">
 
     <!-- Header / Logo -->
-    <header class="fixed top-0 left-0 w-full p-8 z-50 animate-reveal">
+    <header id="main-header" class="fixed top-0 left-0 w-full p-8 z-50 animate-reveal">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <h1 class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase">LYNCRO</h1>
             <div class="hidden md:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
@@ -143,7 +143,7 @@
         class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-24 lg:pt-0 max-w-7xl mx-auto gap-12 lg:gap-24">
 
         <!-- Lado Esquerdo: Narrativa -->
-        <section class="flex-1 text-center lg:text-left">
+        <section id="narrative-section" class="flex-1 text-center lg:text-left">
             <div class="animate-reveal delay-1">
                 <h2 class="text-5xl lg:text-7xl font-segoe-black leading-tight mb-6 uppercase tracking-tight">
                     Sincronia Total.<br>
@@ -288,7 +288,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="fixed bottom-0 left-0 w-full p-8 hidden md:block">
+    <footer id="main-footer" class="fixed bottom-0 left-0 w-full p-8 hidden md:block">
         <div class="max-w-7xl mx-auto flex items-center justify-between opacity-30">
             <div class="flex gap-8">
                 <div class="flex items-center gap-2">
@@ -444,6 +444,23 @@
         const urlParams = new URLSearchParams(window.location.search);
         const prefillRoom = urlParams.get('room');
         if (prefillRoom) {
+            // Modo "Link de Convidado": Focar apenas no card
+            const narrative = document.getElementById('narrative-section');
+            const header = document.getElementById('main-header');
+            const footer = document.getElementById('main-footer');
+            const mobileBadge = document.querySelector('.mt-8.flex.items-center.justify-center'); // O badge mobile
+
+            if (narrative) narrative.classList.add('hidden');
+            if (header) header.classList.add('hidden');
+            if (footer) footer.classList.add('hidden');
+            if (mobileBadge) mobileBadge.classList.add('hidden');
+
+            // Centralizar o Card
+            const mainContent = document.querySelector('main');
+            if (mainContent) {
+                mainContent.className = "min-h-screen flex items-center justify-center p-6";
+            }
+
             switchTab('join');
             document.getElementById('joinRoomId').value = prefillRoom;
         }
