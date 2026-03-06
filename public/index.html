@@ -8,7 +8,7 @@
     <!-- Google Fonts: Inter para fallback premium no iOS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -22,8 +22,8 @@
                     },
                     borderRadius: { 'win': '8px' },
                     fontFamily: {
-                        'segoe-black': ['"Segoe UI Black"', 'Inter', '"Segoe UI"', 'sans-serif'],
-                        'segoe': ['"Segoe UI"', 'Inter', 'sans-serif'],
+                        'segoe-black': ['Inter', '"Segoe UI Black"', '"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
+                        'segoe': ['Inter', '"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
                     }
                 }
             }
@@ -223,26 +223,26 @@
     </style>
 
     <!-- Header / Logo -->
-    <header id="main-header" class="fixed top-0 left-0 w-full p-8 z-50 animate-reveal">
-        <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <header id="main-header" class="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 z-50 animate-reveal">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <h1
-                class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase dark:text-white text-gray-900">
+                class="text-2xl md:text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase dark:text-white text-gray-900">
                 LYNCRO</h1>
 
-            <div class="flex items-center gap-6">
+            <div class="flex items-center gap-3 md:gap-6 flex-wrap justify-end">
                 <!-- Perfil do Host / Logout (Injetado via JS) -->
-                <div id="host-profile"
-                    class="hidden flex items-center gap-4 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-lg">
-                    <div class="flex flex-col text-right">
-                        <span id="user-email" class="text-[9px] font-black text-white truncate max-w-[120px]">...</span>
+                <div id="host-profile" style="display:none;"
+                    class="flex items-center gap-3 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-lg order-first md:order-none">
+                    <i class="ph ph-user-circle text-xl text-win-accent"></i>
+                    <div class="flex flex-col">
+                        <span id="user-email" class="text-[9px] font-bold text-white truncate max-w-[140px]">...</span>
                         <button onclick="window.LYNCRO_AUTH.logout()"
-                            class="text-[8px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors">Sair</button>
+                            class="text-[8px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors text-left">Sair</button>
                     </div>
-                    <i class="ph ph-user-circle text-2xl text-win-accent"></i>
                 </div>
 
                 <!-- Theme Switcher Capsule -->
-                <div class="theme-capsule mr-4">
+                <div class="theme-capsule">
                     <button onclick="changeTheme('auto')" id="theme-auto" class="theme-btn" title="Automático">
                         <i class="ph ph-circle-half text-base"></i>
                     </button>
@@ -638,12 +638,12 @@
             if (session) {
                 stateAuth.classList.remove('hidden');
                 stateNoAuth.classList.add('hidden');
-                hostProfile.classList.remove('hidden');
+                hostProfile.style.display = 'flex';
                 userEmail.textContent = session.user.email;
             } else {
                 stateAuth.classList.add('hidden');
                 stateNoAuth.classList.remove('hidden');
-                hostProfile.classList.add('hidden');
+                hostProfile.style.display = 'none';
             }
         });
 
