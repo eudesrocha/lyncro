@@ -130,18 +130,39 @@ async function initiateConnection(targetId) {
     ws.send(JSON.stringify({ type: 'offer', roomId: roomName, to: targetId, offer }));
 }
 
-function handleRemoteTrack(targetId, stream) {
-    console.log('Receiving remote stream for clean feed: ' + targetId);
+const targetType = urlParams.get('type') || 'camera'; // 'camera' ou 'screen'
+let videoTrackCount = 0;
+
+function handleRemoteTrack(targetId, stream, track) {
+    if (track.kind !== 'video') return;
+
+    videoTrackCount++;
+    console.log(`Receiving remote track ${videoTrackCount} (${track.kind}) for clean feed: ${targetId}`);
+
     const statusEl = document.getElementById('status');
 
     if (targetId === targetParticipantId) {
+        // Lógica de seleção: 
+        // Se type=camera, pegamos o primeiro rastro de vídeo.
+        // Se type=screen, pegamos o segundo rastro de vídeo.
+        const isScreen = targetType === 'screen';
+        const shouldShowThisTrack = (isScreen && videoTrackCount === 2) || (!isScreen && videoTrackCount === 1);
+
+        if (!shouldShowThisTrack) {
+            console.log(`Pulando rastro ${videoTrackCount} (Alvo é ${targetType})`);
+            return;
+        }
+
         if (statusEl) {
             statusEl.style.display = 'block';
             statusEl.textContent = 'CONECTADO! Iniciando vídeo...';
             statusEl.style.background = 'green';
         }
 
-        remoteVideo.srcObject = stream;
+        // Criamos um novo stream apenas com este track para garantir isolamento
+        const singleStream = new MediaStream([track]);
+        remoteVideo.srcObject = singleStream;
+
         remoteVideo.onloadedmetadata = () => {
             remoteVideo.play()
                 .then(() => {

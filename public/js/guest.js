@@ -40,7 +40,11 @@ async function startPreCall() {
 
         localStream = await navigator.mediaDevices.getUserMedia({
             video: { width: { ideal: widthQoS }, height: { ideal: heightQoS }, facingMode: companionOf ? "environment" : "user" },
-            audio: true
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
         });
 
         if (!isMicOn && localStream.getAudioTracks().length > 0) {
@@ -561,7 +565,11 @@ document.getElementById('switchCamera').onclick = async () => {
     try {
         localStream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: newMode },
-            audio: isMicOn
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            }
         });
         mainVideo.srcObject = localStream;
         rtcClient.setLocalStream(localStream);
@@ -579,107 +587,95 @@ document.getElementById('leaveRoom').onclick = () => window.location.href = 'ind
 
 // 3.5. Compartilhamento de Tela (Screen Share)
 let isScreenSharing = false;
-let camTrackBackup = null;
+let screenTrack = null;
 
-document.getElementById('shareScreen').onclick = async () => {
-    const btn = document.getElementById('shareScreen');
-    if (!isScreenSharing) {
-        try {
-            console.log('Iniciando compartilhamento de tela...');
-            const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                video: { cursor: "always" },
-                audio: false
-            });
-            const screenVideoTrack = screenStream.getVideoTracks()[0];
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+const toggleScreenBtn = document.getElementById('toggleScreen');
+const screenIndicator = document.getElementById('screen-share-indicator');
 
-            // Backup da track de vídeo atual
-            camTrackBackup = localStream.getVideoTracks()[0];
+// Esconder botão no mobile para evitar travamentos
+if (isMobile && toggleScreenBtn) {
+    toggleScreenBtn.classList.add('hidden');
+}
 
-            // Ouvir quando o usuário para o compartilhamento via barra do navegador
-            screenVideoTrack.onended = () => {
-                console.log('Compartilhamento de tela encerrado pelo navegador.');
-                stopScreenShare();
-            };
-
-            // Trocar no motor WebRTC
-            if (rtcClient) {
-                await rtcClient.replaceTrack(screenVideoTrack);
-            }
-
-            // Atualizar Stream local e Preview
-            localStream.removeTrack(camTrackBackup);
-            localStream.addTrack(screenVideoTrack);
-
-            // Não paramos a câmera completamente para permitir volta rápida se possível, 
-            // mas desativamos para economizar energia/privacidade
-            camTrackBackup.enabled = false;
-
-            mainVideo.srcObject = localStream;
-            mainVideo.style.objectFit = 'contain';
-            mainVideo.classList.add('bg-black/90');
-
-            btn.classList.replace('bg-purple-600/20', 'bg-purple-600');
-            btn.classList.replace('text-purple-400', 'text-white');
-            isScreenSharing = true;
-
-            // Notificar sistema sobre mudança de estado (opcional)
-            broadcastMediaStatus();
-        } catch (e) {
-            console.error('Erro ao compartilhar tela:', e);
+if (toggleScreenBtn) {
+    toggleScreenBtn.onclick = async () => {
+        if (isMobile) {
+            showToast("O compartilhamento de tela é otimizado para Desktop", "info");
+            return;
         }
-    } else {
-        stopScreenShare();
-    }
-};
+        if (!isScreenSharing) {
+            try {
+                console.log('Iniciando compartilhamento de tela...');
+                const screenStream = await navigator.mediaDevices.getDisplayMedia({
+                    video: { cursor: "always" },
+                    audio: false
+                });
+                screenTrack = screenStream.getVideoTracks()[0];
 
-async function stopScreenShare() {
-    if (!isScreenSharing) return;
+                // Ouvir quando o usuário para o compartilhamento via barra do navegador
+                screenTrack.onended = () => {
+                    console.log('Compartilhamento de tela encerrado pelo navegador.');
+                    stopScreenShare();
+                };
 
-    console.log('Voltando para a câmera...');
-    try {
-        const screenTrack = localStream.getVideoTracks()[0];
+                // Adicionar como rastro extra no WebRTC
+                if (rtcClient) {
+                    rtcClient.addExtraTrack(screenTrack, screenStream);
+                }
 
-        // Se temos o backup e ele ainda está "vivo"
-        if (camTrackBackup && camTrackBackup.readyState === 'live') {
-            camTrackBackup.enabled = isVideoOn; // Respeita o botão de mute de vídeo
+                // Atualizar UI
+                toggleScreenBtn.classList.add('bg-win-accent', 'text-white');
+                toggleScreenBtn.classList.remove('bg-win-surface/80');
+                screenIndicator.classList.remove('hidden');
 
-            localStream.removeTrack(screenTrack);
-            localStream.addTrack(camTrackBackup);
+                isScreenSharing = true;
 
-            if (rtcClient) {
-                await rtcClient.replaceTrack(camTrackBackup);
+                // Notificar sistema sobre mudança de estado
+                ws.send(JSON.stringify({
+                    type: 'screen-status-change',
+                    roomId: roomName,
+                    isScreenSharing: true
+                }));
+
+            } catch (e) {
+                console.error('Erro ao compartilhar tela:', e);
             }
         } else {
-            // Se o backup morreu ou não existe, pegamos a câmera de novo
-            const camStream = await navigator.mediaDevices.getUserMedia({
-                video: { height: { ideal: 720 } },
-                audio: false
-            });
-            const newCamTrack = camStream.getVideoTracks()[0];
+            stopScreenShare();
+        }
+    };
+}
 
-            localStream.removeTrack(screenTrack);
-            localStream.addTrack(newCamTrack);
+async function stopScreenShare() {
+    if (!isScreenSharing || !screenTrack) return;
 
-            if (rtcClient) {
-                await rtcClient.replaceTrack(newCamTrack);
-            }
+    console.log('Parando compartilhamento de tela...');
+    try {
+        if (rtcClient) {
+            rtcClient.removeExtraTrack(screenTrack);
         }
 
-        screenTrack.stop(); // Encerra a captura de tela
+        screenTrack.stop();
+        screenTrack = null;
 
-        mainVideo.srcObject = localStream;
-        mainVideo.style.objectFit = 'cover';
-        mainVideo.classList.remove('bg-black/90');
+        // Atualizar UI
+        toggleScreenBtn.classList.remove('bg-win-accent', 'text-white');
+        toggleScreenBtn.classList.add('bg-win-surface/80');
+        screenIndicator.classList.add('hidden');
 
-        const btn = document.getElementById('shareScreen');
-        btn.classList.replace('bg-purple-600', 'bg-purple-600/20');
-        btn.classList.replace('text-white', 'text-purple-400');
         isScreenSharing = false;
 
-        broadcastMediaStatus();
+        // Notificar sistema
+        ws.send(JSON.stringify({
+            type: 'screen-status-change',
+            roomId: roomName,
+            isScreenSharing: false
+        }));
+
     } catch (e) {
-        console.error('Erro ao retornar para a câmera:', e);
-        isScreenSharing = false; // Reset de segurança
+        console.error('Erro ao parar compartilhamento de tela:', e);
+        isScreenSharing = false;
     }
 }
 

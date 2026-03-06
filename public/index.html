@@ -126,20 +126,126 @@
         }
     </style>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/config.js"></script>
 </head>
 
-<body class="font-segoe selection:bg-win-accent selection:text-white">
+<body
+    class="font-segoe selection:bg-win-accent selection:text-white transition-colors duration-300 dark:bg-[#121212] bg-white dark:text-white text-gray-900">
+
+    <style>
+        /* Ajustes para modo claro/escuro */
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .dark body {
+            background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
+        }
+
+        .mica-effect {
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
+            background: rgba(43, 43, 43, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dark .mica-effect {
+            background: rgba(43, 43, 43, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        html:not(.dark) .mica-effect {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        html:not(.dark) .win-input {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+            color: #121212;
+        }
+
+        html:not(.dark) .win-input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        html:not(.dark) .text-gray-400 {
+            color: #4a4a4a;
+        }
+
+        html:not(.dark) .text-gray-500 {
+            color: #666666;
+        }
+
+        html:not(.dark) .text-gray-700 {
+            color: #888888;
+        }
+
+        /* Cápsula de Tema */
+        .theme-capsule {
+            display: flex;
+            background: rgba(128, 128, 128, 0.1);
+            border-radius: 999px;
+            padding: 4px;
+            gap: 2px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .theme-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+            color: inherit;
+            opacity: 0.5;
+        }
+
+        .theme-btn.active {
+            background: var(--win-accent, #0078d4);
+            color: white;
+            opacity: 1;
+        }
+
+        html:not(.dark) .theme-capsule {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    </style>
 
     <!-- Header / Logo -->
     <header id="main-header" class="fixed top-0 left-0 w-full p-8 z-50 animate-reveal">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <h1 class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase text-white">LYNCRO</h1>
-            <div id="header-extra"
-                class="hidden md:flex items-center gap-6 text-[10px] font-bold uppercase tracking-[0.2em] opacity-40">
-                <span>Real-Time WebRTC</span>
-                <div class="w-1 h-1 bg-white rounded-full"></div>
-                <span>Broadcast Quality</span>
+            <h1
+                class="text-3xl font-segoe-black italic tracking-[-0.02em] select-none uppercase dark:text-white text-gray-900">
+                LYNCRO</h1>
+
+            <div class="flex items-center gap-6">
+                <!-- Perfil do Host / Logout (Injetado via JS) -->
+                <div id="host-profile"
+                    class="hidden flex items-center gap-4 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-lg">
+                    <div class="flex flex-col text-right">
+                        <span id="user-email" class="text-[9px] font-black text-white truncate max-w-[120px]">...</span>
+                        <button onclick="window.LYNCRO_AUTH.logout()"
+                            class="text-[8px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors">Sair</button>
+                    </div>
+                    <i class="ph ph-user-circle text-2xl text-win-accent"></i>
+                </div>
+
+                <!-- Theme Switcher Capsule -->
+                <div class="theme-capsule mr-4">
+                    <button onclick="changeTheme('auto')" id="theme-auto" class="theme-btn">Auto</button>
+                    <button onclick="changeTheme('light')" id="theme-light" class="theme-btn">Claro</button>
+                    <button onclick="changeTheme('dark')" id="theme-dark" class="theme-btn">Escuro</button>
+                </div>
             </div>
         </div>
     </header>
@@ -200,9 +306,8 @@
                 <div class="p-8 pt-10">
                     <!-- Aba Criar Sala -->
                     <div id="panel-create" class="space-y-6">
-                        <!-- Estado 1: Entrada de Dados -->
-                        <div id="state-input"
-                            class="transition-all duration-500 ease-out opacity-100 translate-y-0 relative">
+                        <!-- Estado Autenticado: Formulário -->
+                        <div id="state-auth" class="hidden space-y-6">
                             <h3 class="font-segoe-black text-xl mb-4 tracking-tighter uppercase">CRIAR NOVA SALA</h3>
                             <div class="space-y-6">
                                 <div class="space-y-2">
@@ -231,6 +336,18 @@
                                     <div id="btn-create-loader" class="win-loader hidden"></div>
                                 </button>
                             </div>
+                        </div>
+
+                        <!-- Estado Não Autenticado: Botão de Login -->
+                        <div id="state-no-auth" class="space-y-6 py-4 text-center">
+                            <i class="ph ph-lock-key text-5xl text-win-accent opacity-50 mb-4 inline-block"></i>
+                            <h3 class="font-segoe-black text-xl tracking-tighter uppercase">Acesso Restrito</h3>
+                            <p class="text-sm text-gray-500 leading-relaxed mb-6">A função de Host é exclusiva para
+                                usuários autorizados. Faça login para gerenciar suas transmissões.</p>
+                            <button onclick="window.location.href='login.html'"
+                                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all active:scale-[0.98]">
+                                Login do Host
+                            </button>
                         </div>
 
                         <!-- Estado 2: Sucesso (Link Gerado) -->
@@ -312,6 +429,21 @@
 
     <script>
         let currentRoomData = null;
+
+        function updateThemeButtons() {
+            const theme = localStorage.getItem('theme') || 'auto';
+            document.querySelectorAll('.theme-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`theme-${theme}`);
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        function changeTheme(theme) {
+            window.LYNCRO_THEME.setTheme(theme);
+            updateThemeButtons();
+        }
+
+        // Inicializar botões de tema
+        updateThemeButtons();
 
         function switchTab(tab) {
             const btnCreate = document.getElementById('tab-create');
@@ -486,11 +618,34 @@
             }, 500);
         }
 
+        // Gerenciamento de Sessão e UI de Autenticação
+        window.addEventListener('supabase-ready', (e) => {
+            const session = e.detail.session;
+            const stateAuth = document.getElementById('state-auth');
+            const stateNoAuth = document.getElementById('state-no-auth');
+            const hostProfile = document.getElementById('host-profile');
+            const userEmail = document.getElementById('user-email');
+
+            if (session) {
+                stateAuth.classList.remove('hidden');
+                stateNoAuth.classList.add('hidden');
+                hostProfile.classList.remove('hidden');
+                userEmail.textContent = session.user.email;
+            } else {
+                stateAuth.classList.add('hidden');
+                stateNoAuth.classList.remove('hidden');
+                hostProfile.classList.add('hidden');
+            }
+        });
+
         const lastName = localStorage.getItem('sv_last_name');
         if (lastName) {
             document.getElementById('userNameHost').value = lastName;
             document.getElementById('userNameGuest').value = lastName;
         }
+
+        // Chamar updateThemeButtons periodicamente ou garantir que esteja sincronizado
+        updateThemeButtons();
     </script>
 </body>
 

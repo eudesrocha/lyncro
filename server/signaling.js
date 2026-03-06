@@ -129,6 +129,16 @@ function setupSignaling(server) {
                         });
                         break;
 
+                    case 'screen-status-change':
+                        roomManager.updateParticipant(normalizedRoomId, participantId, {
+                            isScreenSharing: data.isScreenSharing
+                        });
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'participant-update',
+                            participants: roomManager.getRoom(normalizedRoomId).participants
+                        });
+                        break;
+
                     case 'overlay-control':
                         const rmOverlay = roomManager.getRoom(normalizedRoomId);
                         if (rmOverlay && rmOverlay.host === participantId) {

@@ -33,6 +33,7 @@ class RoomManager {
             muted: false,
             audioMuted: false,
             videoMuted: false,
+            isScreenSharing: false,
             ...participantData
         };
 

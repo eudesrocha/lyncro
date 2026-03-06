@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyncro - Login do Host</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="js/theme.js"></script>
+    <script src="js/auth.js"></script>
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
+            min-height: 100vh;
+        }
+
+        .mica-effect {
+            backdrop-filter: blur(40px) saturate(150%);
+            background: rgba(43, 43, 43, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-6 text-white font-sans">
+    <div class="w-full max-w-md mica-effect p-8 rounded-2xl shadow-2xl animate-reveal">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-2">LYNCRO</h1>
+            <p class="text-[10px] font-bold text-win-accent tracking-[0.3em] uppercase">HOST LOGIN</p>
+        </header>
+
+        <div id="login-form" class="space-y-6">
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">E-mail</label>
+                <input type="email" id="email" placeholder="seu@email.com"
+                    class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
+            </div>
+
+            <button onclick="handleEmailLogin()" id="btn-email"
+                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-lg text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95">
+                Enviar Link Mágico
+            </button>
+
+            <div class="relative flex items-center justify-center py-2">
+                <div class="w-full border-t border-white/10"></div>
+                <span
+                    class="absolute bg-[#1c1c1c] px-4 text-[10px] text-gray-500 font-bold uppercase tracking-widest">ou</span>
+            </div>
+
+            <button onclick="window.LYNCRO_AUTH.loginWithGoogle()"
+                class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 rounded-lg text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95">
+                <i class="ph ph-google-logo text-lg"></i>
+                Entrar com Google
+            </button>
+        </div>
+
+        <div id="check-email" class="hidden text-center space-y-4 py-6">
+            <i class="ph ph-paper-plane-tilt text-5xl text-win-accent animate-bounce"></i>
+            <h2 class="font-bold text-xl uppercase tracking-tighter">Verifique seu e-mail</h2>
+            <p class="text-sm text-gray-400">Enviamos um link de acesso para o seu endereço de e-mail.</p>
+            <button onclick="location.reload()"
+                class="text-xs text-win-accent font-bold uppercase tracking-widest mt-4">Tentar novamente</button>
+        </div>
+    </div>
+
+    <script>
+        async function handleEmailLogin() {
+            const email = document.getElementById('email').value.trim();
+            if (!email) return alert('Insira seu email');
+
+            const btn = document.getElementById('btn-email');
+            btn.disabled = true;
+            btn.textContent = 'Enviando...';
+
+            try {
+                await window.LYNCRO_AUTH.loginWithEmail(email);
+                document.getElementById('login-form').classList.add('hidden');
+                document.getElementById('check-email').classList.remove('hidden');
+            } catch (err) {
+                alert('Erro ao enviar email: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Enviar Link Mágico';
+            }
+        }
+
+        // Se o usuário já estiver logado (ao abrir a página), mandar pro Home
+        window.addEventListener('supabase-ready', async (e) => {
+            if (e.detail.session) window.location.href = 'index.html';
+        });
+    </script>
+</body>
+
+</html>

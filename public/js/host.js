@@ -45,6 +45,8 @@ let processedStream = null; // Stream pós-IA (se ativo)
 let currentVbMode = 'none';
 let currentVbImage = null;
 let currentParticipants = [];
+let isMonitorMuted = false;
+const vuAnalyzers = new Map(); // participantId -> { analyzer, dataArray, animationId }
 
 const videoGrid = document.getElementById('video-grid');
 const roomIdDisplay = document.getElementById('room-id-display');
@@ -152,7 +154,12 @@ async function enumerateDevices() {
                 try {
                     if (returnAudioStream) returnAudioStream.getTracks().forEach(t => t.stop());
                     returnAudioStream = await navigator.mediaDevices.getUserMedia({
-                        audio: { deviceId: { exact: deviceId } }
+                        audio: {
+                            deviceId: { exact: deviceId },
+                            echoCancellation: true,
+                            noiseSuppression: true,
+                            autoGainControl: true
+                        }
                     });
                     injectReturnAudioToPeers();
                 } catch (err) {
@@ -172,7 +179,12 @@ async function updateHostDevice(kind, deviceId) {
     try {
         const constraints = {
             video: kind === 'video' ? { deviceId: { exact: deviceId } } : false,
-            audio: kind === 'audio' ? { deviceId: { exact: deviceId } } : false
+            audio: kind === 'audio' ? {
+                deviceId: { exact: deviceId },
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true
+            } : false
         };
 
         // Se estivermos trocando apenas um, precisamos garantir que o outro não seja solicitado novamente ou que mantenhamos o atual
@@ -402,6 +414,11 @@ function renderParticipantCard(participant, isLocal = false) {
           <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Aguardando...</span>
         </div>
 
+        <!-- VU Meter Vertical Minimalista -->
+        <div class="absolute left-2 top-2 bottom-2 w-1 bg-white/5 rounded-full overflow-hidden flex flex-col justify-end z-20 border border-white/5">
+            <div id="vu-bar-${participant.id}" class="w-full bg-[#0078d4] h-0 transition-all duration-75 rounded-full shadow-[0_0_8px_rgba(0,120,212,0.5)]"></div>
+        </div>
+
         <div id="mute-overlay-${participant.id}" class="absolute inset-0 media-muted-overlay ${participant.audioMuted || participant.videoMuted ? '' : 'hidden'}">
           ${participant.videoMuted ? `
               <i class="ph ph-video-camera-slash text-4xl text-red-600/80 drop-shadow-xl animate-pulse"></i>
@@ -458,9 +475,14 @@ function renderParticipantCard(participant, isLocal = false) {
             <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none opacity-50">Lower Third (Overlay)</span>
             <div class="flex items-center gap-2">
               ${isLocal ? '' : `
-              <button onclick="copyCleanFeed('${participant.id}')" title="Copiar Link Clean Feed" class="text-[9px] font-bold uppercase text-win-accent hover:text-white transition-all flex items-center gap-1">
+              <button onclick="copyCleanFeed('${participant.id}')" title="Copiar Link Clean Feed Câmera" class="text-[9px] font-bold uppercase text-win-accent hover:text-white transition-all flex items-center gap-1">
                 <i class="ph ph-copy"></i> Feed
               </button>
+              ${participant.isScreenSharing ? `
+              <button onclick="copyCleanFeed('${participant.id}', 'screen')" title="Copiar Link Clean Feed Tela" class="text-[9px] font-bold uppercase text-blue-400 hover:text-white transition-all flex items-center gap-1">
+                <i class="ph ph-monitor"></i> Tela
+              </button>
+              ` : ''}
               `}
               <button id="btn-ov-toggle-${participant.id}" onclick="toggleOverlay('${participant.id}')" 
                 class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}">
@@ -615,7 +637,84 @@ function handleRemoteTrack(targetId, stream) {
         const waiting = document.getElementById(`waiting-${targetId}`);
         if (waiting) waiting.classList.add('hidden');
     }
+
+    // Iniciar VU Meter se houver áudio
+    if (stream.getAudioTracks().length > 0) {
+        startVUMeter(targetId, stream);
+    }
 }
+
+function startVUMeter(participantId, stream) {
+    try {
+        if (!window.audioCtx) window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Limpar anterior se existir
+        stopVUMeter(participantId);
+
+        const source = window.audioCtx.createMediaStreamSource(stream);
+        const analyzer = window.audioCtx.createAnalyser();
+        analyzer.fftSize = 256;
+        source.connect(analyzer);
+
+        // Mix-Minus Local: O áudio remoto é conectado ao destino do Host (alto-falantes) 
+        // mas podemos silenciar via ganho sem afetar o OBS (que recebe direto via rtc)
+        const monitorGain = window.audioCtx.createGain();
+        monitorGain.gain.value = isMonitorMuted ? 0 : 1;
+        analyzer.connect(monitorGain);
+        monitorGain.connect(window.audioCtx.destination);
+
+        const bufferLength = analyzer.frequencyBinCount;
+        const dataArray = new Uint8Array(bufferLength);
+
+        const updateVU = () => {
+            analyzer.getByteFrequencyData(dataArray);
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            const average = sum / bufferLength;
+            const level = Math.min(100, (average / 128) * 100);
+
+            const vuBar = document.getElementById(`vu-bar-${participantId}`);
+            if (vuBar) {
+                vuBar.style.height = `${level}%`;
+                // Cores suaves: cinza para baixo, azul para ideal
+                vuBar.style.backgroundColor = level > 10 ? '#0078d4' : '#4b5563';
+                vuBar.style.opacity = level > 5 ? '1' : '0.3';
+            }
+
+            if (vuAnalyzers.has(participantId)) {
+                vuAnalyzers.get(participantId).animationId = requestAnimationFrame(updateVU);
+            }
+        };
+
+        vuAnalyzers.set(participantId, { analyzer, monitorGain, animationId: requestAnimationFrame(updateVU) });
+    } catch (e) {
+        console.error("Erro ao iniciar VU Meter:", e);
+    }
+}
+
+function stopVUMeter(participantId) {
+    if (vuAnalyzers.has(participantId)) {
+        cancelAnimationFrame(vuAnalyzers.get(participantId).animationId);
+        vuAnalyzers.delete(participantId);
+    }
+}
+
+window.toggleMonitorMute = () => {
+    isMonitorMuted = !isMonitorMuted;
+    vuAnalyzers.forEach(data => {
+        data.monitorGain.gain.setTargetAtTime(isMonitorMuted ? 0 : 1, window.audioCtx.currentTime, 0.05);
+    });
+
+    const btn = document.getElementById('btn-mute-monitor');
+    if (btn) {
+        btn.classList.toggle('bg-red-600/20', isMonitorMuted);
+        btn.classList.toggle('text-red-500', isMonitorMuted);
+        btn.innerHTML = `<i class="ph ${isMonitorMuted ? 'ph-speaker-slash' : 'ph-speaker-high'} text-xl"></i>`;
+    }
+    showToast(isMonitorMuted ? "Monitoramento silenciado" : "Monitoramento ativo", "info");
+};
 
 function handleDataMessage(targetId, data) {
     if (data.type === 'file-progress') {
@@ -690,9 +789,11 @@ window.remoteMuteVideo = (pId) => {
     ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'video', action: 'toggle' }));
 };
 
-window.copyCleanFeed = (pId) => {
-    const url = `${window.location.origin}/cleanfeed.html?room=${roomName}&participant=${pId}`;
-    navigator.clipboard.writeText(url).then(() => { alert('URL do Clean Feed copiada para o OBS!'); });
+window.copyCleanFeed = (pId, type = 'camera') => {
+    const url = `${window.location.origin}/cleanfeed.html?room=${roomName}&participant=${pId}&type=${type}`;
+    navigator.clipboard.writeText(url).then(() => {
+        showToast(`Link de ${type === 'screen' ? 'Tela' : 'Câmera'} copiado para o OBS!`, 'success');
+    });
 };
 
 window.copyInviteLink = async () => {

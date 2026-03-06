@@ -335,6 +335,24 @@ class WebRTCClient {
         }
     }
 
+    addExtraTrack(track, stream) {
+        this.peers.forEach((peer, id) => {
+            peer.pc.addTrack(track, stream);
+            this.createOffer(id);
+        });
+    }
+
+    removeExtraTrack(track) {
+        this.peers.forEach((peer, id) => {
+            const senders = peer.pc.getSenders();
+            const sender = senders.find(s => s.track === track);
+            if (sender) {
+                peer.pc.removeTrack(sender);
+                this.createOffer(id);
+            }
+        });
+    }
+
     async addReturnAudioTrack(track) {
         this.returnAudioTrack = track;
         for (const [targetId, pc] of this.peers.entries()) {
