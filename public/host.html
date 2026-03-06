@@ -28,6 +28,8 @@
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="js/config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
         .video-label-accent {
             background: rgba(0, 0, 0, 0.4);
@@ -48,6 +50,11 @@
                 class="text-xs font-normal opacity-50 uppercase ml-2">Host Monitor</span></h1>
         <div class="flex gap-2 items-center">
             <div id="room-id-display" class="text-xs opacity-50 mr-4 font-mono"></div>
+            <button id="openMobileCam"
+                class="flex items-center gap-2 bg-win-surface border border-win-border px-4 py-1.5 rounded-win win-btn-hover transition-all text-sm">
+                <i class="ph ph-camera"></i>
+                Lyncro Cam
+            </button>
             <button onclick="copyInviteLink()"
                 class="flex items-center gap-2 bg-win-surface border border-win-border px-4 py-1.5 rounded-win win-btn-hover transition-all text-sm">
                 <i class="ph ph-link"></i>
@@ -120,6 +127,25 @@
     </div>
 
     <!-- Script de Tabs Removido -->
+
+    <!-- Modal QR Code Companion -->
+    <div id="qr-modal"
+        class="hidden fixed inset-0 z-[110] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
+        <div
+            class="bg-win-surface border border-win-border rounded-xl p-6 shadow-2xl max-w-sm w-full relative text-gray-100">
+            <button id="close-qr-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
+                <i class="ph ph-x text-xl"></i>
+            </button>
+            <h3 class="text-xl font-bold mb-2">Lyncro Camera</h3>
+            <p class="text-xs text-gray-400 mb-6 font-sans">Escaneie o código abaixo com a câmera do seu celular para
+                ativá-lo como sua câmera secundária.</p>
+            <div class="bg-white p-4 rounded-lg inline-block mb-4">
+                <div id="qrcode-container"></div>
+            </div>
+            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold font-sans">O celular entrará em modo
+                cego automático</p>
+        </div>
+    </div>
 
     <script src="js/webrtc.js"></script>
     <script src="js/host.js"></script>

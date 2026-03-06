@@ -617,3 +617,40 @@ function appendChatMessage(name, text, time) {
     chatMessages.appendChild(msg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+// --- Lyncro Cam (QR Code Companion) para o Host ---
+const openMobileBtn = document.getElementById('openMobileCam');
+const qrModal = document.getElementById('qr-modal');
+const closeQrModal = document.getElementById('close-qr-modal');
+const qrContainer = document.getElementById('qrcode-container');
+let qrcodeInstance = null;
+
+if (openMobileBtn && qrModal && closeQrModal && qrContainer) {
+    openMobileBtn.onclick = () => {
+        qrModal.classList.remove('hidden');
+        if (!qrcodeInstance && myId) {
+            // Gerar URL de Convidado com o parâmetro companionOf apontando para o Host
+            const baseUrl = window.location.origin;
+            const qrUrl = new URL(`${baseUrl}/guest.html`);
+            qrUrl.searchParams.set('room', roomName);
+            qrUrl.searchParams.set('companionOf', myId);
+            qrUrl.searchParams.set('name', 'Lyncro Cam (Host)');
+
+            qrcodeInstance = new QRCode(qrContainer, {
+                text: qrUrl.toString(),
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        } else if (!myId) {
+            showToast("Aguarde a conexão com o servidor...", "error");
+            qrModal.classList.add('hidden');
+        }
+    };
+
+    closeQrModal.onclick = () => {
+        qrModal.classList.add('hidden');
+    };
+}
