@@ -135,9 +135,11 @@ class VirtualBackground {
 
     setMode(mode, imageUrl = null) {
         this.mode = mode;
-        if (mode === 'image' && imageUrl) {
+        if (imageUrl) {
             this.backgroundImage = new Image();
             this.backgroundImage.src = imageUrl;
+        } else {
+            this.backgroundImage = null;
         }
     }
 

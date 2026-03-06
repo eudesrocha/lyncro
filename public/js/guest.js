@@ -102,30 +102,56 @@ window.setVirtualBackground = async (mode, imageUrl = null, btnId = null) => {
     currentVbMode = mode;
     currentVbImage = imageUrl;
 
-    if (btnId) {
-        currentVbBtnId = btnId;
-    } else {
+    let targetId = btnId;
+    if (!targetId) {
         // Fallback
-        currentVbBtnId = `vb-btn-${mode === 'image' ? (imageUrl?.includes('office') ? 'office' : 'studio') : mode}`;
+        targetId = mode === 'image' ? (imageUrl?.includes('office') ? 'office-premium' : imageUrl?.includes('studio') ? 'studio-pro' : imageUrl?.includes('loft') ? 'loft' : imageUrl?.includes('living') ? 'living' : 'abstract') : mode;
+    } else {
+        targetId = targetId.replace('pre-vb-btn-', '').replace('vb-btn-', '');
     }
 
     // Reset UI styling for all background buttons
-    document.querySelectorAll('[id^="vb-btn-"]').forEach(el => {
+    document.querySelectorAll('[id*="vb-btn-"]').forEach(el => {
         el.classList.remove('border-win-accent', 'bg-win-accent/10');
         el.classList.add('border-transparent');
     });
 
-    // Highlight selected
-    const activeEl = document.getElementById(currentVbBtnId);
-    if (activeEl) {
+    // Highlight selected across all lists
+    document.querySelectorAll(`[id$="vb-btn-${targetId}"]`).forEach(activeEl => {
         activeEl.classList.remove('border-transparent');
         activeEl.classList.add('border-win-accent', 'bg-win-accent/10');
-    }
+    });
 
     if (localStream) {
-        // Stop current tracks and restart precall to apply the effect smoothly
-        localStream.getTracks().forEach(t => t.stop());
-        await startPreCall();
+        document.querySelectorAll(`[id$="vb-btn-${targetId}"]`).forEach(btn => btn.classList.add('opacity-50', 'pointer-events-none'));
+
+        try {
+            const videoTrack = localStream.getVideoTracks()[0];
+            if (videoTrack) {
+                if (mode !== 'none') {
+                    processedStream = await window.vbManager.start(localStream, { mode, imageUrl });
+                    if (!precallScreen.classList.contains('hidden')) {
+                        preVideo.srcObject = processedStream;
+                    } else {
+                        mainVideo.srcObject = processedStream;
+                    }
+                    if (rtcClient) await rtcClient.replaceTrack(processedStream.getVideoTracks()[0]);
+                } else {
+                    window.vbManager.stop();
+                    processedStream = localStream;
+                    if (!precallScreen.classList.contains('hidden')) {
+                        preVideo.srcObject = localStream;
+                    } else {
+                        mainVideo.srcObject = localStream;
+                    }
+                    if (rtcClient) await rtcClient.replaceTrack(videoTrack);
+                }
+            }
+        } catch (e) {
+            console.error("Falha ao aplicar fundo virtual", e);
+        } finally {
+            document.querySelectorAll(`[id$="vb-btn-${targetId}"]`).forEach(btn => btn.classList.remove('opacity-50', 'pointer-events-none'));
+        }
     }
 };
 

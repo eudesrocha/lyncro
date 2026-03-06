@@ -913,7 +913,7 @@ window.setVirtualBackground = async (mode, imageUrl = null, btnId = null) => {
 
     let currentVbBtnId = btnId;
     if (!currentVbBtnId) {
-        currentVbBtnId = `vb-btn-${mode === 'image' ? (imageUrl?.includes('office') ? 'office' : 'studio') : mode}`;
+        currentVbBtnId = `vb-btn-${mode === 'image' ? (imageUrl?.includes('office') ? 'office-premium' : imageUrl?.includes('studio') ? 'studio-pro' : imageUrl?.includes('loft') ? 'loft' : imageUrl?.includes('living') ? 'living' : 'abstract') : mode}`;
     }
 
     // Reset UI styling
