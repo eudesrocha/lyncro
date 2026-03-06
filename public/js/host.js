@@ -41,6 +41,9 @@ let returnAudioStream = null; // Áudio de Loopback do Mix-Minus
 let rtcClient;
 let ws;
 let myId;
+let processedStream = null; // Stream pós-IA (se ativo)
+let currentVbMode = 'none';
+let currentVbImage = null;
 let currentParticipants = [];
 
 const videoGrid = document.getElementById('video-grid');
@@ -58,16 +61,28 @@ async function init() {
     try {
         localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
 
+        // Aplicar processamento de Fundo Virtual (se ativo)
+        if (currentVbMode !== 'none') {
+            try {
+                processedStream = await window.vbManager.start(localStream, { mode: currentVbMode, imageUrl: currentVbImage });
+            } catch (e) {
+                console.error("Falha ao iniciar Virtual Background, usando stream limpo", e);
+                processedStream = localStream;
+            }
+        } else {
+            processedStream = localStream;
+        }
+
         // Atualizar vídeo local
         const localVideoEl = document.querySelector('#video-card-local video');
-        if (localVideoEl) localVideoEl.srcObject = localStream;
+        if (localVideoEl) localVideoEl.srcObject = processedStream;
 
         // Injetar stream no cliente RTC se ele já existir
         if (rtcClient) {
-            rtcClient.setLocalStream(localStream);
+            rtcClient.setLocalStream(processedStream);
 
             // Adicionar trilhas aos peers já conectados (se houver)
-            localStream.getTracks().forEach(track => {
+            processedStream.getTracks().forEach(track => {
                 rtcClient.replaceTrack(track);
             });
         }
@@ -179,12 +194,22 @@ async function updateHostDevice(kind, deviceId) {
         // Atualizar vídeo local
         const localVideoEl = document.querySelector('#video-card-local video');
         if (localVideoEl && kind === 'video') {
-            localVideoEl.srcObject = localStream;
+            if (currentVbMode !== 'none') {
+                try {
+                    processedStream = await window.vbManager.start(localStream, { mode: currentVbMode, imageUrl: currentVbImage });
+                    localVideoEl.srcObject = processedStream;
+                } catch (e) {
+                    console.error("Falha ao processar Fundo Virtual na troca de camera", e);
+                    localVideoEl.srcObject = localStream;
+                }
+            } else {
+                localVideoEl.srcObject = localStream;
+            }
         }
 
         // Substituir track em todos os peers ativos
         if (rtcClient) {
-            await rtcClient.replaceTrack(newTrack);
+            await rtcClient.replaceTrack(currentVbMode !== 'none' && kind === 'video' ? processedStream.getVideoTracks()[0] : newTrack);
         }
 
         showToast(`${kind === 'video' ? 'Câmera' : 'Microfone'} atualizada com sucesso!`, "success");
@@ -217,7 +242,7 @@ function setupWebSocket() {
 
     ws.onopen = () => {
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, initiateConnection, null, handleDataMessage);
-        rtcClient.setLocalStream(localStream);
+        rtcClient.setLocalStream(processedStream || localStream);
 
         const payload = {
             type: 'join',
@@ -451,6 +476,30 @@ function renderParticipantCard(participant, isLocal = false) {
           </div>
         </div>
       </div>
+
+      ${isLocal ? `
+      <!-- Virtual Background Selector (Host Only) -->
+      <div class="px-3 pb-3 bg-white/5 border-t border-win-border/10">
+        <div class="flex flex-col gap-2 pt-3">
+          <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none opacity-50 flex items-center gap-1"><i class="ph ph-sparkle text-purple-400"></i> Fundo Virtual</span>
+          <div class="grid grid-cols-4 gap-1.5">
+            <button onclick="setVirtualBackground('none')" id="vb-btn-none" class="flex flex-col items-center justify-center p-1.5 rounded bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer h-10">
+                <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span>
+            </button>
+            <button onclick="setVirtualBackground('blur')" id="vb-btn-blur" class="flex flex-col items-center justify-center p-1.5 rounded bg-white/5 border border-transparent transition-all hover:bg-white/10 cursor-pointer h-10">
+                <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
+            </button>
+            <button onclick="setVirtualBackground('image', 'img/bg-office.png')" id="vb-btn-office" class="flex flex-col items-center justify-center p-0 rounded border border-transparent overflow-hidden transition-all hover:border-win-accent/50 cursor-pointer h-10 relative">
+                <img src="img/bg-office.png" alt="Office" class="w-full h-full object-cover">
+            </button>
+            <button onclick="setVirtualBackground('image', 'img/bg-studio.png')" id="vb-btn-studio" class="flex flex-col items-center justify-center p-0 rounded border border-transparent overflow-hidden transition-all hover:border-win-accent/50 cursor-pointer h-10 relative">
+                <img src="img/bg-studio.png" alt="Studio" class="w-full h-full object-cover">
+            </button>
+          </div>
+        </div>
+      </div>
+      ` : ''}
+
     `;
 
     videoGrid.appendChild(card);
@@ -698,6 +747,50 @@ function appendChatMessage(name, text, time) {
     chatMessages.appendChild(msg);
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
+
+// Funcao exposta pro HTML para selecionar Fundo (Host)
+window.setVirtualBackground = async (mode, imageUrl = null) => {
+    currentVbMode = mode;
+    currentVbImage = imageUrl;
+
+    // Reset UI styling
+    ['none', 'blur', 'office', 'studio'].forEach(id => {
+        const el = document.getElementById(`vb-btn-${id}`);
+        if (el) {
+            el.classList.remove('border-win-accent', 'bg-win-accent/10');
+            el.classList.add('border-transparent');
+        }
+    });
+
+    // Highlight selected
+    const activeId = mode === 'image' ? (imageUrl.includes('office') ? 'office' : 'studio') : mode;
+    const activeEl = document.getElementById(`vb-btn-${activeId}`);
+    if (activeEl) {
+        activeEl.classList.remove('border-transparent');
+        activeEl.classList.add('border-win-accent', 'bg-win-accent/10');
+    }
+
+    if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        if (videoTrack) {
+            // Re-apply process to current localStream and push to RTC
+            if (mode !== 'none') {
+                try {
+                    processedStream = await window.vbManager.start(localStream, { mode, imageUrl });
+                    const localVideoEl = document.querySelector('#video-card-local video');
+                    if (localVideoEl) localVideoEl.srcObject = processedStream;
+                    if (rtcClient) await rtcClient.replaceTrack(processedStream.getVideoTracks()[0]);
+                } catch (e) { console.error(e); }
+            } else {
+                window.vbManager.stop();
+                processedStream = localStream;
+                const localVideoEl = document.querySelector('#video-card-local video');
+                if (localVideoEl) localVideoEl.srcObject = localStream;
+                if (rtcClient) await rtcClient.replaceTrack(videoTrack);
+            }
+        }
+    }
+};
 
 const openMobileBtn = document.getElementById('openMobileCam');
 const qrModal = document.getElementById('qr-modal');

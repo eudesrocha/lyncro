@@ -1,9 +1,12 @@
-const CACHE_NAME = 'sv-guest-v3';
+const CACHE_NAME = 'sv-guest-v4';
 const urlsToCache = [
     '/guest.html',
     '/css/shared.css',
     '/js/webrtc.js',
     '/js/guest.js',
+    '/js/virtual-background.js',
+    '/img/bg-office.png',
+    '/img/bg-studio.png',
     'https://cdn.tailwindcss.com',
     'https://unpkg.com/@phosphor-icons/web'
 ];

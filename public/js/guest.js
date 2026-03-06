@@ -11,6 +11,9 @@ let isMicOn = companionOf ? false : true; // Companion começa sempre mudo
 let isVideoOn = true;
 let audioContext;
 let analyser;
+let processedStream = null; // Stream pós-IA (se ativo)
+let currentVbMode = 'none';
+let currentVbImage = null;
 
 const preVideo = document.getElementById('pre-localVideo');
 const mainVideo = document.getElementById('localVideo');
@@ -44,7 +47,27 @@ async function startPreCall() {
             localStream.getAudioTracks()[0].enabled = false;
         }
 
-        preVideo.srcObject = localStream;
+        // Aplicar processamento de Fundo Virtual (se ativo)
+        if (currentVbMode !== 'none') {
+            const btn = document.getElementById(`vb-btn-${currentVbMode === 'image' ? (currentVbImage.includes('office') ? 'office' : 'studio') : currentVbMode}`);
+            if (btn) btn.classList.add('opacity-50', 'pointer-events-none'); // Disable during load
+
+            try {
+                processedStream = await window.vbManager.start(localStream, { mode: currentVbMode, imageUrl: currentVbImage });
+                preVideo.srcObject = processedStream;
+            } catch (e) {
+                console.error("Falha ao iniciar Virtual Background, usando stream limpo", e);
+                processedStream = localStream;
+                preVideo.srcObject = localStream;
+            } finally {
+                if (btn) btn.classList.remove('opacity-50', 'pointer-events-none');
+            }
+        } else {
+            processedStream = localStream;
+            preVideo.srcObject = localStream;
+            window.vbManager.stop();
+        }
+
         setupAudioMonitor(localStream);
     } catch (err) {
         console.error('Precall error (Mídia bloqueada?):', err);
@@ -68,6 +91,35 @@ if (qualitySelectEl) {
         startPreCall();
     });
 }
+
+// Funcao exposta pro HTML para selecionar Fundo
+window.setVirtualBackground = async (mode, imageUrl = null) => {
+    currentVbMode = mode;
+    currentVbImage = imageUrl;
+
+    // Reset UI styling
+    ['none', 'blur', 'office', 'studio'].forEach(id => {
+        const el = document.getElementById(`vb-btn-${id}`);
+        if (el) {
+            el.classList.remove('border-win-accent', 'bg-win-accent/10');
+            el.classList.add('border-transparent');
+        }
+    });
+
+    // Highlight selected
+    const activeId = mode === 'image' ? (imageUrl.includes('office') ? 'office' : 'studio') : mode;
+    const activeEl = document.getElementById(`vb-btn-${activeId}`);
+    if (activeEl) {
+        activeEl.classList.remove('border-transparent');
+        activeEl.classList.add('border-win-accent', 'bg-win-accent/10');
+    }
+
+    if (localStream) {
+        // Stop current tracks and restart precall to apply the effect smoothly
+        localStream.getTracks().forEach(t => t.stop());
+        await startPreCall();
+    }
+};
 
 window.selectQuality = (val, label) => {
     const el = document.getElementById('video-quality');
@@ -287,7 +339,8 @@ function setupWebSocket() {
         if (waitTitle) waitTitle.innerHTML = 'Conectado! <br><span class="text-sm font-normal text-gray-400">Aguardando aprovação do produtor...</span>';
 
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, null, null, handleDataMessage);
-        rtcClient.setLocalStream(localStream);
+        // Garantir que a conexão WebRTC envie a câmera processada com o fundo virtual (se as opções estiverem visíveis)
+        rtcClient.setLocalStream(processedStream || localStream);
 
         const passwordEl = document.getElementById('room-password');
         const password = passwordEl ? passwordEl.value.trim() : null;

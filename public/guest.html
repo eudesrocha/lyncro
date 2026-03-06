@@ -272,6 +272,34 @@
                     class="w-full bg-black/30 border border-win-border rounded-lg text-sm p-2.5 outline-none focus:border-win-accent text-white shadow-inner transition-all">
             </div>
 
+            <!-- Virtual Background Selector -->
+            <div class="w-full mb-6">
+                <label
+                    class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-2 block ml-1 flex items-center gap-1">
+                    <i class="ph ph-sparkle text-win-accent"></i> Fundo Virtual (IA)
+                </label>
+                <div class="grid grid-cols-4 gap-2">
+                    <button onclick="setVirtualBackground('none')" id="vb-btn-none"
+                        class="flex flex-col items-center justify-center p-2 rounded-xl bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-gray-300">Real</span>
+                    </button>
+                    <button onclick="setVirtualBackground('blur')" id="vb-btn-blur"
+                        class="flex flex-col items-center justify-center p-2 rounded-xl bg-black/40 border border-win-border/40 transition-all hover:bg-white/5 cursor-pointer">
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
+                    </button>
+                    <button onclick="setVirtualBackground('image', 'img/bg-office.png')" id="vb-btn-office"
+                        class="flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative aspect-video">
+                        <img src="img/bg-office.png" alt="Office" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                    </button>
+                    <button onclick="setVirtualBackground('image', 'img/bg-studio.png')" id="vb-btn-studio"
+                        class="flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative aspect-video">
+                        <img src="img/bg-studio.png" alt="Studio" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                    </button>
+                </div>
+            </div>
+
             <button id="join-btn"
                 class="w-full bg-win-accent hover:bg-opacity-90 text-white font-semibold py-4 rounded-xl text-lg shadow-lg active:scale-95 transition-all">
                 Entrar na Sala
@@ -462,6 +490,8 @@
         </div>
     </div>
 
+    <!-- Script de Fundo Virtual Inteligente (MediaPipe) -->
+    <script src="js/virtual-background.js"></script>
     <script src="js/webrtc.js"></script>
     <script src="js/guest.js"></script>
     <script>
