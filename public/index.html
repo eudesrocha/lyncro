@@ -42,8 +42,10 @@
             <div>
                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Sala</label>
                 <div class="flex gap-2">
-                    <input type="text" id="roomName" placeholder="Identificador da sala" required
-                        class="flex-1 bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
+                    <input type="text" id="hostRoomId" placeholder="ID da Sala (Opcional)"
+                        class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
+                    <input type="password" id="roomPassword" placeholder="Senha da Sala (Opcional)"
+                        class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
                     <button type="button" onclick="copyLink()" title="Copiar link de convite"
                         class="bg-win-surface border border-win-border p-2 rounded-win hover:bg-win-accent/20 transition-all">
                         <i class="ph ph-link"></i>
@@ -89,6 +91,32 @@
             const dest = role === 'host' ? 'host.html' : 'guest.html';
             window.location.href = `${dest}?room=${room}&name=${name}`;
         };
+
+        async function createRoom() {
+            const roomId = document.getElementById('hostRoomId').value.trim();
+            const password = document.getElementById('roomPassword').value.trim();
+            const payload = { name: roomId };
+            if (password) payload.password = password;
+
+            try {
+                const res = await fetch('/api/rooms', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                // Armazenar senha localmente para o Host não ter que digitar de novo
+                if (password) {
+                    localStorage.setItem(`room_pwd_${data.roomId}`, password);
+                }
+
+                window.location.href = `host.html?room=${data.roomId}`;
+            } catch (err) {
+                console.error('Erro ao criar sala:', err);
+                alert('Erro ao criar sala');
+            }
+        }
 
         function copyLink() {
             const room = document.getElementById('roomName').value.trim();

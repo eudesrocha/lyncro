@@ -135,18 +135,27 @@ function setupWebSocket() {
     console.log(`Conectando ao servidor Lyncro em: ${wsUrl}`);
     ws = new WebSocket(wsUrl);
 
+    const storedPassword = localStorage.getItem(`room_pwd_${roomName}`);
+
     ws.onopen = () => {
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, initiateConnection, null, handleDataMessage);
         rtcClient.setLocalStream(localStream);
 
-        ws.send(JSON.stringify({
+        console.log('WS: Conectado. Enviando join como Host...');
+        const payload = {
             type: 'join',
             roomId: roomName,
             participant: {
-                name: userName,
+                name: 'Host (Você)',
                 role: 'host'
             }
-        }));
+        };
+
+        if (storedPassword) {
+            payload.password = storedPassword;
+        }
+
+        ws.send(JSON.stringify(payload));
     };
 
     ws.onmessage = async (event) => {

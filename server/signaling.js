@@ -25,6 +25,18 @@ function setupSignaling(server) {
                 switch (type) {
                     case 'join':
                         currentRoomId = normalizedRoomId;
+                        const room_join = roomManager.rooms.get(normalizedRoomId);
+
+                        // Validar senha se a sala possuir uma
+                        if (room_join && room_join.password && data.password !== room_join.password) {
+                            console.log(`[JOIN REJECTED] Room: "${normalizedRoomId}" | Motivo: Senha Incorreta`);
+                            ws.send(JSON.stringify({
+                                type: 'error',
+                                message: 'Senha incorreta para esta sala.'
+                            }));
+                            return;
+                        }
+
                         const participant = roomManager.joinRoom(normalizedRoomId, { ...data.participant, ws });
                         participantId = participant.id;
 
@@ -107,7 +119,7 @@ function setupSignaling(server) {
                         break;
 
                     case 'media-status-change':
-                        roomManager.updateParticipant(roomId, participantId, {
+                        roomManager.updateParticipant(normalizedRoomId, participantId, {
                             audioMuted: data.audioMuted,
                             videoMuted: data.videoMuted
                         });

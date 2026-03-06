@@ -22,8 +22,8 @@ app.get('/api/rooms', (req, res) => {
 });
 
 app.post('/api/rooms', (req, res) => {
-    const { name } = req.body;
-    const roomId = roomManager.createRoom(name);
+    const { name, password } = req.body;
+    const roomId = roomManager.createRoom(name, password);
     res.json({ roomId });
 });
 

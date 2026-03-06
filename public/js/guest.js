@@ -21,12 +21,17 @@ const precallScreen = document.getElementById('precall-screen');
 const callScreen = document.getElementById('call-screen');
 const audioBar = document.getElementById('audio-bar');
 
-document.getElementById('display-name').textContent = userName;
+const savedUserName = localStorage.getItem('lyncro_user_name');
+const finalUserName = savedUserName || userName;
+document.getElementById('display-name').textContent = finalUserName;
 
 // 1. Início do Fluxo de Pré-chamada
 async function startPreCall() {
     try {
         const qualitySelect = document.getElementById('video-quality');
+        const savedQuality = localStorage.getItem('lyncro_video_quality');
+        if (savedQuality && qualitySelect) qualitySelect.value = savedQuality;
+
         const heightQoS = qualitySelect ? parseInt(qualitySelect.value) : 720;
         const widthQoS = Math.round(heightQoS * (16 / 9));
 
@@ -51,6 +56,7 @@ async function startPreCall() {
 const qualitySelectEl = document.getElementById('video-quality');
 if (qualitySelectEl) {
     qualitySelectEl.addEventListener('change', () => {
+        localStorage.setItem('lyncro_video_quality', qualitySelectEl.value);
         if (localStream) {
             localStream.getTracks().forEach(t => t.stop());
         }
@@ -168,11 +174,18 @@ function setupWebSocket() {
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, null, null, handleDataMessage);
         rtcClient.setLocalStream(localStream);
 
-        ws.send(JSON.stringify({
+        const passwordEl = document.getElementById('room-password');
+        const password = passwordEl ? passwordEl.value.trim() : null;
+
+        const joinPayload = {
             type: 'join',
             roomId: roomName,
             participant: { name: userName, role: 'guest', companionOf: companionOf }
-        }));
+        };
+
+        if (password) joinPayload.password = password;
+
+        ws.send(JSON.stringify(joinPayload));
     };
 
     ws.onmessage = async (event) => {
@@ -262,6 +275,17 @@ function setupWebSocket() {
                     const badge = document.getElementById('chat-badge');
                     if (badge) badge.classList.remove('hidden');
                     if (navigator.vibrate) navigator.vibrate(50);
+                }
+                break;
+            case 'error':
+                console.error('SERVER ERROR:', data.message);
+                alert(data.message);
+                // Se o erro for senha, voltamos para a tela de pré-chamada
+                if (data.message.includes('Senha')) {
+                    const waitingScreen = document.getElementById('waiting-screen');
+                    const precallScreen = document.getElementById('precall-screen');
+                    if (waitingScreen) waitingScreen.classList.add('hidden');
+                    if (precallScreen) precallScreen.classList.remove('hidden');
                 }
                 break;
         }

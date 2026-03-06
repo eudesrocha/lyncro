@@ -5,11 +5,12 @@ class RoomManager {
         this.rooms = new Map(); // roomId -> { participants: Map(participantId -> data), host: participantId }
     }
 
-    createRoom(roomId = uuidv4()) {
+    createRoom(roomId = uuidv4(), password = null) {
         if (!this.rooms.has(roomId)) {
             this.rooms.set(roomId, {
                 participants: new Map(),
-                host: null
+                host: null,
+                password: password ? String(password).trim() : null
             });
         }
         return roomId;
