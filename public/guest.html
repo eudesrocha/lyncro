@@ -681,10 +681,21 @@
     <script src="js/webrtc.js"></script>
     <script src="js/guest.js"></script>
     <script>
-        // Registrar Service Worker
+        // Forçar atualização do Service Worker (resolve cache travado no mobile)
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW reg error:', err));
+            window.addEventListener('load', async () => {
+                try {
+                    // Forçar limpeza de todos os caches antigos
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+
+                    // Registrar e forçar atualização
+                    const reg = await navigator.serviceWorker.register('/sw.js');
+                    await reg.update(); // Busca nova versão do servidor
+                    console.log('SW atualizado com sucesso');
+                } catch (err) {
+                    console.log('SW error:', err);
+                }
             });
         }
     </script>

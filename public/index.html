@@ -656,6 +656,17 @@
         // Chamar updateThemeButtons periodicamente ou garantir que esteja sincronizado
         updateThemeButtons();
     </script>
+    <script>
+        // Limpar Service Workers antigos ao visitar a Home (resolve cache travado no mobile)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations().then(regs => {
+                regs.forEach(reg => reg.unregister());
+            });
+            caches.keys().then(names => {
+                names.forEach(name => caches.delete(name));
+            });
+        }
+    </script>
 </body>
 
 </html>
