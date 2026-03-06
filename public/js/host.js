@@ -41,6 +41,7 @@ let returnAudioStream = null; // Áudio de Loopback do Mix-Minus
 let rtcClient;
 let ws;
 let myId;
+let currentParticipants = [];
 
 const videoGrid = document.getElementById('video-grid');
 const roomIdDisplay = document.getElementById('room-id-display');
@@ -189,6 +190,7 @@ function setupWebSocket() {
 }
 
 function updateUI(participants) {
+    currentParticipants = participants;
     const videoGrid = document.getElementById('video-grid');
     const waitingList = document.getElementById('waiting-list');
     const emptyQueueMsg = document.getElementById('empty-queue-msg');
@@ -305,6 +307,21 @@ function renderParticipantCard(participant, isLocal = false) {
         <div class="absolute inset-0 flex items-center justify-center opacity-30 ${isLocal ? 'hidden' : ''}" id="waiting-${participant.id}">
           <span class="text-xs italic">Aguardando Convidado...</span>
         </div>
+
+        <div id="mute-overlay-${participant.id}" class="absolute inset-0 media-muted-overlay ${participant.audioMuted || participant.videoMuted ? '' : 'hidden'}">
+          ${participant.videoMuted ? `
+            <div class="flex flex-col items-center animate-pulse">
+              <i class="ph ph-video-camera-slash text-3xl text-red-500"></i>
+              <span class="text-[10px] font-bold uppercase tracking-widest text-red-500 mt-2">Câmera Desligada</span>
+            </div>
+          ` : ''}
+          ${participant.audioMuted ? `
+            <div class="flex items-center gap-2 bg-red-600/20 px-3 py-1 rounded-full border border-red-500/30">
+              <i class="ph ph-microphone-slash text-red-500"></i>
+              <span class="text-[9px] font-bold uppercase text-red-500">Mudo</span>
+            </div>
+          ` : ''}
+        </div>
         
         <div class="absolute top-3 right-3 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-sm border border-win-border">
           <div id="tally-dot-${participant.id}" class="w-2 h-2 rounded-full ${participant.tallyState === 'program' ? 'bg-red-500 animate-pulse' : participant.tallyState === 'preview' ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}"></div>
@@ -407,7 +424,31 @@ function updateParticipantStatus(p) {
         }
     }
 
-    // Atualizar Ícones de Audio/Video
+    // Atualizar Overlays de Mídia
+    const overlay = document.getElementById(`mute-overlay-${p.id}`);
+    if (overlay) {
+        if (p.audioMuted || p.videoMuted) {
+            overlay.classList.remove('hidden');
+            overlay.innerHTML = `
+                ${p.videoMuted ? `
+                    <div class="flex flex-col items-center animate-pulse">
+                        <i class="ph ph-video-camera-slash text-3xl text-red-500"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-red-500 mt-2">Câmera Desligada</span>
+                    </div>
+                ` : ''}
+                ${p.audioMuted ? `
+                    <div class="flex items-center gap-2 bg-red-600/20 px-3 py-1 rounded-full border border-red-500/30">
+                        <i class="ph ph-microphone-slash text-red-500"></i>
+                        <span class="text-[9px] font-bold uppercase text-red-500">Mudo</span>
+                    </div>
+                ` : ''}
+            `;
+        } else {
+            overlay.classList.add('hidden');
+        }
+    }
+
+    // Atualizar Ícones de Audio/Video nos botões
     const btnAudio = document.getElementById(`btn-audio-${p.id}`);
     if (btnAudio) {
         btnAudio.className = `${p.audioMuted ? 'text-red-500 bg-red-600/20' : 'hover:text-red-400'} p-1 rounded transition-colors`;
@@ -512,6 +553,14 @@ window.handleTallyChange = (pId, state, name) => {
 };
 
 window.remoteMute = (pId) => {
+    // Busca o participante atual na lista
+    const p = currentParticipants.find(part => part.id === pId);
+    if (p) {
+        // Atualização Otimista na UI
+        p.audioMuted = !p.audioMuted;
+        updateParticipantStatus(p);
+    }
+
     ws.send(JSON.stringify({
         type: 'media-control',
         roomId: roomName,
@@ -522,6 +571,13 @@ window.remoteMute = (pId) => {
 };
 
 window.remoteMuteVideo = (pId) => {
+    const p = currentParticipants.find(part => part.id === pId);
+    if (p) {
+        // Atualização Otimista na UI
+        p.videoMuted = !p.videoMuted;
+        updateParticipantStatus(p);
+    }
+
     ws.send(JSON.stringify({
         type: 'media-control',
         roomId: roomName,
