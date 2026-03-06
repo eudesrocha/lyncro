@@ -38,10 +38,24 @@
                     class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
             </div>
 
-            <button onclick="handleEmailLogin()" id="btn-email"
-                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-lg text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95">
-                Enviar Link Mágico
-            </button>
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Senha <span
+                        class="text-[8px] opacity-50 lowercase">(Opcional para Link Mágico)</span></label>
+                <input type="password" id="password" placeholder="••••••••"
+                    class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
+            </div>
+
+            <div class="flex flex-col gap-3">
+                <button onclick="handlePasswordLogin()" id="btn-password"
+                    class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-lg text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95">
+                    Entrar com Senha
+                </button>
+
+                <button onclick="handleEmailLogin()" id="btn-email"
+                    class="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-lg text-[10px] uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 active:scale-95 border border-white/5">
+                    <i class="ph ph-envelope-simple text-sm"></i> Enviar Link Mágico
+                </button>
+            </div>
 
             <div class="relative flex items-center justify-center py-2">
                 <div class="w-full border-t border-white/10"></div>
@@ -66,13 +80,34 @@
     </div>
 
     <script>
+        async function handlePasswordLogin() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!email || !password) return alert('Insira seu email e senha');
+
+            const btn = document.getElementById('btn-password');
+            btn.disabled = true;
+            btn.textContent = 'Entrando...';
+
+            try {
+                await window.LYNCRO_AUTH.loginWithPassword(email, password);
+                // O evento supabase-ready será disparado pelo auth.js se der sucesso
+                window.location.href = 'index.html';
+            } catch (err) {
+                alert('Erro ao fazer login: ' + err.message);
+                btn.disabled = false;
+                btn.textContent = 'Entrar com Senha';
+            }
+        }
+
         async function handleEmailLogin() {
             const email = document.getElementById('email').value.trim();
             if (!email) return alert('Insira seu email');
 
             const btn = document.getElementById('btn-email');
             btn.disabled = true;
-            btn.textContent = 'Enviando...';
+            btn.innerHTML = 'Enviando...';
 
             try {
                 await window.LYNCRO_AUTH.loginWithEmail(email);
@@ -81,7 +116,7 @@
             } catch (err) {
                 alert('Erro ao enviar email: ' + err.message);
                 btn.disabled = false;
-                btn.textContent = 'Enviar Link Mágico';
+                btn.innerHTML = '<i class="ph ph-envelope-simple text-sm"></i> Enviar Link Mágico';
             }
         }
 
