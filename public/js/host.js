@@ -52,7 +52,7 @@ async function init() {
     setupWebSocket();
 
     // 2. Renderizar card local (vazio inicialmente)
-    renderParticipantCard({ id: 'local', name: `${userName} (Host)`, role: 'host' }, true);
+    renderParticipantCard({ id: 'local', name: userName, role: 'host' }, true);
 
     // 3. Solicitar mídias em background
     try {
@@ -223,7 +223,7 @@ function setupWebSocket() {
             type: 'join',
             roomId: roomName,
             participant: {
-                name: 'Host (Você)',
+                name: userName,
                 role: 'host'
             }
         };
@@ -274,7 +274,7 @@ function updateUI(participants) {
 
     participants.forEach(p => {
         if (p.role === 'observer' || (p.name && p.name.startsWith('OBS-'))) return;
-        if (p.role === 'host' && p.name === userName) return;
+        if (p.id === myId) return; // Não renderizar a si mesmo como remoto (evita card fantasma)
 
         if (p.status === 'waiting') {
             queueCount++;
