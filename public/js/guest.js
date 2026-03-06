@@ -1085,29 +1085,41 @@ let qrcodeInstance = null;
 if (openMobileBtn && qrModal && closeQrModal && qrContainer) {
     openMobileBtn.addEventListener('click', () => {
         qrModal.classList.remove('hidden');
-        if (!qrcodeInstance && myId) {
-            // Gerar URL mágica
-            const qrUrl = new URL(window.location.href);
-            qrUrl.searchParams.set('companionOf', myId);
-            // Evitar problemas de loop adicionando sufixo
+
+        // Gerar QR Code usando userName (sempre disponível) como identificador companion
+        if (!qrcodeInstance) {
+            qrContainer.innerHTML = ''; // Limpar container
+            const baseUrl = window.location.origin;
+            const qrUrl = new URL(`${baseUrl}/guest.html`);
+            qrUrl.searchParams.set('room', roomName);
+            qrUrl.searchParams.set('companionOf', myId || userName);
             qrUrl.searchParams.set('name', userName + ' (Cam 2)');
 
-            qrcodeInstance = new QRCode(qrContainer, {
-                text: qrUrl.toString(),
-                width: 200,
-                height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
-        } else if (!myId) {
-            alert("Aguarde a conexão com o servidor ser estabelecida para gerar o QR Code.");
-            qrModal.classList.add('hidden');
+            try {
+                qrcodeInstance = new QRCode(qrContainer, {
+                    text: qrUrl.toString(),
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (err) {
+                console.error('Erro ao gerar QR Code:', err);
+                qrContainer.innerHTML = '<p style="color:red;font-size:12px;">Erro ao gerar QR Code</p>';
+            }
         }
     });
 
     closeQrModal.addEventListener('click', () => {
         qrModal.classList.add('hidden');
+    });
+
+    // Fechar ao clicar fora do modal
+    qrModal.addEventListener('click', (e) => {
+        if (e.target === qrModal) {
+            qrModal.classList.add('hidden');
+        }
     });
 }
 
