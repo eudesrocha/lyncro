@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyncro - Host Monitor</title>
+    <!-- Tailwind CSS (usando via CDN para simplificar no MVP, mas configurado localmente se necessário) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'win-bg': '#1c1c1c',      // Fundo principal
+                        'win-card': '#2b2b2b',    // Cards de vídeo
+                        'win-surface': '#323232', // Botões e inputs
+                        'win-accent': '#0078d4',  // Azul padrão Windows
+                        'win-border': 'rgba(255, 255, 255, 0.08)',
+                    },
+                    borderRadius: {
+                        'win': '4px', // O segredo para não ficar "arredondado demais"
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="js/config.js"></script>
+    <style>
+        .video-label-accent {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 2px;
+        }
+
+        .win-btn-hover:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-win-bg text-gray-100 font-sans p-6 selection:bg-win-accent flex flex-col">
+
+    <header class="flex justify-between items-center mb-8 border-b border-win-border pb-4">
+        <h1 class="text-xl font-semibold tracking-tight">Lyncro <span
+                class="text-xs font-normal opacity-50 uppercase ml-2">Host Monitor</span></h1>
+        <div class="flex gap-2 items-center">
+            <div id="room-id-display" class="text-xs opacity-50 mr-4 font-mono"></div>
+            <button onclick="copyInviteLink()"
+                class="flex items-center gap-2 bg-win-surface border border-win-border px-4 py-1.5 rounded-win win-btn-hover transition-all text-sm">
+                <i class="ph ph-link"></i>
+                Convidar
+            </button>
+            <div class="flex items-center gap-2 bg-win-surface border border-win-border px-3 py-1.5 rounded-win">
+                <i class="ph ph-microphone-stage text-win-accent text-lg"></i>
+                <select id="return-audio-select"
+                    class="bg-transparent border-none text-xs text-gray-300 outline-none w-32 cursor-pointer">
+                    <option value="">Retorno Desligado</option>
+                    <!-- Preenchido via JS -->
+                </select>
+            </div>
+            <button onclick="window.location.href='index.html'"
+                class="bg-red-900/20 border border-red-500/20 text-red-400 px-4 py-1.5 rounded-win hover:bg-red-900/40 transition-all text-sm">
+                Encerrar Sala
+            </button>
+        </div>
+    </header>
+
+    <div class="flex-1 flex gap-4 min-h-0 pl-4 pr-4 pb-4 h-full">
+        <main id="video-grid"
+            class="flex-1 grid grid-auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 overflow-y-auto pr-2"
+            style="grid-auto-rows: min-content;">
+            <!-- O Card do Host (Você) é dinâmico. -->
+        </main>
+
+        <!-- Right Side Panel (Split: Fila & Chat) -->
+        <aside class="w-80 flex flex-col gap-4 flex-shrink-0 min-h-0">
+            <!-- Fila Section -->
+            <section class="flex-1 bg-win-card border border-win-border rounded-win flex flex-col shadow-xl min-h-0">
+                <div class="px-4 py-3 border-b border-win-border flex items-center justify-between">
+                    <h2 class="text-sm font-bold flex items-center gap-2">
+                        <i class="ph ph-users text-win-accent"></i> Fila
+                    </h2>
+                    <span id="queue-count"
+                        class="bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full hidden">0</span>
+                </div>
+                <div id="tab-content-queue" class="flex-1 p-3 overflow-y-auto flex flex-col gap-3">
+                    <div class="text-xs text-center text-gray-500 my-4" id="empty-queue-msg">Nenhum convidado
+                        aguardando.</div>
+                    <div id="waiting-list" class="flex flex-col gap-2">
+                        <!-- Cards de convidados aguardando entram aqui via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Chat Section -->
+            <section class="flex-1 bg-win-card border border-win-border rounded-win flex flex-col shadow-xl min-h-0">
+                <div class="px-4 py-3 border-b border-win-border">
+                    <h2 class="text-sm font-bold flex items-center gap-2">
+                        <i class="ph ph-chat-text text-win-accent"></i> Chat
+                    </h2>
+                </div>
+                <div id="tab-content-chat" class="flex-1 flex flex-col overflow-hidden">
+                    <div id="chat-messages" class="flex-1 p-3 overflow-y-auto flex flex-col gap-3 text-xs">
+                        <!-- Mensagens aqui -->
+                    </div>
+                    <div class="p-2 border-t border-win-border bg-win-surface/40 flex items-center gap-2 shrink-0">
+                        <input type="text" id="chat-input" placeholder="Mensagem para geral..."
+                            class="flex-1 bg-black/40 border border-win-border rounded px-3 py-1.5 outline-none focus:border-win-accent transition-colors text-sm">
+                        <button id="send-chat"
+                            class="bg-win-accent text-white w-8 h-8 rounded flex items-center justify-center hover:bg-win-accent/80 transition-colors">
+                            <i class="ph ph-paper-plane-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+
+    <!-- Script de Tabs Removido -->
+
+    <script src="js/webrtc.js"></script>
+    <script src="js/host.js"></script>
+</body>
+
+</html>

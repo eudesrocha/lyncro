@@ -1,0 +1,17 @@
+{
+    "name": "Lyncro Guest",
+    "short_name": "LY Guest",
+    "description": "App de Transmissão Remota para Convidados",
+    "start_url": "/guest.html",
+    "display": "standalone",
+    "background_color": "#1c1c1c",
+    "theme_color": "#0078d4",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

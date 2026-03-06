@@ -1,0 +1,97 @@
+const { v4: uuidv4 } = require('uuid');
+
+class RoomManager {
+    constructor() {
+        this.rooms = new Map(); // roomId -> { participants: Map(participantId -> data), host: participantId }
+    }
+
+    createRoom(roomId = uuidv4()) {
+        if (!this.rooms.has(roomId)) {
+            this.rooms.set(roomId, {
+                participants: new Map(),
+                host: null
+            });
+        }
+        return roomId;
+    }
+
+    joinRoom(roomId, participantData) {
+        if (!this.rooms.has(roomId)) {
+            this.createRoom(roomId);
+        }
+
+        const room = this.rooms.get(roomId);
+        const participantId = participantData.id || uuidv4();
+
+        const participant = {
+            id: participantId,
+            name: participantData.name || 'Anonymous',
+            role: participantData.role || 'guest',
+            status: participantData.role === 'host' || participantData.role === 'observer' ? 'accepted' : 'waiting', // Hosts e OBS entram direto
+            tallyState: 'off',
+            muted: false,
+            audioMuted: false,
+            videoMuted: false,
+            ...participantData
+        };
+
+        room.participants.set(participantId, participant);
+
+        if (participant.role === 'host' && !room.host) {
+            room.host = participantId;
+        }
+
+        return participant;
+    }
+
+    leaveRoom(roomId, participantId) {
+        if (!this.rooms.has(roomId)) return null;
+
+        const room = this.rooms.get(roomId);
+        const participant = room.participants.get(participantId);
+
+        room.participants.delete(participantId);
+
+        if (room.host === participantId) {
+            room.host = null;
+            // Opcional: promover outro para host ou fechar sala
+        }
+
+        if (room.participants.size === 0) {
+            this.rooms.delete(roomId);
+        }
+
+        return participant;
+    }
+
+    getRoom(roomId) {
+        const room = this.rooms.get(roomId);
+        if (!room) return null;
+
+        return {
+            id: roomId,
+            host: room.host,
+            participants: Array.from(room.participants.values()).map(p => {
+                const { ws, ...data } = p; // Remove WebSocket do retorno
+                return data;
+            })
+        };
+    }
+
+    updateParticipant(roomId, participantId, updates) {
+        if (!this.rooms.has(roomId)) return null;
+        const room = this.rooms.get(roomId);
+        const participant = room.participants.get(participantId);
+        if (!participant) return null;
+
+        Object.assign(participant, updates);
+        return participant;
+    }
+
+    getParticipants(roomId) {
+        if (!this.rooms.has(roomId)) return [];
+        return Array.from(this.rooms.get(roomId).participants.values());
+    }
+}
+
+module.exports = new RoomManager();

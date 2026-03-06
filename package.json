@@ -1,0 +1,26 @@
+{
+  "name": "lyncro-mvp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "electron": "electron ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "electron": "^40.7.0",
+    "express": "^5.2.1",
+    "qrcode": "^1.5.4",
+    "twilio": "^5.12.2",
+    "uuid": "^13.0.0",
+    "ws": "^8.19.0"
+  },
+  "devDependencies": {
+    "@electron/rebuild": "^4.0.3"
+  }
+}

@@ -1,0 +1,169 @@
+const WebSocket = require('ws');
+const roomManager = require('./rooms');
+const { getIceServers } = require('./ice');
+
+function setupSignaling(server) {
+    const wss = new WebSocket.Server({ server });
+
+    wss.on('connection', (ws, req) => {
+        const ip = req.socket.remoteAddress;
+        console.log(`\n[WS] >>> TENTATIVA DE CONEXÃO RECEBIDA DE: ${ip}`);
+        console.log(`[WS] User-Agent: ${req.headers['user-agent']}`);
+
+        let currentRoomId = null;
+        let participantId = null;
+
+        ws.on('error', (err) => console.error(`[WS Error] ${ip}:`, err));
+
+        ws.on('message', async (message) => {
+            try {
+                const data = JSON.parse(message);
+                const rawRoomId = data.roomId;
+                const normalizedRoomId = (rawRoomId || 'default').trim();
+                const { type, to } = data;
+
+                switch (type) {
+                    case 'join':
+                        currentRoomId = normalizedRoomId;
+                        const participant = roomManager.joinRoom(normalizedRoomId, { ...data.participant, ws });
+                        participantId = participant.id;
+
+                        console.log(`[JOIN] Room: "${normalizedRoomId}" | Participant: "${participant.name}" | Role: ${participant.role}`);
+
+                        // Buscar IceServers dinâmicos para o cliente
+                        const iceServers = await getIceServers();
+
+                        // Enviar configuração de rede inicial apenas para o participante que entrou
+                        ws.send(JSON.stringify({
+                            type: 'init-network',
+                            iceServers: iceServers,
+                            yourId: participantId
+                        }));
+
+                        // Avisar a todos na sala sobre a atualização
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'participant-update',
+                            participants: roomManager.getRoom(normalizedRoomId).participants
+                        });
+                        break;
+
+                    case 'offer':
+                    case 'answer':
+                    case 'ice-candidate':
+                        // Encaminhar sinalização WebRTC para o destinatário específico
+                        if (to) {
+                            sendToParticipant(normalizedRoomId, to, { ...data, from: participantId });
+                        }
+                        break;
+
+                    case 'chat':
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'chat',
+                            from: participantId,
+                            name: data.name,
+                            text: data.text,
+                            timestamp: Date.now()
+                        });
+                        break;
+
+                    case 'tally-change':
+                        const room = roomManager.getRoom(normalizedRoomId);
+                        if (room.host === participantId) {
+                            roomManager.updateParticipant(normalizedRoomId, data.participantId, { tallyState: data.tallyState });
+
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'participant-update',
+                                participants: roomManager.getRoom(normalizedRoomId).participants
+                            });
+                        }
+                        break;
+
+                    case 'media-control':
+                        const rm = roomManager.getRoom(normalizedRoomId);
+                        if (rm && rm.host === participantId) {
+                            sendToParticipant(normalizedRoomId, data.targetId, {
+                                type: 'media-control',
+                                mediaType: data.mediaType,
+                                action: data.action
+                            });
+                        }
+                        break;
+
+                    case 'room-admission':
+                        const rmAdm = roomManager.getRoom(normalizedRoomId);
+                        if (rmAdm && rmAdm.host === participantId) {
+                            roomManager.updateParticipant(normalizedRoomId, data.targetId, { status: data.status });
+                            // Avisar o convidado que ele foi aceito ou rejeitado
+                            sendToParticipant(normalizedRoomId, data.targetId, {
+                                type: 'admission-result',
+                                status: data.status
+                            });
+                            // Atualizar a lista de todos
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'participant-update',
+                                participants: roomManager.getRoom(normalizedRoomId).participants
+                            });
+                        }
+                        break;
+
+                    case 'media-status-change':
+                        roomManager.updateParticipant(roomId, participantId, {
+                            audioMuted: data.audioMuted,
+                            videoMuted: data.videoMuted
+                        });
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'participant-update',
+                            participants: roomManager.getRoom(normalizedRoomId).participants
+                        });
+                        break;
+                }
+            } catch (err) {
+                console.error('Error processing WS message:', err);
+            }
+        });
+
+        ws.on('close', () => {
+            if (currentRoomId && participantId) {
+                console.log(`Participant ${participantId} left room ${currentRoomId}`);
+                roomManager.leaveRoom(currentRoomId, participantId);
+
+                const room = roomManager.getRoom(currentRoomId);
+                if (room) {
+                    broadcastToRoom(currentRoomId, {
+                        type: 'participant-update',
+                        participants: room.participants
+                    });
+                }
+            }
+        });
+    });
+
+    function broadcastToRoom(roomId, message) {
+        const participants = roomManager.getParticipants(roomId);
+        if (participants.length === 0) return;
+        let payload = JSON.stringify(message);
+
+        // Se for atualização de lista, garantir que observers sumiram
+        if (message.type === 'participant-update') {
+            const publicOnly = message.participants.filter(p => p.role !== 'observer');
+            payload = JSON.stringify({ ...message, participants: publicOnly });
+            console.log(`[Broadcast] Room ${roomId} update. Sending ${publicOnly.length} participants.`);
+        }
+
+        participants.forEach(p => {
+            if (p.ws && p.ws.readyState === WebSocket.OPEN) {
+                p.ws.send(payload);
+            }
+        });
+    }
+
+    function sendToParticipant(roomId, targetId, message) {
+        const participants = roomManager.getParticipants(roomId);
+        const target = participants.find(p => p.id === targetId);
+        if (target && target.ws && target.ws.readyState === WebSocket.OPEN) {
+            target.ws.send(JSON.stringify(message));
+        }
+    }
+}
+
+module.exports = setupSignaling;

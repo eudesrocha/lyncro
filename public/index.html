@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyncro - Lobby</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'win-bg': '#1c1c1c',
+                        'win-card': '#2b2b2b',
+                        'win-surface': '#323232',
+                        'win-accent': '#0078d4',
+                        'win-border': 'rgba(255, 255, 255, 0.08)',
+                    },
+                    borderRadius: { 'win': '4px' }
+                }
+            }
+        }
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="js/config.js"></script>
+</head>
+
+<body
+    class="bg-win-bg text-gray-100 font-sans min-h-screen flex flex-col items-center justify-center p-6 selection:bg-win-accent">
+
+    <div class="w-full max-w-sm bg-win-card border border-win-border p-8 rounded-win shadow-2xl">
+        <div class="flex flex-col items-center mb-8">
+            <div class="w-12 h-12 bg-win-accent rounded-win flex items-center justify-center mb-4 shadow-lg">
+                <i class="ph ph-broadcast text-2xl text-white"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-tight">Lyncro</h1>
+            <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Transmissão Remota</p>
+        </div>
+
+        <form id="lobby-form" class="space-y-4">
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Sala</label>
+                <div class="flex gap-2">
+                    <input type="text" id="roomName" placeholder="Identificador da sala" required
+                        class="flex-1 bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
+                    <button type="button" onclick="copyLink()" title="Copiar link de convite"
+                        class="bg-win-surface border border-win-border p-2 rounded-win hover:bg-win-accent/20 transition-all">
+                        <i class="ph ph-link"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Seu Nome</label>
+                <input type="text" id="userName" placeholder="Como você quer ser visto" required
+                    class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
+            </div>
+
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Papel</label>
+                <select id="role"
+                    class="w-full bg-win-surface border border-win-border rounded-win px-3 py-2 text-sm focus:border-win-accent outline-none transition-all">
+                    <option value="guest">Convidado (Guest)</option>
+                    <option value="host">Monitor do Host (Admin)</option>
+                </select>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-win-accent hover:bg-opacity-90 text-white font-semibold py-2.5 rounded-win text-sm shadow-lg shadow-win-accent/20 transition-all mt-4">
+                Entrar na Sessão
+            </button>
+        </form>
+    </div>
+
+    <footer class="mt-12 text-[10px] opacity-20 uppercase tracking-widest">
+        Powered by Lyncro Core
+    </footer>
+
+    <script>
+        document.getElementById('lobby-form').onsubmit = (e) => {
+            e.preventDefault();
+            const room = document.getElementById('roomName').value.trim();
+            const name = document.getElementById('userName').value.trim();
+            const role = document.getElementById('role').value;
+
+            localStorage.setItem('sv_last_name', name);
+
+            const dest = role === 'host' ? 'host.html' : 'guest.html';
+            window.location.href = `${dest}?room=${room}&name=${name}`;
+        };
+
+        function copyLink() {
+            const room = document.getElementById('roomName').value.trim();
+            if (!room) {
+                alert('Digite o nome da sala primeiro!');
+                return;
+            }
+            const url = `${window.location.origin}/index.html?room=${room}`;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Link de convite copiado!');
+            });
+        }
+
+        // Auto-fill from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const prefillRoom = urlParams.get('room');
+        if (prefillRoom) document.getElementById('roomName').value = prefillRoom;
+
+        // Auto-fill last name
+        const lastName = localStorage.getItem('sv_last_name');
+        if (lastName) document.getElementById('userName').value = lastName;
+    </script>
+</body>
+
+</html>
