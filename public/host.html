@@ -42,14 +42,38 @@
         }
 
         .media-muted-overlay {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.15);
+            /* Opacidade reduzida conforme solicitado */
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 12px;
             z-index: 10;
+        }
+
+        /* Ajuste para o fundo do dropdown (select options) */
+        select,
+        select option {
+            background-color: #1a1a1a !important;
+            color: #efefef !important;
+        }
+
+        /* Animação para expansão suave da fila */
+        .section-expand {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            max-height: 1000px;
+            opacity: 1;
+        }
+
+        .section-collapsed {
+            max-height: 0;
+            opacity: 0;
+            margin-bottom: 0 !important;
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
+            border: none !important;
+            overflow: hidden;
         }
     </style>
 </head>
@@ -57,42 +81,62 @@
 <body class="min-h-screen bg-win-bg text-gray-100 font-sans p-6 selection:bg-win-accent flex flex-col">
 
     <header class="flex justify-between items-center mb-8 border-b border-win-border/40 pb-5">
-        <div class="flex flex-col">
-            <h1 class="text-3xl font-[900] italic tracking-tight text-white select-none leading-none"
+        <div class="flex items-baseline gap-5">
+            <h1 class="text-4xl font-[900] italic tracking-tight text-white select-none leading-none"
                 style="font-family: 'Segoe UI', Tahoma, sans-serif;">Lyncro</h1>
-            <span class="text-[9px] font-bold opacity-30 uppercase tracking-[0.4em] mt-1 ml-0.5">Host Monitor</span>
+            <span class="text-2xl font-black opacity-30 uppercase tracking-[0.25em] text-win-accent/90">Host
+                Monitor</span>
         </div>
 
-        <div class="flex gap-3 items-center">
+        <div class="flex gap-4 items-center">
             <div id="room-id-display"
-                class="text-[10px] opacity-40 mr-4 font-bold uppercase tracking-widest bg-black/20 px-2 py-1 rounded border border-win-border/20">
+                class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-1.5 rounded-sm border border-win-accent/20 shadow-inner">
             </div>
 
-            <div class="flex items-center gap-1 bg-win-surface/40 border border-win-border p-1 rounded-win">
+            <div class="flex items-center gap-1 bg-white/5 border border-win-border p-1 rounded-win">
                 <button id="openMobileCam"
-                    class="flex items-center gap-2 hover:bg-win-accent/20 px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-wider text-gray-300">
-                    <i class="ph ph-camera text-sm text-win-accent"></i>
+                    class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
+                    <i class="ph ph-camera text-sm text-win-accent group-hover:text-white transition-colors"></i>
                     Lyncro Cam
                 </button>
                 <div class="w-px h-4 bg-win-border mx-1"></div>
                 <button onclick="copyInviteLink()"
-                    class="flex items-center gap-2 hover:bg-win-accent/20 px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-wider text-gray-300">
-                    <i class="ph ph-link text-sm text-win-accent"></i>
+                    class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
+                    <i class="ph ph-link text-sm text-win-accent group-hover:text-white transition-colors"></i>
                     Convidar
                 </button>
             </div>
 
-            <div class="flex items-center gap-2 bg-win-surface/40 border border-win-border px-3 py-1.5 rounded-win">
+            <div class="flex items-center gap-1 bg-white/5 border border-win-border p-1 rounded-win">
+                <div class="flex items-center gap-2 px-2.5 py-1.5 hover:bg-white/5 rounded-win transition-all group">
+                    <i class="ph ph-video-camera text-win-accent text-sm opacity-80"></i>
+                    <select id="video-device-select"
+                        class="bg-transparent border-none text-[10px] font-bold text-gray-400 outline-none w-24 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
+                        <option value="">Câmera</option>
+                    </select>
+                </div>
+                <div class="w-px h-4 bg-win-border mx-1"></div>
+                <div class="flex items-center gap-2 px-2.5 py-1.5 hover:bg-white/5 rounded-win transition-all group">
+                    <i class="ph ph-microphone text-win-accent text-sm opacity-80"></i>
+                    <select id="audio-device-select"
+                        class="bg-transparent border-none text-[10px] font-bold text-gray-400 outline-none w-24 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
+                        <option value="">Microfone</option>
+                    </select>
+                </div>
+            </div>
+
+            <div
+                class="flex items-center gap-2 bg-white/5 border border-win-border px-3 py-1.5 rounded-win group hover:border-win-accent/40 transition-colors">
                 <i class="ph ph-microphone-stage text-win-accent text-lg opacity-80"></i>
                 <select id="return-audio-select"
-                    class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-36 cursor-pointer uppercase tracking-tight">
-                    <option value="">Sem Retorno Audio</option>
+                    class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-32 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
+                    <option value="">Sem Retorno</option>
                     <!-- Preenchido via JS -->
                 </select>
             </div>
 
             <button onclick="window.location.href='index.html'"
-                class="bg-red-900/10 border border-red-500/20 text-red-500/80 px-5 py-2 rounded-win hover:bg-red-900/40 hover:text-red-400 transition-all text-[11px] font-bold uppercase tracking-widest">
+                class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win bg-red-600/5 hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
                 Encerrar
             </button>
         </div>
@@ -108,8 +152,8 @@
         <!-- Right Side Panel (Split: Fila & Chat) -->
         <aside class="w-80 flex flex-col gap-4 flex-shrink-0 min-h-0">
             <!-- Fila Section -->
-            <section
-                class="flex-1 bg-win-card/40 border border-win-border/60 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm">
+            <section id="queue-section"
+                class="bg-win-card/40 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm section-expand overflow-hidden border border-win-border/20">
                 <div class="px-5 py-4 border-b border-win-border/40 flex items-center justify-between bg-white/5">
                     <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
                         <i class="ph ph-users text-win-accent text-sm"></i> Fila de Espera
@@ -118,10 +162,6 @@
                         class="bg-red-600 text-white text-[9px] px-1.5 py-0.5 rounded-sm font-bold hidden">0</span>
                 </div>
                 <div id="tab-content-queue" class="flex-1 p-4 overflow-y-auto flex flex-col gap-3">
-                    <div class="text-[10px] text-center text-gray-600 my-4 uppercase tracking-widest font-bold"
-                        id="empty-queue-msg opacity-40">
-                        Vazio
-                    </div>
                     <div id="waiting-list" class="flex flex-col gap-2">
                         <!-- Cards de convidados aguardando entram aqui via JS -->
                     </div>
@@ -130,7 +170,7 @@
 
             <!-- Chat Section -->
             <section
-                class="flex-1 bg-win-card/40 border border-win-border/60 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm">
+                class="flex-1 bg-win-card/40 rounded-win flex flex-col shadow-2xl min-h-0 backdrop-blur-sm border border-win-border/20">
                 <div class="px-5 py-4 border-b border-win-border/40 bg-white/5">
                     <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
                         <i class="ph ph-chat-text text-win-accent text-sm"></i> Chat de Produção

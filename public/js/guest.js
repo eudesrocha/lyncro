@@ -149,6 +149,31 @@ function handleIceCandidate(targetId, candidate) {
     }
 }
 
+function updateOverlay(action, name, title) {
+    const overlay = document.getElementById('lower-third');
+    const nameEl = document.getElementById('ov-display-name');
+    const titleEl = document.getElementById('ov-display-title');
+
+    if (!overlay || !nameEl || !titleEl) return;
+
+    if (action === 'show') {
+        nameEl.textContent = name;
+        titleEl.textContent = title;
+        overlay.classList.remove('overlay-animated-out');
+        overlay.classList.add('overlay-animated-in');
+        overlay.style.opacity = '1';
+    } else {
+        overlay.classList.remove('overlay-animated-in');
+        overlay.classList.add('overlay-animated-out');
+        // Oculta após a animação
+        setTimeout(() => {
+            if (overlay.classList.contains('overlay-animated-out')) {
+                overlay.style.opacity = '0';
+            }
+        }, 400);
+    }
+}
+
 function setupWebSocket() {
     let wsUrl;
 
@@ -267,6 +292,10 @@ function setupWebSocket() {
                 } else if (data.mediaType === 'video') {
                     setVideoEnabled(!isVideoOn);
                 }
+                break;
+            case 'overlay-control':
+                console.log('Overlay control received:', data);
+                updateOverlay(data.action, data.name, data.title);
                 break;
             case 'chat':
                 appendChatMessage(data.name, data.text, data.timestamp);

@@ -128,6 +128,33 @@ function setupSignaling(server) {
                             participants: roomManager.getRoom(normalizedRoomId).participants
                         });
                         break;
+
+                    case 'overlay-control':
+                        const rmOverlay = roomManager.getRoom(normalizedRoomId);
+                        if (rmOverlay && rmOverlay.host === participantId) {
+                            // Persistir o estado do overlay no participante alvo
+                            roomManager.updateParticipant(normalizedRoomId, data.targetId, {
+                                overlayActive: data.action === 'show',
+                                overlayName: data.name || '',
+                                overlayTitle: data.title || ''
+                            });
+
+                            // Broadcast para todos na sala (incluindo o alvo e clean feeds)
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'overlay-control',
+                                targetId: data.targetId,
+                                action: data.action, // 'show' ou 'hide'
+                                name: data.name,
+                                title: data.title
+                            });
+
+                            // Também avisar a todos sobre a atualização de estado (para quem entrar depois)
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'participant-update',
+                                participants: roomManager.getRoom(normalizedRoomId).participants
+                            });
+                        }
+                        break;
                 }
             } catch (err) {
                 console.error('Error processing WS message:', err);

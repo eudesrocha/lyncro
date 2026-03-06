@@ -45,7 +45,7 @@ let currentParticipants = [];
 
 const videoGrid = document.getElementById('video-grid');
 const roomIdDisplay = document.getElementById('room-id-display');
-roomIdDisplay.textContent = `Sala: ${roomName}`;
+if (roomIdDisplay) roomIdDisplay.textContent = `Sala: ${roomName}`;
 
 async function init() {
     try {
@@ -57,29 +57,56 @@ async function init() {
         if (localVideoEl) localVideoEl.srcObject = localStream;
     } catch (err) {
         console.error('Falha ao iniciar mídia local:', err);
-        // Não bloqueia o app, apenas avisa
         showToast('Aviso: Câmera/Mic do Host não iniciados (Timeout)', 'info');
-        // Renderiza card vazio para o host
         renderParticipantCard({ id: 'local', name: `${userName} (Host)`, role: 'host' }, true);
     }
 
-    // SEMPRE conecta o socket, mesmo que a câmera local dê erro
     setupWebSocket();
-    await enumerateAudioDevices();
+    await enumerateDevices();
 }
 
-// Lógica de Retorno de Áudio (Mix-Minus)
-async function enumerateAudioDevices() {
+// Lógica de Seleção de Dispositivos (Câmera, Microfone e Retorno)
+async function enumerateDevices() {
     try {
         const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(device => device.kind === 'videoinput');
         const audioInputs = devices.filter(device => device.kind === 'audioinput');
+
+        const videoSelect = document.getElementById('video-device-select');
+        const audioSelect = document.getElementById('audio-device-select');
         const returnSelect = document.getElementById('return-audio-select');
 
-        if (returnSelect) {
+        // Preencher Vídeo
+        if (videoSelect) {
+            videoSelect.innerHTML = '<option value="">Câmera</option>';
+            videoInputs.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = device.label || `Câmera ${videoSelect.length}`;
+                videoSelect.appendChild(option);
+            });
+            videoSelect.onchange = (e) => updateHostDevice('video', e.target.value);
+        }
+
+        // Preencher Áudio
+        if (audioSelect) {
+            audioSelect.innerHTML = '<option value="">Microfone</option>';
             audioInputs.forEach(device => {
                 const option = document.createElement('option');
                 option.value = device.deviceId;
-                option.text = device.label || `Microfone ${returnSelect.length}`;
+                option.text = device.label || `Mic ${audioSelect.length}`;
+                audioSelect.appendChild(option);
+            });
+            audioSelect.onchange = (e) => updateHostDevice('audio', e.target.value);
+        }
+
+        // Preencher Retorno de Áudio (Mix-Minus)
+        if (returnSelect) {
+            returnSelect.innerHTML = '<option value="">Retorno</option>';
+            audioInputs.forEach(device => {
+                const option = document.createElement('option');
+                option.value = device.deviceId;
+                option.text = device.label || `Mix ${returnSelect.length}`;
                 returnSelect.appendChild(option);
             });
 
@@ -89,27 +116,67 @@ async function enumerateAudioDevices() {
                     if (returnAudioStream) {
                         returnAudioStream.getTracks().forEach(t => t.stop());
                         returnAudioStream = null;
-                        console.log("Retorno de áudio desativado.");
                         if (rtcClient) rtcClient.removeReturnAudioTrack();
                     }
                     return;
                 }
-
                 try {
+                    if (returnAudioStream) returnAudioStream.getTracks().forEach(t => t.stop());
                     returnAudioStream = await navigator.mediaDevices.getUserMedia({
                         audio: { deviceId: { exact: deviceId } }
                     });
-                    console.log(`Retorno de áudio ativado: ${deviceId}`, returnAudioStream.getAudioTracks()[0].label);
-                    // TODO: Injetar track nos peers existentes
                     injectReturnAudioToPeers();
                 } catch (err) {
                     console.error("Erro ao capturar retorno de áudio:", err);
-                    alert("Falha ao capturar o dispositivo selecionado.");
+                    showToast("Falha ao capturar retorno.", "error");
                 }
             });
         }
     } catch (error) {
-        console.error('Erro ao enumerar dispositivos de audio:', error);
+        console.error('Erro ao enumerar dispositivos:', error);
+    }
+}
+
+async function updateHostDevice(kind, deviceId) {
+    if (!deviceId) return;
+
+    try {
+        const constraints = {
+            video: kind === 'video' ? { deviceId: { exact: deviceId } } : false,
+            audio: kind === 'audio' ? { deviceId: { exact: deviceId } } : false
+        };
+
+        // Se estivermos trocando apenas um, precisamos garantir que o outro não seja solicitado novamente ou que mantenhamos o atual
+        // No entanto, replaceTrack do ebot simplifica isso. Vamos pegar apenas a track necessária.
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const newTrack = kind === 'video' ? newStream.getVideoTracks()[0] : newStream.getAudioTracks()[0];
+
+        if (localStream) {
+            const oldTracks = kind === 'video' ? localStream.getVideoTracks() : localStream.getAudioTracks();
+            oldTracks.forEach(t => {
+                t.stop();
+                localStream.removeTrack(t);
+            });
+            localStream.addTrack(newTrack);
+        } else {
+            localStream = newStream;
+        }
+
+        // Atualizar vídeo local
+        const localVideoEl = document.querySelector('#video-card-local video');
+        if (localVideoEl && kind === 'video') {
+            localVideoEl.srcObject = localStream;
+        }
+
+        // Substituir track em todos os peers ativos
+        if (rtcClient) {
+            await rtcClient.replaceTrack(newTrack);
+        }
+
+        showToast(`${kind === 'video' ? 'Câmera' : 'Microfone'} atualizada com sucesso!`, "success");
+    } catch (err) {
+        console.error(`Erro ao trocar ${kind}:`, err);
+        showToast(`Erro ao trocar ${kind}. Verifique as permissões.`, "error");
     }
 }
 
@@ -123,26 +190,21 @@ function injectReturnAudioToPeers() {
 
 function setupWebSocket() {
     let wsUrl;
-
-    // Priorizar configuração global se disponível e preenchida
     if (window.LYNCRO_CONFIG && window.LYNCRO_CONFIG.SIGNALING_URL) {
         wsUrl = window.LYNCRO_CONFIG.SIGNALING_URL;
     } else {
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-        const host = window.location.host; // Detecta automaticamente o domínio ou IP:Porta
+        const host = window.location.host;
         wsUrl = `${protocol}//${host}`;
     }
 
-    console.log(`Conectando ao servidor Lyncro em: ${wsUrl}`);
     ws = new WebSocket(wsUrl);
-
     const storedPassword = localStorage.getItem(`room_pwd_${roomName}`);
 
     ws.onopen = () => {
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, initiateConnection, null, handleDataMessage);
         rtcClient.setLocalStream(localStream);
 
-        console.log('WS: Conectado. Enviando join como Host...');
         const payload = {
             type: 'join',
             roomId: roomName,
@@ -152,10 +214,7 @@ function setupWebSocket() {
             }
         };
 
-        if (storedPassword) {
-            payload.password = storedPassword;
-        }
-
+        if (storedPassword) payload.password = storedPassword;
         ws.send(JSON.stringify(payload));
     };
 
@@ -166,10 +225,8 @@ function setupWebSocket() {
             case 'init-network':
                 myId = data.yourId;
                 if (rtcClient) rtcClient.updateConfig(data.iceServers);
-                console.log('My ID:', myId);
                 break;
             case 'participant-update':
-                console.log('Lista de participantes recebida:', data.participants);
                 updateUI(data.participants);
                 break;
             case 'offer':
@@ -196,54 +253,48 @@ function updateUI(participants) {
     const emptyQueueMsg = document.getElementById('empty-queue-msg');
     const queueCountBadge = document.getElementById('queue-count');
 
-    // Manter lista de quem deve estar no grid principal (Aceitos)
     const currentParticipantIds = participants.filter(p => p.status === 'accepted' || p.role === 'host').map(p => p.id);
     let queueCount = 0;
 
-    // Limpar a fila de espera visual antes de repreencher
     if (waitingList) waitingList.innerHTML = '';
 
     participants.forEach(p => {
-        if (p.role === 'observer' || (p.name && p.name.startsWith('OBS-'))) {
-            return;
-        }
+        if (p.role === 'observer' || (p.name && p.name.startsWith('OBS-'))) return;
         if (p.role === 'host' && p.name === userName) return;
 
-        // Se está aguardando aprovação, renderiza na barra lateral
         if (p.status === 'waiting') {
             queueCount++;
             renderWaitingParticipant(p);
-            return; // Interrompe para não tentar renderizar o vídeo
+            return;
         }
 
-        // Se chegou aqui, está 'accepted'. Renderiza no vídeo matrix.
         if (!document.getElementById(`video-card-${p.id}`)) {
             renderParticipantCard(p);
         } else {
-            // Atualizar status (onAir, muted, etc) no componente existente
             updateParticipantStatus(p);
         }
 
-        // Apenas estabelece conexão WebRTC P2P se a pessoa foi "accepted"
         if (!rtcClient.peers.has(p.id) && p.role !== 'observer' && myId && myId < p.id) {
-            console.log('Initiating connection to accepted guest:', p.id);
             initiateConnection(p.id);
         }
     });
 
-    // Atualizar Badge de Notificação
-    if (queueCountBadge) {
-        queueCountBadge.textContent = queueCount;
+    const queueSection = document.getElementById('queue-section');
+    if (queueSection) {
         if (queueCount > 0) {
-            queueCountBadge.classList.remove('hidden');
-            emptyQueueMsg.classList.add('hidden');
+            queueSection.classList.remove('section-collapsed');
+            if (queueCountBadge) {
+                queueCountBadge.textContent = queueCount;
+                queueCountBadge.classList.remove('hidden');
+            }
         } else {
-            queueCountBadge.classList.add('hidden');
-            emptyQueueMsg.classList.remove('hidden');
+            queueSection.classList.add('section-collapsed');
+            if (queueCountBadge) {
+                queueCountBadge.classList.add('hidden');
+            }
         }
     }
 
-    // Remover do Video Grid principal quem saiu ou foi rebaixado
     const cards = document.querySelectorAll('[id^="video-card-"]');
     cards.forEach(card => {
         const id = card.id.replace('video-card-', '');
@@ -310,16 +361,12 @@ function renderParticipantCard(participant, isLocal = false) {
 
         <div id="mute-overlay-${participant.id}" class="absolute inset-0 media-muted-overlay ${participant.audioMuted || participant.videoMuted ? '' : 'hidden'}">
           ${participant.videoMuted ? `
-            <div class="flex flex-col items-center animate-pulse">
-              <i class="ph ph-video-camera-slash text-2xl text-red-500"></i>
-              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-red-500 mt-2">Câmera Off</span>
-            </div>
+              <i class="ph ph-video-camera-slash text-4xl text-red-600/80 drop-shadow-xl animate-pulse"></i>
           ` : ''}
-          ${participant.audioMuted ? `
-            <div class="flex items-center gap-2 bg-red-600/10 px-2.5 py-1 rounded-full border border-red-500/20">
-              <i class="ph ph-microphone-slash text-[10px] text-red-500"></i>
-              <span class="text-[8px] font-bold uppercase tracking-wider text-red-500">Muted</span>
-            </div>
+          ${participant.audioMuted && !participant.videoMuted ? `
+              <div class="bg-black/40 p-3 rounded-full border border-red-500/30">
+                <i class="ph ph-microphone-slash text-3xl text-red-500 drop-shadow-lg"></i>
+              </div>
           ` : ''}
         </div>
         
@@ -342,35 +389,53 @@ function renderParticipantCard(participant, isLocal = false) {
              <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>
           </button>
         </div>
-        
+
         ${isLocal ? '' : `
         <div class="flex items-center gap-1">
-          <button id="btn-prv-${participant.id}" onclick="handleTallyChange('${participant.id}', 'preview', '${participant.name}')" class="text-[10px] font-bold px-2 py-1 rounded transition-all ${participant.tallyState === 'preview' ? 'bg-green-600 text-white' : 'bg-win-surface hover:bg-white/10 text-gray-400'}">PRV</button>
-          <button id="btn-pgm-${participant.id}" onclick="handleTallyChange('${participant.id}', 'program', '${participant.name}')" class="text-[10px] font-bold px-2 py-1 rounded transition-all ${participant.tallyState === 'program' ? 'bg-red-600 text-white' : 'bg-win-surface hover:bg-white/10 text-gray-400'}">PGM</button>
-          <button id="btn-off-${participant.id}" onclick="handleTallyChange('${participant.id}', 'off', '${participant.name}')" class="text-[10px] font-bold px-2 py-1 rounded transition-all ${participant.tallyState === 'off' ? 'bg-gray-600 text-white' : 'bg-win-surface hover:bg-white/10 text-gray-400'}">OFF</button>
+          <button id="btn-prv-${participant.id}" onclick="handleTallyChange('${participant.id}', 'preview', '${participant.name}')" 
+            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}">PRV</button>
+          <button id="btn-pgm-${participant.id}" onclick="handleTallyChange('${participant.id}', 'program', '${participant.name}')" 
+            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}">PGM</button>
+          <button id="btn-off-${participant.id}" onclick="handleTallyChange('${participant.id}', 'off', '${participant.name}')" 
+            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}">OFF</button>
         </div>
-        <button class="text-[9px] text-win-accent hover:underline ml-2" onclick="copyCleanFeed('${participant.id}')">Clean Feed</button>
         `}
+      </div>
+
+      <div id="overlay-controls-${participant.id}" class="px-3 pb-3 bg-white/5 border-t border-win-border/10">
+        <div class="flex flex-col gap-2 pt-3">
+          <div class="flex justify-between items-center mb-1">
+            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none opacity-50">Lower Third (Overlay)</span>
+            <div class="flex items-center gap-2">
+              ${isLocal ? '' : `
+              <button onclick="copyCleanFeed('${participant.id}')" title="Copiar Link Clean Feed" class="text-[9px] font-bold uppercase text-win-accent hover:text-white transition-all flex items-center gap-1">
+                <i class="ph ph-copy"></i> Feed
+              </button>
+              `}
+              <button id="btn-ov-toggle-${participant.id}" onclick="toggleOverlay('${participant.id}')" 
+                class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border/20'}">
+                ${participant.overlayActive ? 'Ocultar' : 'Disparar'}
+              </button>
+            </div>
+          </div>
+          <div class="flex gap-1.5">
+            <input type="text" id="ov-name-${participant.id}" placeholder="Nome" value="${participant.overlayName || participant.name || ''}"
+              class="flex-1 bg-black/30 border border-win-border/30 rounded px-2.5 py-2 text-[11px] outline-none focus:border-win-accent transition-all placeholder:text-gray-700 text-gray-300">
+            <input type="text" id="ov-title-${participant.id}" placeholder="Tagline / Título" value="${participant.overlayTitle || ''}"
+              class="flex-1 bg-black/30 border border-win-border/30 rounded px-2.5 py-2 text-[11px] outline-none focus:border-win-accent transition-all placeholder:text-gray-700 text-gray-300">
+          </div>
+        </div>
       </div>
     `;
 
     videoGrid.appendChild(card);
 
-    // Lógica de Drag & Drop para Media Drop
     if (!isLocal) {
-        card.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            card.classList.add('border-win-accent', 'scale-[1.02]');
-        });
-
-        card.addEventListener('dragleave', () => {
-            card.classList.remove('border-win-accent', 'scale-[1.02]');
-        });
-
+        card.addEventListener('dragover', (e) => { e.preventDefault(); card.classList.add('border-win-accent', 'scale-[1.02]'); });
+        card.addEventListener('dragleave', () => { card.classList.remove('border-win-accent', 'scale-[1.02]'); });
         card.addEventListener('drop', async (e) => {
             e.preventDefault();
             card.classList.remove('border-win-accent', 'scale-[1.02]');
-
             const files = e.dataTransfer.files;
             if (files.length > 0) {
                 const file = files[0];
@@ -389,8 +454,6 @@ function renderParticipantCard(participant, isLocal = false) {
                         }
                         bar.style.width = `${progress}%`;
                     });
-
-                    // Sucesso
                     const barContainer = card.querySelector('.file-progress-bar')?.parentElement;
                     if (barContainer) barContainer.remove();
                     showToast(`Arquivo ${file.name} enviado!`, 'success');
@@ -408,7 +471,6 @@ function updateParticipantStatus(p) {
     const card = document.getElementById(`video-card-${p.id}`);
     if (!card) return;
 
-    // Atualizar badge ON AIR / NDI
     const dot = document.getElementById(`tally-dot-${p.id}`);
     const text = document.getElementById(`tally-text-${p.id}`);
     if (dot && text) {
@@ -424,31 +486,19 @@ function updateParticipantStatus(p) {
         }
     }
 
-    // Atualizar Overlays de Mídia
     const overlay = document.getElementById(`mute-overlay-${p.id}`);
     if (overlay) {
         if (p.audioMuted || p.videoMuted) {
             overlay.classList.remove('hidden');
             overlay.innerHTML = `
-                ${p.videoMuted ? `
-                    <div class="flex flex-col items-center animate-pulse">
-                        <i class="ph ph-video-camera-slash text-2xl text-red-500"></i>
-                        <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-red-500 mt-2">Câmera Off</span>
-                    </div>
-                ` : ''}
-                ${p.audioMuted ? `
-                    <div class="flex items-center gap-2 bg-red-600/10 px-2.5 py-1 rounded-full border border-red-500/20">
-                        <i class="ph ph-microphone-slash text-[10px] text-red-500"></i>
-                        <span class="text-[8px] font-bold uppercase tracking-wider text-red-500">Muted</span>
-                    </div>
-                ` : ''}
+                ${p.videoMuted ? `<i class="ph ph-video-camera-slash text-4xl text-red-600/80 drop-shadow-xl animate-pulse"></i>` : ''}
+                ${p.audioMuted && !p.videoMuted ? `<div class="bg-black/40 p-3 rounded-full border border-red-500/30"><i class="ph ph-microphone-slash text-3xl text-red-500 drop-shadow-lg"></i></div>` : ''}
             `;
         } else {
             overlay.classList.add('hidden');
         }
     }
 
-    // Atualizar Ícones de Audio/Video nos botões
     const btnAudio = document.getElementById(`btn-audio-${p.id}`);
     if (btnAudio) {
         btnAudio.className = `${p.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all`;
@@ -461,15 +511,19 @@ function updateParticipantStatus(p) {
         btnVideo.innerHTML = `<i class="ph ${p.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>`;
     }
 
-    // Atualizar Botões de Controle Tally
     const btnPrv = document.getElementById(`btn-prv-${p.id}`);
     const btnPgm = document.getElementById(`btn-pgm-${p.id}`);
     const btnOff = document.getElementById(`btn-off-${p.id}`);
-
     if (btnPrv && btnPgm && btnOff) {
-        btnPrv.className = `text-[10px] font-bold px-2 py-1 rounded transition-all ${p.tallyState === 'preview' ? 'bg-green-600 text-white' : 'bg-win-surface hover:bg-white/10 text-gray-400'}`;
-        btnPgm.className = `text-[10px] font-bold px-2 py-1 rounded transition-all ${p.tallyState === 'program' ? 'bg-red-600 text-white' : 'bg-win-surface hover:bg-white/10 text-gray-400'}`;
-        btnOff.className = `text-[10px] font-bold px-2 py-1 rounded transition-all ${p.tallyState === 'off' ? 'bg-gray-600 text-white' : 'bg-win-surface hover:bg-white/10 text-gray-400'}`;
+        btnPrv.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}`;
+        btnPgm.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}`;
+        btnOff.className = `text-[9px] font-black px-2.5 py-1 rounded transition-all border ${p.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border/40 hover:bg-white/5 text-gray-500'}`;
+    }
+
+    const btnOv = document.getElementById(`btn-ov-toggle-${p.id}`);
+    if (btnOv) {
+        btnOv.className = `text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${p.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border/20'}`;
+        btnOv.textContent = p.overlayActive ? 'Ocultar' : 'Disparar';
     }
 }
 
@@ -479,14 +533,11 @@ async function initiateConnection(targetId) {
 }
 
 function handleRemoteTrack(targetId, stream) {
-    console.log('Attaching remote stream for:', targetId);
     const card = document.getElementById(`video-card-${targetId}`);
     if (card) {
         const video = card.querySelector('video');
         video.srcObject = stream;
-        video.onloadedmetadata = () => {
-            video.play().catch(e => console.error('Video play failed:', e));
-        };
+        video.onloadedmetadata = () => { video.play().catch(e => console.error('Video play failed:', e)); };
         const waiting = document.getElementById(`waiting-${targetId}`);
         if (waiting) waiting.classList.add('hidden');
     }
@@ -494,8 +545,6 @@ function handleRemoteTrack(targetId, stream) {
 
 function handleDataMessage(targetId, data) {
     if (data.type === 'file-progress') {
-        // console.log(`Arquivo ${data.fileName}: ${data.progress.toFixed(1)}%`);
-        // Opcional: Atualizar UI de progresso no card
         const card = document.getElementById(`video-card-${targetId}`);
         if (card) {
             let progress = card.querySelector('.file-progress-bar');
@@ -511,19 +560,10 @@ function handleDataMessage(targetId, data) {
             progress.style.width = `${data.progress}%`;
         }
     } else if (data.type === 'file') {
-        console.log('Arquivo recebido via P2P:', data.fileName);
         const url = URL.createObjectURL(data.blob);
-
-        // Notificar no chat com link de download
         appendChatMessage('Sistema P2P', `Arquivo recebido: <a href="${url}" download="${data.fileName}" class="text-win-accent underline font-bold">${data.fileName}</a>`, Date.now());
-
-        // Limpar barra de progresso
         const card = document.getElementById(`video-card-${targetId}`);
-        if (card) {
-            const bar = card.querySelector('.file-progress-bar')?.parentElement;
-            if (bar) bar.remove();
-        }
-
+        if (card) { const bar = card.querySelector('.file-progress-bar')?.parentElement; if (bar) bar.remove(); }
         showToast(`Arquivo recebido de ${targetId}`, 'success');
     }
 }
@@ -532,85 +572,63 @@ function handleIceCandidate(targetId, candidate) {
     ws.send(JSON.stringify({ type: 'ice-candidate', roomId: roomName, to: targetId, candidate }));
 }
 
-// Host Controls
 window.handleTallyChange = (pId, state, name) => {
-    ws.send(JSON.stringify({
-        type: 'tally-change',
-        roomId: roomName,
-        participantId: pId,
-        tallyState: state
-    }));
-
-    // Integração NDI Mock/IPC - Apenas liga se for Programa
+    ws.send(JSON.stringify({ type: 'tally-change', roomId: roomName, participantId: pId, tallyState: state }));
     if (window.lyncroAPI) {
-        if (state === 'program') {
-            window.lyncroAPI.sendNDIControl({ action: 'start', participantId: pId, name: name });
-        } else {
-            // Se for Preview ou Off, não vai pro ar no NDI
-            window.lyncroAPI.sendNDIControl({ action: 'stop', participantId: pId });
-        }
+        if (state === 'program') window.lyncroAPI.sendNDIControl({ action: 'start', participantId: pId, name: name });
+        else window.lyncroAPI.sendNDIControl({ action: 'stop', participantId: pId });
     }
 };
 
-window.remoteMute = (pId) => {
-    // Busca o participante atual na lista
-    const p = currentParticipants.find(part => part.id === pId);
-    if (p) {
-        // Atualização Otimista na UI
-        p.audioMuted = !p.audioMuted;
-        updateParticipantStatus(p);
-    }
+window.toggleOverlay = (pId) => {
+    const p = currentParticipants.find(part => part.id === pId) || (pId === 'local' ? { id: 'local', overlayActive: false } : null);
+    if (!p) return;
+
+    const nameInput = document.getElementById(`ov-name-${pId}`);
+    const titleInput = document.getElementById(`ov-title-${pId}`);
+    const action = p.overlayActive ? 'hide' : 'show';
 
     ws.send(JSON.stringify({
-        type: 'media-control',
+        type: 'overlay-control',
         roomId: roomName,
         targetId: pId,
-        mediaType: 'audio',
-        action: 'toggle'
+        action: action,
+        name: nameInput ? nameInput.value : p.name,
+        title: titleInput ? titleInput.value : ''
     }));
+
+    // Atualização otimista
+    p.overlayActive = (action === 'show');
+    p.overlayName = nameInput ? nameInput.value : p.name;
+    p.overlayTitle = titleInput ? titleInput.value : '';
+    updateParticipantStatus(p);
+};
+
+window.remoteMute = (pId) => {
+    const p = currentParticipants.find(part => part.id === pId);
+    if (p) { p.audioMuted = !p.audioMuted; updateParticipantStatus(p); }
+    ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'audio', action: 'toggle' }));
 };
 
 window.remoteMuteVideo = (pId) => {
     const p = currentParticipants.find(part => part.id === pId);
-    if (p) {
-        // Atualização Otimista na UI
-        p.videoMuted = !p.videoMuted;
-        updateParticipantStatus(p);
-    }
-
-    ws.send(JSON.stringify({
-        type: 'media-control',
-        roomId: roomName,
-        targetId: pId,
-        mediaType: 'video',
-        action: 'toggle'
-    }));
+    if (p) { p.videoMuted = !p.videoMuted; updateParticipantStatus(p); }
+    ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'video', action: 'toggle' }));
 };
 
 window.copyCleanFeed = (pId) => {
     const url = `${window.location.origin}/cleanfeed.html?room=${roomName}&participant=${pId}`;
-    navigator.clipboard.writeText(url).then(() => {
-        alert('URL do Clean Feed copiada para o OBS!');
-    });
+    navigator.clipboard.writeText(url).then(() => { alert('URL do Clean Feed copiada para o OBS!'); });
 };
 
 window.copyInviteLink = async () => {
     let baseUrl = window.location.origin;
-
-    // Se estivermos em localhost no Electron, tentamos oferecer o IP da rede local como alternativa
-    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') &&
-        window.lyncroAPI && window.lyncroAPI.getLocalIp) {
+    if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.lyncroAPI && window.lyncroAPI.getLocalIp) {
         const ip = await window.lyncroAPI.getLocalIp();
-        if (ip && ip !== 'localhost') {
-            baseUrl = `http://${ip}:3000`;
-            showToast('Dica: Link local gerado para dispositivos no mesmo Wi-Fi.', 'info');
-        }
+        if (ip && ip !== 'localhost') baseUrl = `http://${ip}:3000`;
     }
-
     const url = `${baseUrl}/guest.html?room=${encodeURIComponent(roomName)}`;
-    navigator.clipboard.writeText(url).then(() => {
-        showToast('Link de convite copiado!', 'success');
-    });
+    navigator.clipboard.writeText(url).then(() => { showToast('Link de convite copiado!', 'success'); });
 };
 
 init();
@@ -618,24 +636,13 @@ init();
 function showToast(message, type = "info") {
     const toast = document.createElement('div');
     toast.className = `fixed bottom-6 right-6 px-4 py-2 rounded-win shadow-2xl border border-win-border text-xs z-50 transition-all font-semibold`;
-
-    const colors = {
-        success: 'bg-green-600/90 text-white',
-        error: 'bg-red-600/90 text-white',
-        info: 'bg-win-accent/90 text-white'
-    };
-
+    const colors = { success: 'bg-green-600/90 text-white', error: 'bg-red-600/90 text-white', info: 'bg-win-accent/90 text-white' };
     toast.classList.add(...colors[type].split(' '));
     toast.textContent = message;
     document.body.appendChild(toast);
-
-    setTimeout(() => {
-        toast.style.opacity = '0';
-        setTimeout(() => toast.remove(), 500);
-    }, 3000);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
 }
 
-// --- Chat de Produção (Host) ---
 const chatInput = document.getElementById('chat-input');
 const chatMessages = document.getElementById('chat-messages');
 const sendChatBtn = document.getElementById('send-chat');
@@ -643,13 +650,7 @@ const sendChatBtn = document.getElementById('send-chat');
 function sendChatMessage() {
     const text = chatInput.value.trim();
     if (text && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-            type: 'chat',
-            roomId: roomName,
-            name: 'Produção (Host)',
-            text: text,
-            timestamp: Date.now()
-        }));
+        ws.send(JSON.stringify({ type: 'chat', roomId: roomName, name: 'Produção (Host)', text: text, timestamp: Date.now() }));
         chatInput.value = '';
     }
 }
@@ -662,7 +663,6 @@ function appendChatMessage(name, text, time) {
     const msg = document.createElement('div');
     const isMe = name === 'Produção (Host)';
     msg.className = `flex flex-col max-w-[90%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
-
     const timeStr = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     msg.innerHTML = `
         <span class="text-[9px] text-gray-500 mb-1 px-1 font-bold uppercase tracking-tighter">${name} • ${timeStr}</span>
@@ -674,7 +674,6 @@ function appendChatMessage(name, text, time) {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// --- Lyncro Cam (QR Code Companion) para o Host ---
 const openMobileBtn = document.getElementById('openMobileCam');
 const qrModal = document.getElementById('qr-modal');
 const closeQrModal = document.getElementById('close-qr-modal');
@@ -685,28 +684,16 @@ if (openMobileBtn && qrModal && closeQrModal && qrContainer) {
     openMobileBtn.onclick = () => {
         qrModal.classList.remove('hidden');
         if (!qrcodeInstance && myId) {
-            // Gerar URL de Convidado com o parâmetro companionOf apontando para o Host
             const baseUrl = window.location.origin;
             const qrUrl = new URL(`${baseUrl}/guest.html`);
             qrUrl.searchParams.set('room', roomName);
             qrUrl.searchParams.set('companionOf', myId);
             qrUrl.searchParams.set('name', 'Lyncro Cam (Host)');
-
-            qrcodeInstance = new QRCode(qrContainer, {
-                text: qrUrl.toString(),
-                width: 200,
-                height: 200,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.H
-            });
+            qrcodeInstance = new QRCode(qrContainer, { text: qrUrl.toString(), width: 200, height: 200, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.H });
         } else if (!myId) {
             showToast("Aguarde a conexão com o servidor...", "error");
             qrModal.classList.add('hidden');
         }
     };
-
-    closeQrModal.onclick = () => {
-        qrModal.classList.add('hidden');
-    };
+    closeQrModal.onclick = () => { qrModal.classList.add('hidden'); };
 }

@@ -73,13 +73,16 @@
             <div class="space-y-1.5">
                 <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Papel na
                     Sessão</label>
-                <div class="relative">
-                    <select id="role"
-                        class="w-full bg-black/30 border border-win-border rounded-win px-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all appearance-none cursor-pointer">
-                        <option value="guest">💻 Convidado (Guest)</option>
-                        <option value="host">🎯 Monitor do Host (Admin)</option>
+                <div class="relative flex items-center">
+                    <div class="absolute left-4 pointer-events-none text-win-accent">
+                        <i id="role-icon" class="ph ph-user text-sm"></i>
+                    </div>
+                    <select id="role" onchange="updateRoleIcon(this.value)"
+                        class="w-full bg-black/30 border border-win-border rounded-win pl-11 pr-4 py-3 text-sm focus:border-win-accent focus:bg-black/50 outline-none transition-all appearance-none cursor-pointer">
+                        <option value="guest">Convidado (Guest)</option>
+                        <option value="host">Monitor do Host (Admin)</option>
                     </select>
-                    <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
+                    <div class="absolute right-4 pointer-events-none text-gray-500">
                         <i class="ph ph-caret-down"></i>
                     </div>
                 </div>
@@ -129,7 +132,6 @@
                 });
                 const data = await res.json();
 
-                // Armazenar senha localmente para o Host não ter que digitar de novo
                 if (password) {
                     localStorage.setItem(`room_pwd_${data.roomId}`, password);
                 }
@@ -138,6 +140,15 @@
             } catch (err) {
                 console.error('Erro ao criar sala:', err);
                 alert('Erro ao criar sala');
+            }
+        }
+
+        function updateRoleIcon(role) {
+            const icon = document.getElementById('role-icon');
+            if (role === 'host') {
+                icon.className = 'ph ph-monitor-play text-sm';
+            } else {
+                icon.className = 'ph ph-user text-sm';
             }
         }
 
