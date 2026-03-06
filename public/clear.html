@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyncro - Limpeza de Cache</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #121212;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #0078d4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 1rem;
+        }
+
+        .status {
+            font-size: 0.75rem;
+            color: #0078d4;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="spinner"></div>
+    <h1>Atualizando Lyncro...</h1>
+    <p>Limpando cache antigo do navegador</p>
+    <div class="status" id="status">Iniciando...</div>
+
+    <script>
+        const statusEl = document.getElementById('status');
+
+        async function clearEverything() {
+            try {
+                // 1. Desregistrar todos os Service Workers
+                if ('serviceWorker' in navigator) {
+                    statusEl.textContent = 'Removendo Service Workers...';
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    for (const reg of registrations) {
+                        await reg.unregister();
+                    }
+                }
+
+                // 2. Limpar todos os caches (Cache API)
+                statusEl.textContent = 'Limpando caches...';
+                const cacheNames = await caches.keys();
+                for (const name of cacheNames) {
+                    await caches.delete(name);
+                }
+
+                // 3. Sucesso
+                statusEl.textContent = '✅ Cache limpo! Redirecionando...';
+
+                // 4. Redirect para a home com bust param
+                setTimeout(() => {
+                    window.location.replace('/?v=' + Date.now());
+                }, 1500);
+
+            } catch (err) {
+                statusEl.textContent = '⚠️ Erro: ' + err.message;
+                // Tentar redirecionar mesmo assim
+                setTimeout(() => {
+                    window.location.replace('/');
+                }, 3000);
+            }
+        }
+
+        clearEverything();
+    </script>
+</body>
+
+</html>
