@@ -260,23 +260,23 @@ function renderWaitingParticipant(participant) {
 
     const card = document.createElement('div');
     card.id = `queue-card-${participant.id}`;
-    card.className = "bg-win-surface border border-win-border rounded-win p-2 flex items-center justify-between";
+    card.className = "bg-white/5 border border-win-border/40 rounded-win p-2.5 flex items-center justify-between group hover:bg-white/10 transition-all";
 
     card.innerHTML = `
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-win-accent flex items-center justify-center text-white font-bold text-xs uppercase shadow-inner">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded bg-win-accent/20 border border-win-accent/20 flex items-center justify-center text-win-accent font-black text-xs uppercase shadow-lg">
                 ${participant.name.charAt(0)}
             </div>
             <div class="flex flex-col">
-                <span class="text-sm font-semibold truncate max-w-[120px]" title="${participant.name}">${participant.name}</span>
-                <span class="text-[9px] text-gray-500">Aguardando...</span>
+                <span class="text-xs font-bold text-gray-200 truncate max-w-[110px]" title="${participant.name}">${participant.name}</span>
+                <span class="text-[9px] text-gray-600 uppercase font-bold tracking-tighter">Na Fila</span>
             </div>
         </div>
-        <div class="flex gap-1">
-            <button onclick="handleAdmission('${participant.id}', 'accepted')" class="w-8 h-8 rounded bg-green-600/20 text-green-500 hover:bg-green-600 hover:text-white transition-all flex items-center justify-center" title="Aprovar Entrada">
+        <div class="flex gap-1.5 grayscale group-hover:grayscale-0 transition-all">
+            <button onclick="handleAdmission('${participant.id}', 'accepted')" class="w-8 h-8 rounded-win bg-green-500/10 text-green-500 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center" title="Aprovar">
                 <i class="ph ph-check font-bold"></i>
             </button>
-            <button onclick="handleAdmission('${participant.id}', 'rejected')" class="w-8 h-8 rounded bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center" title="Recusar">
+            <button onclick="handleAdmission('${participant.id}', 'rejected')" class="w-8 h-8 rounded-win bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="Recusar">
                 <i class="ph ph-x font-bold"></i>
             </button>
         </div>
@@ -301,45 +301,45 @@ function renderParticipantCard(participant, isLocal = false) {
     card.className = "bg-win-card border border-win-border rounded-win overflow-hidden shadow-xl flex flex-col";
 
     card.innerHTML = `
-      <div class="aspect-video bg-black relative group">
+      <div class="aspect-video bg-black relative group rounded-t-win overflow-hidden">
         <video class="w-full h-full object-cover" autoplay playsinline ${isLocal ? 'muted' : ''}></video>
         
-        <div class="absolute inset-0 flex items-center justify-center opacity-30 ${isLocal ? 'hidden' : ''}" id="waiting-${participant.id}">
-          <span class="text-xs italic">Aguardando Convidado...</span>
+        <div class="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm opacity-60 ${isLocal ? 'hidden' : ''}" id="waiting-${participant.id}">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-gray-400">Aguardando...</span>
         </div>
 
         <div id="mute-overlay-${participant.id}" class="absolute inset-0 media-muted-overlay ${participant.audioMuted || participant.videoMuted ? '' : 'hidden'}">
           ${participant.videoMuted ? `
             <div class="flex flex-col items-center animate-pulse">
-              <i class="ph ph-video-camera-slash text-3xl text-red-500"></i>
-              <span class="text-[10px] font-bold uppercase tracking-widest text-red-500 mt-2">Câmera Desligada</span>
+              <i class="ph ph-video-camera-slash text-2xl text-red-500"></i>
+              <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-red-500 mt-2">Câmera Off</span>
             </div>
           ` : ''}
           ${participant.audioMuted ? `
-            <div class="flex items-center gap-2 bg-red-600/20 px-3 py-1 rounded-full border border-red-500/30">
-              <i class="ph ph-microphone-slash text-red-500"></i>
-              <span class="text-[9px] font-bold uppercase text-red-500">Mudo</span>
+            <div class="flex items-center gap-2 bg-red-600/10 px-2.5 py-1 rounded-full border border-red-500/20">
+              <i class="ph ph-microphone-slash text-[10px] text-red-500"></i>
+              <span class="text-[8px] font-bold uppercase tracking-wider text-red-500">Muted</span>
             </div>
           ` : ''}
         </div>
         
-        <div class="absolute top-3 right-3 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded-sm border border-win-border">
-          <div id="tally-dot-${participant.id}" class="w-2 h-2 rounded-full ${participant.tallyState === 'program' ? 'bg-red-500 animate-pulse' : participant.tallyState === 'preview' ? 'bg-green-500 animate-pulse' : 'bg-gray-500'}"></div>
-          <span id="tally-text-${participant.id}" class="text-[10px] font-bold tracking-widest uppercase">${participant.tallyState === 'program' ? 'No Ar' : participant.tallyState === 'preview' ? 'Preview' : 'Standby'}</span>
+        <div class="absolute top-2.5 right-2.5 flex items-center gap-2 bg-black/60 backdrop-blur-md px-2 py-1 rounded border border-win-border/40 min-w-[70px] justify-center">
+          <div id="tally-dot-${participant.id}" class="w-1.5 h-1.5 rounded-full ${participant.tallyState === 'program' ? 'bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]' : participant.tallyState === 'preview' ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]' : 'bg-gray-600'}"></div>
+          <span id="tally-text-${participant.id}" class="text-[9px] font-black tracking-widest uppercase text-white/90">${participant.tallyState === 'program' ? 'No Ar' : participant.tallyState === 'preview' ? 'Preview' : 'Ready'}</span>
         </div>
 
-        <div class="absolute bottom-3 left-3 bg-black/40 px-2 py-0.5 rounded text-xs">
-          ${participant.name} ${isLocal ? '(Você)' : ''}
+        <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold border border-win-border/20 text-white/70">
+          ${participant.name} ${isLocal ? '(Host)' : ''}
         </div>
       </div>
 
-      <div class="p-3 flex justify-between items-center bg-win-surface/40">
-        <div class="flex gap-3">
-          <button id="btn-audio-${participant.id}" class="${participant.audioMuted ? 'text-red-500 bg-red-600/20' : 'hover:text-red-400'} p-1 rounded transition-colors" onclick="remoteMute('${participant.id}')">
-             <i class="ph ${participant.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'}"></i>
+      <div class="p-3 flex justify-between items-center bg-white/5 border-t border-win-border/20">
+        <div class="flex gap-2">
+          <button id="btn-audio-${participant.id}" class="${participant.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all" onclick="remoteMute('${participant.id}')">
+             <i class="ph ${participant.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>
           </button>
-          <button id="btn-video-${participant.id}" class="${participant.videoMuted ? 'text-red-500 bg-red-600/20' : 'hover:text-win-accent'} p-1 rounded transition-colors" onclick="remoteMuteVideo('${participant.id}')">
-             <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'}"></i>
+          <button id="btn-video-${participant.id}" class="${participant.videoMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-win transition-all" onclick="remoteMuteVideo('${participant.id}')">
+             <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>
           </button>
         </div>
         
@@ -413,14 +413,14 @@ function updateParticipantStatus(p) {
     const text = document.getElementById(`tally-text-${p.id}`);
     if (dot && text) {
         if (p.tallyState === 'program') {
-            dot.className = "w-2 h-2 rounded-full bg-red-500 animate-pulse";
+            dot.className = "w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.5)]";
             text.textContent = "No Ar";
         } else if (p.tallyState === 'preview') {
-            dot.className = "w-2 h-2 rounded-full bg-green-500 animate-pulse";
+            dot.className = "w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)]";
             text.textContent = "Preview";
         } else {
-            dot.className = "w-2 h-2 rounded-full bg-gray-500";
-            text.textContent = "Standby";
+            dot.className = "w-1.5 h-1.5 rounded-full bg-gray-600";
+            text.textContent = "Ready";
         }
     }
 
@@ -432,14 +432,14 @@ function updateParticipantStatus(p) {
             overlay.innerHTML = `
                 ${p.videoMuted ? `
                     <div class="flex flex-col items-center animate-pulse">
-                        <i class="ph ph-video-camera-slash text-3xl text-red-500"></i>
-                        <span class="text-[10px] font-bold uppercase tracking-widest text-red-500 mt-2">Câmera Desligada</span>
+                        <i class="ph ph-video-camera-slash text-2xl text-red-500"></i>
+                        <span class="text-[9px] font-bold uppercase tracking-[0.2em] text-red-500 mt-2">Câmera Off</span>
                     </div>
                 ` : ''}
                 ${p.audioMuted ? `
-                    <div class="flex items-center gap-2 bg-red-600/20 px-3 py-1 rounded-full border border-red-500/30">
-                        <i class="ph ph-microphone-slash text-red-500"></i>
-                        <span class="text-[9px] font-bold uppercase text-red-500">Mudo</span>
+                    <div class="flex items-center gap-2 bg-red-600/10 px-2.5 py-1 rounded-full border border-red-500/20">
+                        <i class="ph ph-microphone-slash text-[10px] text-red-500"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-wider text-red-500">Muted</span>
                     </div>
                 ` : ''}
             `;
@@ -451,14 +451,14 @@ function updateParticipantStatus(p) {
     // Atualizar Ícones de Audio/Video nos botões
     const btnAudio = document.getElementById(`btn-audio-${p.id}`);
     if (btnAudio) {
-        btnAudio.className = `${p.audioMuted ? 'text-red-500 bg-red-600/20' : 'hover:text-red-400'} p-1 rounded transition-colors`;
-        btnAudio.innerHTML = `<i class="ph ${p.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'}"></i>`;
+        btnAudio.className = `${p.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all`;
+        btnAudio.innerHTML = `<i class="ph ${p.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>`;
     }
 
     const btnVideo = document.getElementById(`btn-video-${p.id}`);
     if (btnVideo) {
-        btnVideo.className = `${p.videoMuted ? 'text-red-500 bg-red-600/20' : 'hover:text-win-accent'} p-1 rounded transition-colors`;
-        btnVideo.innerHTML = `<i class="ph ${p.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'}"></i>`;
+        btnVideo.className = `${p.videoMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-win transition-all`;
+        btnVideo.innerHTML = `<i class="ph ${p.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>`;
     }
 
     // Atualizar Botões de Controle Tally
@@ -661,12 +661,12 @@ function appendChatMessage(name, text, time) {
     if (!chatMessages) return;
     const msg = document.createElement('div');
     const isMe = name === 'Produção (Host)';
-    msg.className = `flex flex-col max-w-[85%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
+    msg.className = `flex flex-col max-w-[90%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
 
     const timeStr = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     msg.innerHTML = `
-        <span class="text-[10px] text-gray-400 mb-0.5 px-1">${name} • ${timeStr}</span>
-        <div class="px-3 py-1.5 rounded-lg shadow-md ${isMe ? 'bg-win-accent text-white rounded-br-none' : 'bg-win-surface border border-win-border text-gray-200 rounded-bl-none'}">
+        <span class="text-[9px] text-gray-500 mb-1 px-1 font-bold uppercase tracking-tighter">${name} • ${timeStr}</span>
+        <div class="px-4 py-2 rounded-win shadow-lg ${isMe ? 'bg-win-accent text-white border-none' : 'bg-black/40 border border-win-border/60 text-gray-200'} text-sm leading-relaxed">
             ${text}
         </div>
     `;
