@@ -55,6 +55,13 @@ class WebRTCClient {
 
         pc.oniceconnectionstatechange = () => {
             this.log(`ICE State with ${targetId}: ${pc.iceConnectionState}`);
+            if (pc.iceConnectionState === 'connected' || pc.iceConnectionState === 'completed') {
+                this.checkSelectedCandidate(targetId, pc);
+            }
+        };
+
+        pc.onicecandidateerror = (e) => {
+            this.log(`ICE Candidate Error: ${e.errorText} (${e.errorCode})`);
         };
 
         pc.ontrack = (event) => {
@@ -108,6 +115,26 @@ class WebRTCClient {
 
         this.peers.set(targetId, pc);
         return pc;
+    }
+
+    async checkSelectedCandidate(targetId, pc) {
+        try {
+            const stats = await pc.getStats();
+            stats.forEach(report => {
+                if (report.type === 'candidate-pair' && report.state === 'succeeded' && report.writable) {
+                    const localCandidate = stats.get(report.localCandidateId);
+                    const remoteCandidate = stats.get(report.remoteCandidateId);
+                    if (localCandidate && remoteCandidate) {
+                        this.log(`[4G-TEST] Active Pair: Local(${localCandidate.candidateType}) <-> Remote(${remoteCandidate.candidateType})`);
+                        if (localCandidate.candidateType === 'relay' || remoteCandidate.candidateType === 'relay') {
+                            this.log(`✅ [SUCCESS] Conexão via TURN (Relay) ativa! 4G/Firewall funcionando.`);
+                        }
+                    }
+                }
+            });
+        } catch (e) {
+            this.log('Stats error: ' + e.message);
+        }
     }
 
     async createOffer(targetId) {
