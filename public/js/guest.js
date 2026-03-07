@@ -2,16 +2,16 @@
 const VIDEO_QUALITY_PRESETS = {
     '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
     '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
-    '720':     { label: '720p HD',     width: 1280, height: 720,  frameRate: 30 },
-    '480':     { label: '480p SD',     width: 854,  height: 480,  frameRate: 30 },
-    '360':     { label: '360p LQ',     width: 640,  height: 360,  frameRate: 30 },
+    '720': { label: '720p HD', width: 1280, height: 720, frameRate: 30 },
+    '480': { label: '480p SD', width: 854, height: 480, frameRate: 30 },
+    '360': { label: '360p LQ', width: 640, height: 360, frameRate: 30 },
 };
 
 function buildVideoConstraints(qualityKey, extras = {}) {
     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
     return {
-        width:     { ideal: p.width },
-        height:    { ideal: p.height },
+        width: { ideal: p.width },
+        height: { ideal: p.height },
         frameRate: { ideal: p.frameRate, max: p.frameRate },
         ...extras
     };
@@ -84,7 +84,7 @@ let currentFullscreenId = null; // ID de quem está sendo exibido em fullscreen 
 
 // ── Noise-tolerant speaker detection parameters ──────────────────────────────
 // Requires sustained speech before switching; ignores brief spikes and background noise.
-const SPEAK_THRESHOLD      = 18;  // Raw avg level (0-255) above noise floor to count as speaking
+const SPEAK_THRESHOLD = 18;  // Raw avg level (0-255) above noise floor to count as speaking
 const SPEAK_CONFIRM_FRAMES = 6;   // Must speak for 6 × 200ms = ~1.2s before switching
 const SILENCE_CONFIRM_FRAMES = 25; // Must be silent for 25 × 200ms = ~5s before switching back
 const SPEAKER_SWITCH_COOLDOWN = 3000; // Minimum ms between auto-switches
@@ -414,7 +414,7 @@ function createOrUpdatePipCard(targetId, stream) {
     if (!card) {
         card = document.createElement('div');
         card.id = `remote-card-${targetId}`;
-        card.className = 'relative w-36 h-24 rounded-lg overflow-hidden border-2 border-white/20 shadow-2xl bg-black/80 backdrop-blur-sm transition-all duration-300 hover:scale-105 cursor-pointer';
+        card.className = 'glass-panel relative w-28 h-36 sm:w-36 sm:h-24 rounded-2xl overflow-hidden border border-white/10 shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer hover:border-win-accent flex-shrink-0';
         card.innerHTML = `
             <video autoplay playsinline muted class="w-full h-full object-cover"></video>
             <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
@@ -591,7 +591,7 @@ function ensureSelfPip() {
     if (!selfCard) {
         selfCard = document.createElement('div');
         selfCard.id = 'remote-card-self';
-        selfCard.className = 'relative w-36 h-24 rounded-lg overflow-hidden border-2 shadow-2xl bg-black/80 backdrop-blur-sm transition-all duration-300 hover:scale-105 cursor-pointer pip-self-card';
+        selfCard.className = 'glass-panel relative w-28 h-36 sm:w-36 sm:h-24 rounded-2xl overflow-hidden border border-win-accent/50 shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer pip-self-card flex-shrink-0';
         selfCard.innerHTML = `
             <video autoplay playsinline muted class="w-full h-full object-cover"></video>
             <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
@@ -1003,7 +1003,7 @@ async function setupWebSocket() {
             case 'session-ended':
                 wsIntentionalClose = true;
                 if (localStream) localStream.getTracks().forEach(t => t.stop());
-                if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) {} }); rtcClient.peers.clear(); }
+                if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) { } }); rtcClient.peers.clear(); }
                 if (speakerDetectionInterval) { clearInterval(speakerDetectionInterval); speakerDetectionInterval = null; }
                 showSessionEndedScreen('O host encerrou a sessão.');
                 break;
@@ -1011,7 +1011,7 @@ async function setupWebSocket() {
             case 'kicked':
                 wsIntentionalClose = true;
                 if (localStream) localStream.getTracks().forEach(t => t.stop());
-                if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) {} }); rtcClient.peers.clear(); }
+                if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) { } }); rtcClient.peers.clear(); }
                 if (speakerDetectionInterval) { clearInterval(speakerDetectionInterval); speakerDetectionInterval = null; }
                 showSessionEndedScreen('Você foi removido da sala pelo produtor.');
                 break;
@@ -1386,9 +1386,8 @@ function showSessionBanner(message, type = 'warning') {
 
     const banner = document.createElement('div');
     banner.id = 'session-banner';
-    banner.className = `fixed top-0 inset-x-0 z-[300] flex items-center justify-center gap-3 py-3 px-6 text-sm font-bold ${
-        type === 'warning' ? 'bg-yellow-600/90 text-white' : 'bg-red-600/90 text-white'
-    } backdrop-blur-sm shadow-xl`;
+    banner.className = `fixed top-0 inset-x-0 z-[300] flex items-center justify-center gap-3 py-3 px-6 text-sm font-bold ${type === 'warning' ? 'bg-yellow-600/90 text-white' : 'bg-red-600/90 text-white'
+        } backdrop-blur-sm shadow-xl`;
     banner.innerHTML = `<i class="ph ph-warning text-lg"></i><span>${message}</span>`;
     document.body.appendChild(banner);
 }

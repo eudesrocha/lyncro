@@ -465,7 +465,7 @@ function renderWaitingParticipant(participant) {
 
     const card = document.createElement('div');
     card.id = `queue-card-${participant.id}`;
-    card.className = "bg-white/5 border border-win-border rounded-win p-2.5 flex items-center justify-between group hover:bg-white/10 transition-all";
+    card.className = "bg-black/20 border border-white/10 rounded-xl p-2.5 flex items-center justify-between group hover:bg-white/10 transition-all";
 
     card.innerHTML = `
         <div class="flex items-center gap-3">
@@ -503,7 +503,7 @@ window.handleAdmission = (participantId, status) => {
 function renderParticipantCard(participant, isLocal = false) {
     const card = document.createElement('div');
     card.id = `video-card-${participant.id}`;
-    card.className = "bg-win-card border border-win-border rounded-win shadow-xl flex flex-col";
+    card.className = "glass-panel border-white/10 rounded-2xl shadow-2xl flex flex-col h-full transition-all hover:border-win-accent/50 hover:shadow-[0_0_30px_rgba(0,120,212,0.15)]";
 
     card.innerHTML = `
       <div class="aspect-video bg-black relative group rounded-t-win overflow-hidden">

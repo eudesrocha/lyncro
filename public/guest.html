@@ -3,7 +3,7 @@
 
 <head>
     <script>
-        (function(){var t=localStorage.getItem('lyncro-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();
+        (function () { var t = localStorage.getItem('lyncro-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); document.documentElement.setAttribute('data-theme', t); })();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -15,36 +15,72 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <!-- Google Fonts: Inter para fallback premium no iOS e Outfit para Logo -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/themes.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* Custom Dropdown Styles */
+        /* CSS Cinematic + Glassmorphism Premium */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+        }
+
+        [data-theme="light"] .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+        }
+
+        .bg-glow {
+            position: relative;
+        }
+
+        .bg-glow::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.12) 0%, transparent 60%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        [data-theme="light"] .bg-glow::before {
+            background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.05) 0%, transparent 60%);
+        }
+
+        /* Custom Dropdown Styles (Mobile Touch Friendly) */
         .custom-select-trigger {
             width: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
-            border: 1px solid #2a2a2a;
-            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
             font-size: 0.875rem;
-            padding: 0.75rem;
+            padding: 0.75rem 1rem;
             outline: none;
             transition: all 0.2s;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        [data-theme="light"] .custom-select-trigger {
+            background-color: rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         .custom-select-trigger:hover {
             border-color: #0078d480;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
         .custom-select-menu {
@@ -53,22 +89,30 @@
             top: 100%;
             left: 0;
             width: 100%;
-            margin-top: 0.25rem;
-            background-color: #2b2b2b;
-            border: 1px solid #2a2a2a;
-            border-radius: 8px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            margin-top: 0.5rem;
+            background-color: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
             z-index: 110;
             overflow: hidden;
             backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        [data-theme="light"] .custom-select-menu {
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
         .custom-select-option {
-            padding: 0.625rem 1rem;
+            padding: 0.875rem 1rem;
             font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s, color 0.2s;
-            border-bottom: 1px solid rgba(42, 42, 42, 0.3);
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .custom-select-option:last-child {
@@ -77,7 +121,11 @@
 
         .custom-select-option:hover {
             background-color: rgba(0, 120, 212, 0.2);
-            color: #ffffff;
+            color: #0078d4;
+        }
+
+        [data-theme="light"] .custom-select-option {
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .rotate-180 {
@@ -88,8 +136,12 @@
         html {
             height: 100%;
             overflow: hidden;
-            background-color: #1c1c1c;
-            color: #fff;
+            background-color: #101a22;
+            /* Cinemaster dark */
+        }
+
+        [data-theme="light"] body {
+            background-color: #f6f7f8;
         }
 
         .tally-program {
@@ -102,7 +154,6 @@
             animation: pulse-preview 1.5s infinite;
         }
 
-        /* Overlay / Lower Third Animations */
         @keyframes overlay-in {
             from {
                 transform: translateX(-50px) scale(0.95);
@@ -149,9 +200,9 @@
             backdrop-filter: blur(12px);
             border-left: 4px solid #fff;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 0 8px 8px 0;
         }
 
-        /* === Speaker View === */
         .pip-active-speaker {
             box-shadow: 0 0 0 2px #0078d4, 0 0 16px rgba(0, 120, 212, 0.5) !important;
             border-color: #0078d4 !important;
@@ -193,409 +244,352 @@
 
         @keyframes pulse-program {
             0% {
-                box-shadow: inset 0 0 0 6px #ef4444;
+                box-shadow: inset 0 0 0 4px #ef4444;
             }
 
             50% {
-                box-shadow: inset 0 0 0 12px #ef4444;
+                box-shadow: inset 0 0 0 8px #ef4444;
             }
 
             100% {
-                box-shadow: inset 0 0 0 6px #ef4444;
+                box-shadow: inset 0 0 0 4px #ef4444;
             }
         }
 
         @keyframes pulse-preview {
             0% {
-                box-shadow: inset 0 0 0 6px #22c55e;
+                box-shadow: inset 0 0 0 4px #22c55e;
             }
 
             50% {
-                box-shadow: inset 0 0 0 12px #22c55e;
+                box-shadow: inset 0 0 0 8px #22c55e;
             }
 
             100% {
-                box-shadow: inset 0 0 0 6px #22c55e;
+                box-shadow: inset 0 0 0 4px #22c55e;
             }
         }
     </style>
 </head>
 
-<body class="text-gray-100 font-sans bg-win-bg transition-colors duration-300">
+<body class="text-gray-100 font-sans bg-win-bg bg-glow transition-colors duration-300">
 
     <!-- Pré-chamada / Lobby Local -->
     <div id="precall-screen"
-        class="fixed inset-0 z-[100] bg-win-bg flex flex-col items-center overflow-y-auto p-6 pb-[env(safe-area-inset-bottom)]">
-        <div class="w-full max-w-sm flex flex-col items-center py-8">
-            <div class="flex w-full items-center gap-3 mb-6">
-                <div class="w-10 h-10 bg-win-accent rounded-win flex items-center justify-center shadow-md shrink-0">
-                    <i class="ph ph-video-camera text-xl text-white"></i>
-                </div>
-                <div class="flex flex-col text-left flex-1">
-                    <h1 class="text-[18px] font-bold leading-tight">Configure sua Entrada</h1>
-                    <p class="text-[9px] theme-text-secondary uppercase tracking-widest mt-0.5">Teste sua câmera e microfone</p>
+        class="fixed inset-0 z-[100] bg-win-bg bg-glow flex flex-col items-center justify-center overflow-y-auto p-4 sm:p-6 pb-[env(safe-area-inset-bottom)]">
+
+        <div class="w-full max-w-md glass-panel p-6 sm:p-8 rounded-3xl flex flex-col items-center">
+
+            <div class="flex w-full items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-win-accent rounded-xl flex items-center justify-center shadow-lg shrink-0">
+                        <i class="ph ph-video-camera text-xl text-white"></i>
+                    </div>
+                    <div class="flex flex-col text-left">
+                        <h1 class="text-xl font-bold leading-tight font-logo tracking-tight">Setup de Entrada</h1>
+                        <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5 font-bold">Lyncro Premium
+                        </p>
+                    </div>
                 </div>
                 <!-- Toggle de Tema -->
                 <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
-                    class="theme-toggle-btn shrink-0" aria-label="Alternar tema claro/escuro">
-                    <i class="ph ph-moon"></i>
+                    class="theme-toggle-btn w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
+                    aria-label="Alternar tema">
+                    <i class="ph ph-moon text-gray-300"></i>
                 </button>
             </div>
 
             <div
-                class="w-full aspect-video bg-black rounded-lg border border-win-border overflow-hidden mb-6 relative shadow-2xl">
+                class="w-full aspect-[4/3] sm:aspect-video bg-black rounded-2xl border border-white/10 overflow-hidden mb-6 relative shadow-2xl group">
                 <video id="pre-localVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
                 <div id="pre-audio-meter"
-                    class="absolute bottom-2 left-2 right-2 h-1 bg-white/10 rounded-full overflow-hidden">
+                    class="absolute bottom-3 left-3 right-3 h-1.5 bg-black/50 backdrop-blur-md rounded-full overflow-hidden border border-white/10">
                     <div id="audio-bar" class="h-full bg-green-500 w-0 transition-all duration-75"></div>
                 </div>
+                <!-- Identificador no espelho -->
+                <div
+                    class="absolute top-3 left-3 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-[10px] uppercase font-bold tracking-widest text-white/80 border border-white/10">
+                    Sua Câmera</div>
             </div>
 
-            <!-- Device Selectors -->
-            <div class="w-full space-y-3 mb-4">
-                <div class="grid grid-cols-2 gap-3">
+            <!-- Formulários e Controles -->
+            <div class="w-full space-y-4 mb-6">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <!-- Camera Select -->
                     <div class="relative">
                         <label
-                            class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Câmera</label>
-                        <div id="cam-select-trigger" class="custom-select-trigger !py-2.5">
+                            class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1.5 block pl-1">Câmera</label>
+                        <div id="cam-select-trigger" class="custom-select-trigger shadow-inner">
                             <div class="flex items-center gap-2 truncate">
-                                <i class="ph ph-video-camera text-win-accent shrink-0"></i>
-                                <span id="cam-display-name" class="truncate text-[11px]">Câmera...</span>
+                                <i class="ph ph-video-camera text-win-accent shrink-0 text-lg"></i>
+                                <span id="cam-display-name"
+                                    class="truncate text-xs font-semibold text-gray-200">Câmera...</span>
                             </div>
-                            <i class="ph ph-caret-down text-gray-400 text-[10px] shrink-0"></i>
+                            <i class="ph ph-caret-down text-gray-400 text-sm shrink-0"></i>
                         </div>
-                        <div id="cam-select-menu" class="custom-select-menu">
-                            <!-- Populated by JS -->
-                        </div>
+                        <div id="cam-select-menu" class="custom-select-menu"></div>
                     </div>
 
                     <!-- Mic Select -->
                     <div class="relative">
                         <label
-                            class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Microfone</label>
-                        <div id="mic-select-trigger" class="custom-select-trigger !py-2.5">
+                            class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1.5 block pl-1">Microfone</label>
+                        <div id="mic-select-trigger" class="custom-select-trigger shadow-inner">
                             <div class="flex items-center gap-2 truncate">
-                                <i class="ph ph-microphone text-win-accent shrink-0"></i>
-                                <span id="mic-display-name" class="truncate text-[11px]">Micro...</span>
+                                <i class="ph ph-microphone text-win-accent shrink-0 text-lg"></i>
+                                <span id="mic-display-name"
+                                    class="truncate text-xs font-semibold text-gray-200">Micro...</span>
                             </div>
-                            <i class="ph ph-caret-down text-gray-400 text-[10px] shrink-0"></i>
+                            <i class="ph ph-caret-down text-gray-400 text-sm shrink-0"></i>
                         </div>
-                        <div id="mic-select-menu" class="custom-select-menu">
-                            <!-- Populated by JS -->
+                        <div id="mic-select-menu" class="custom-select-menu"></div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-4">
+                    <!-- Senha e Qualidade -->
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label
+                                class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1.5 block pl-1">Senha
+                                (Opcional)</label>
+                            <input type="password" id="room-password" placeholder="Se necessário"
+                                class="w-full bg-white/5 border border-white/10 rounded-xl text-sm font-semibold p-3 outline-none focus:border-win-accent text-white shadow-inner transition-all placeholder:text-gray-600">
+                        </div>
+
+                        <div class="w-1/3 relative">
+                            <label
+                                class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1.5 block pl-1">Vídeo</label>
+                            <div id="quality-select-trigger" class="custom-select-trigger !px-2">
+                                <div class="flex items-center gap-1">
+                                    <span id="quality-display-name" class="text-[10px] font-bold">720p HD</span>
+                                </div>
+                                <i class="ph ph-caret-down text-gray-400 text-[10px]"></i>
+                            </div>
+                            <div id="quality-select-menu" class="custom-select-menu !w-[150%] !right-0 !left-auto">
+                                <div class="custom-select-option" onclick="selectQuality('1080_60', '1080p 60fps')">
+                                    1080p 60fps ⚡</div>
+                                <div class="custom-select-option" onclick="selectQuality('1080_30', '1080p 30fps')">
+                                    1080p 30fps</div>
+                                <div class="custom-select-option" onclick="selectQuality('720', '720p HD')">720p HD
+                                </div>
+                                <div class="custom-select-option" onclick="selectQuality('480', '480p SD')">480p SD
+                                </div>
+                                <div class="custom-select-option" onclick="selectQuality('360', '360p LQ')">360p LQ
+                                </div>
+                            </div>
+                            <select id="video-quality" class="hidden">
+                                <option value="1080_60">1080p 60fps</option>
+                                <option value="1080_30">1080p 30fps</option>
+                                <option value="720" selected>720p HD</option>
+                                <option value="480">480p SD</option>
+                                <option value="360">360p LQ</option>
+                            </select>
                         </div>
                     </div>
                 </div>
 
-                <!-- Quality Select -->
-                <div class="relative">
+                <!-- Virtual Background Selector (Refinado) -->
+                <div class="w-full mt-4 pt-4 border-t border-white/5">
                     <label
-                        class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Qualidade
-                        Video</label>
-                    <div id="quality-select-trigger" class="custom-select-trigger !py-2.5">
-                        <div class="flex items-center gap-2">
-                            <i class="ph ph-broadcast text-win-accent shrink-0"></i>
-                            <span id="quality-display-name" class="text-[11px]">720p HD</span>
-                        </div>
-                        <i class="ph ph-caret-down text-gray-400 text-[10px]"></i>
+                        class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-3 block pl-1 flex items-center gap-1.5">
+                        <i class="ph ph-sparkle text-win-accent"></i> Fundo Virtual (Auto-Mágica)
+                    </label>
+
+                    <div
+                        class="flex overflow-x-auto gap-3 pb-4 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory">
+                        <!-- Controls -->
+                        <button onclick="setVirtualBackground('none', null, this.id)" id="pre-vb-btn-none"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-white/5 border border-white/10 transition-all hover:bg-white/10 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-prohibit text-xl text-gray-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Nenhum</span>
+                        </button>
+                        <button onclick="setVirtualBackground('blur', null, this.id)" id="pre-vb-btn-blur"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-black/40 border border-white/10 transition-all hover:bg-white/10 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-drop text-xl text-blue-400 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Desfoque</span>
+                        </button>
+
+                        <!-- Static Images (5) -->
+                        <button onclick="setVirtualBackground('image', 'img/bg-living-room.png', this.id)"
+                            id="pre-vb-btn-living"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
+                            <img src="img/bg-living-room.png" alt="Living" class="w-full h-full object-cover">
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-office-premium.png', this.id)"
+                            id="pre-vb-btn-office-premium"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
+                            <img src="img/bg-office-premium.png" alt="Office" class="w-full h-full object-cover">
+                        </button>
+                        <button onclick="setVirtualBackground('image', 'img/bg-studio-pro.png', this.id)"
+                            id="pre-vb-btn-studio-pro"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
+                            <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
+                        </button>
                     </div>
-                    <div id="quality-select-menu" class="custom-select-menu">
-                        <div class="custom-select-option" onclick="selectQuality('1080_60', '1080p 60fps')">1080p 60fps ⚡</div>
-                        <div class="custom-select-option" onclick="selectQuality('1080_30', '1080p 30fps')">1080p 30fps</div>
-                        <div class="custom-select-option" onclick="selectQuality('720', '720p HD')">720p HD</div>
-                        <div class="custom-select-option" onclick="selectQuality('480', '480p SD')">480p SD</div>
-                        <div class="custom-select-option" onclick="selectQuality('360', '360p LQ')">360p LQ</div>
-                    </div>
-                    <select id="video-quality" class="hidden">
-                        <option value="1080_60">1080p 60fps</option>
-                        <option value="1080_30">1080p 30fps</option>
-                        <option value="720" selected>720p HD</option>
-                        <option value="480">480p SD</option>
-                        <option value="360">360p LQ</option>
-                    </select>
                 </div>
             </div>
 
-            <div class="w-full mb-4">
-                <label class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Senha
-                    opcional</label>
-                <input type="password" id="room-password" placeholder="Digite se houver"
-                    class="w-full bg-black/30 border border-win-border rounded-lg text-sm p-2.5 outline-none focus:border-win-accent text-white shadow-inner transition-all">
-            </div>
-
-            <!-- Virtual Background Selector -->
-            <div class="w-full mb-6">
-                <label
-                    class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-2 block ml-1 flex items-center gap-1">
-                    <i class="ph ph-sparkle text-win-accent"></i> Fundo Virtual
-                </label>
-
-                <div class="flex overflow-x-auto gap-2 pb-2 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory">
-                    <!-- Controls -->
-                    <button onclick="setVirtualBackground('none', null, this.id)" id="pre-vb-btn-none"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-1.5 rounded-xl bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer w-[4.5rem] h-14">
-                        <i class="ph ph-prohibit text-lg text-gray-300 mb-0.5"></i>
-                        <span class="text-[7px] font-bold uppercase tracking-widest text-gray-300">Real</span>
-                    </button>
-                    <button onclick="setVirtualBackground('blur', null, this.id)" id="pre-vb-btn-blur"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-1.5 rounded-xl bg-black/40 border border-win-border/40 transition-all hover:bg-white/5 cursor-pointer w-[4.5rem] h-14">
-                        <i class="ph ph-drop text-lg text-blue-400 mb-0.5"></i>
-                        <span class="text-[7px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
-                    </button>
-
-                    <!-- Static Images (5) -->
-                    <button onclick="setVirtualBackground('image', 'img/bg-living-room.png', this.id)"
-                        id="pre-vb-btn-living"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14">
-                        <img src="img/bg-living-room.png" alt="Living" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-office-premium.png', this.id)"
-                        id="pre-vb-btn-office-premium"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14">
-                        <img src="img/bg-office-premium.png" alt="Office" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-studio-pro.png', this.id)"
-                        id="pre-vb-btn-studio-pro"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14">
-                        <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-loft.png', this.id)" id="pre-vb-btn-loft"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14">
-                        <img src="img/bg-loft.png" alt="Loft" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-                    <button onclick="setVirtualBackground('image', 'img/bg-abstract.png', this.id)"
-                        id="pre-vb-btn-abstract"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14">
-                        <img src="img/bg-abstract.png" alt="Abstract" class="w-full h-full object-cover">
-                        <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                    </button>
-
-                    <!-- Animated -->
-                    <button onclick="setVirtualBackground('anim-window', null, this.id)" id="pre-vb-btn-anim-window"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14 bg-gradient-to-b from-sky-400 to-green-700">
-                        <i class="ph ph-window text-white/60 text-sm absolute top-1.5"></i>
-                        <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                class="ph ph-film-strip text-white text-[8px]"></i></div>
-                        <span class="mt-3 text-[7px] font-bold text-white uppercase tracking-widest">Janela</span>
-                    </button>
-                    <button onclick="setVirtualBackground('anim-studio', null, this.id)" id="pre-vb-btn-anim-studio"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14 bg-gradient-to-br from-blue-900 to-black relative">
-                        <i class="ph ph-film-strip text-white/40 text-sm absolute top-2"></i>
-                        <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                class="ph ph-film-strip text-white text-[8px]"></i></div>
-                        <span class="mt-3 text-[7px] font-bold text-white uppercase tracking-widest">Premium</span>
-                    </button>
-                    <button onclick="setVirtualBackground('anim-particles', null, this.id)"
-                        id="pre-vb-btn-anim-particles"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[4.5rem] h-14 bg-gradient-to-tr from-purple-900 to-[#1a0a1f] relative">
-                        <i class="ph ph-sparkle text-white/40 text-sm absolute top-2"></i>
-                        <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                class="ph ph-film-strip text-white text-[8px]"></i></div>
-                        <span class="mt-3 text-[7px] font-bold text-white uppercase tracking-widest">Partículas</span>
-                    </button>
-                </div>
-            </div>
             <button id="join-btn"
-                class="w-full bg-win-accent hover:bg-opacity-90 text-white font-semibold py-4 rounded-xl text-lg shadow-lg active:scale-95 transition-all">
-                Entrar na Sala
+                class="w-full bg-win-accent hover:bg-[length:200%_auto] bg-size-200 text-white font-bold py-4 rounded-2xl text-[15px] uppercase tracking-widest shadow-[0_10px_30px_-5px_rgba(0,120,212,0.6)] hover:shadow-[0_15px_40px_-5px_rgba(0,120,212,0.8)] active:scale-[0.98] transition-all transform duration-300">
+                Entrar no Estúdio
             </button>
-            <p id="access-msg" class="text-[10px] text-gray-600 mt-4 text-center">Ao entrar, você permite o uso
-                temporário da mídia para esta conexão.</p>
+            <p id="access-msg" class="text-[9px] font-bold uppercase tracking-widest text-gray-500 mt-4 text-center">
+                Conexão P2P Criptografada (WebRTC)</p>
         </div>
     </div>
 
     <!-- Tela de Espera (Green Room) -->
     <div id="waiting-screen"
-        class="hidden fixed inset-0 z-[90] bg-win-bg flex flex-col items-center justify-center p-6 text-center">
-        <i class="ph ph-hourglass-medium text-5xl text-win-accent mb-6 animate-pulse"></i>
-        <h2 class="text-2xl font-bold mb-3">Aguardando Aprovação...</h2>
-        <p class="text-gray-400 text-sm max-w-[280px]">O produtor já sabe que você está aqui. Sua câmera será
-            ativada
-            automaticamente assim que você for aceito na sala principal.</p>
-        <div class="mt-8 flex gap-2">
-            <div class="w-2 h-2 rounded-full bg-win-accent animate-[bounce_1s_infinite_0ms]"></div>
-            <div class="w-2 h-2 rounded-full bg-win-accent animate-[bounce_1s_infinite_200ms]"></div>
-            <div class="w-2 h-2 rounded-full bg-win-accent animate-[bounce_1s_infinite_400ms]"></div>
+        class="hidden fixed inset-0 z-[105] bg-win-bg bg-glow flex flex-col items-center justify-center p-6 text-center">
+
+        <div class="glass-panel p-10 rounded-3xl flex flex-col items-center max-w-sm w-full animate-fade-in shadow-2xl">
+            <div class="relative mb-8">
+                <div class="absolute inset-0 bg-win-accent/20 rounded-full animate-ping"></div>
+                <div
+                    class="w-20 h-20 bg-win-accent/10 border border-win-accent/20 rounded-full flex items-center justify-center relative">
+                    <i class="ph ph-hourglass-medium text-4xl text-win-accent animate-pulse"></i>
+                </div>
+            </div>
+            <h2 class="text-2xl font-bold font-logo mb-2 tracking-tight">Sala de Espera</h2>
+            <p class="text-gray-400 text-sm mb-8 leading-relaxed">Você está na fila da produção. Sua câmera só será
+                ativada quando o Diretor permitir sua entrada.</p>
+
+            <div class="flex items-center gap-3">
+                <div
+                    class="w-2.5 h-2.5 rounded-full bg-win-accent animate-[bounce_1s_infinite_0ms] shadow-[0_0_10px_rgba(0,120,212,0.8)]">
+                </div>
+                <div
+                    class="w-2.5 h-2.5 rounded-full bg-win-accent animate-[bounce_1s_infinite_200ms] shadow-[0_0_10px_rgba(0,120,212,0.8)]">
+                </div>
+                <div
+                    class="w-2.5 h-2.5 rounded-full bg-win-accent animate-[bounce_1s_infinite_400ms] shadow-[0_0_10px_rgba(0,120,212,0.8)]">
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Interface Principal (Call Screen) -->
-    <div id="call-screen" class="hidden h-full flex flex-col relative">
+    <div id="call-screen" class="hidden h-full flex flex-col relative bg-black">
         <!-- Tally Overlay -->
-        <div id="tally-indicator" class="absolute inset-0 pointer-events-none z-50 transition-all duration-300">
-        </div>
+        <div id="tally-indicator" class="absolute inset-0 pointer-events-none z-[45] transition-all duration-300"></div>
+
         <div id="on-air-msg"
-            class="fixed top-8 left-1/2 -translate-x-1/2 bg-red-600 text-white px-4 py-1.5 rounded-full text-xs font-bold z-[60] shadow-2xl animate-bounce hidden uppercase tracking-widest">
-            VOCÊ ESTÁ NO AR
+            class="hidden fixed top-8 left-1/2 -translate-x-1/2 bg-red-600 text-white px-5 py-2 rounded-full text-[10px] font-black z-[60] shadow-[0_0_30px_rgba(239,68,68,0.8)] animate-bounce uppercase tracking-[0.2em]">
+            Você Está no Ar!
+        </div>
+
+        <!-- Indicador de Status Lyncro Minimalista -->
+        <div
+            class="absolute top-4 sm:top-6 left-4 sm:left-6 z-50 flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-xl">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
+            <span class="text-[10px] uppercase font-bold tracking-widest text-white/90"
+                id="room-status-indicator">LYNCRO LIVE</span>
         </div>
 
         <!-- Screen Share Indicator -->
         <div id="screen-share-indicator"
-            class="hidden fixed top-8 left-1/2 -translate-x-1/2 bg-win-surface/90 backdrop-blur-xl border border-win-border px-4 py-2 rounded-full flex items-center gap-3 z-[60] shadow-2xl animate-fade-in transition-all">
-            <div class="w-8 h-8 rounded-lg bg-[#0078d4]/10 flex items-center justify-center">
-                <i class="ph ph-monitor text-xl text-[#0078d4]"></i>
+            class="hidden absolute top-20 left-1/2 -translate-x-1/2 glass-panel border border-win-accent/50 px-4 py-2 rounded-full flex items-center gap-3 z-[60] shadow-2xl animate-fade-in transition-all">
+            <div class="w-8 h-8 rounded-full bg-[#0078d4]/20 flex items-center justify-center">
+                <i class="ph ph-monitor text-lg text-[#0078d4]"></i>
             </div>
             <div class="flex flex-col">
-                <span class="text-[10px] font-bold text-win-accent uppercase tracking-widest">Compartilhando</span>
-                <span class="text-[9px] text-gray-400 uppercase tracking-tighter">Sua tela está visível</span>
+                <span
+                    class="text-[10px] font-bold text-win-accent uppercase tracking-widest leading-none">Apresentando</span>
+                <span class="text-[8px] text-gray-300 uppercase tracking-tighter mt-1">Tela Visível</span>
             </div>
         </div>
 
         <!-- Remote Participants PiP Gallery -->
         <div id="remote-videos"
-            class="absolute top-16 right-4 z-40 flex flex-col gap-2 max-h-[60vh] overflow-y-auto scrollbar-thin">
-            <!-- Video elements are added dynamically by guest.js -->
+            class="absolute top-24 right-4 sm:right-6 z-40 flex flex-col gap-3 max-h-[60vh] overflow-y-auto scrollbar-thin pointer-events-auto w-32 sm:w-48">
+            <!-- Video elements added dynamically (Styled in js) -->
         </div>
 
-        <!-- Chat Overlay -->
+        <!-- Chat Overlay (Glassmorphism) -->
         <div id="chat-panel"
-            class="hidden absolute top-4 right-4 bottom-32 w-72 max-w-[calc(100%-2rem)] bg-win-card/95 backdrop-blur-xl border border-win-border rounded-xl flex flex-col shadow-2xl z-50 overflow-hidden transform transition-transform duration-300">
-            <div
-                class="p-3 bg-black/40 border-b border-win-border font-semibold flex items-center justify-between text-sm">
-                <span>Chat Produção</span>
-                <button id="closeChat" class="text-gray-400 hover:text-white"><i class="ph ph-x"></i></button>
+            class="hidden absolute top-24 left-4 sm:left-6 bottom-32 w-[300px] max-w-[calc(100vw-2rem)] glass-panel rounded-2xl flex flex-col shadow-2xl z-50 overflow-hidden transform transition-all duration-300 origin-bottom-left">
+            <div class="p-4 bg-black/20 border-b border-white/5 font-semibold flex items-center justify-between">
+                <span class="text-[11px] uppercase tracking-widest font-bold text-win-accent flex items-center gap-2"><i
+                        class="ph ph-chat-text text-lg"></i> Backstage</span>
+                <button id="closeChat"
+                    class="w-8 h-8 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center"><i
+                        class="ph ph-x text-sm"></i></button>
             </div>
-            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 text-sm scrollbar-thin">
+            <div id="chat-messages" class="flex-1 overflow-y-auto p-4 flex flex-col gap-3 text-xs custom-scrollbar">
                 <!-- Mensagens do chat -->
             </div>
-
-            <div id="typing-indicator" class="px-4 py-1 text-xs text-win-accent italic hidden bg-win-surface/90"></div>
-
-            <!-- Input -->
-            <div class="p-3 border-t border-win-border bg-win-surface/90 flex gap-2">
+            <div id="typing-indicator"
+                class="px-4 py-1 text-[10px] text-win-accent uppercase tracking-widest font-bold italic hidden bg-black/20">
+            </div>
+            <div class="p-3 border-t border-white/5 bg-black/40 flex items-center gap-2">
                 <input type="text" id="chat-input" placeholder="Mensagem..."
-                    class="flex-1 bg-black/60 border border-win-border rounded-lg px-3 py-2 outline-none focus:border-win-accent transition-colors">
+                    class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-win-accent font-medium transition-colors text-xs text-white placeholder:text-gray-500 shadow-inner">
                 <button id="send-chat"
-                    class="bg-win-accent text-white w-8 h-8 rounded-lg flex items-center justify-center hover:bg-opacity-80">
-                    <i class="ph ph-paper-plane-right"></i>
+                    class="bg-win-accent text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-win-accent/80 transition-all shadow-lg shadow-win-accent/20">
+                    <i class="ph ph-paper-plane-right font-bold text-sm"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Config Menu Overlay -->
+        <!-- Config Menu Overlay (Restyled to Match Chat) -->
         <div id="settings-panel"
-            class="hidden absolute bottom-32 left-1/2 -translate-x-1/2 w-[90%] max-w-md bg-win-card/95 backdrop-blur-xl border border-win-border rounded-2xl flex flex-col shadow-2xl z-50 overflow-hidden transform transition-transform duration-300">
-            <div
-                class="p-4 bg-black/40 border-b border-win-border font-semibold flex items-center justify-between text-sm">
-                <span class="flex items-center gap-2"><i class="ph ph-gear text-win-accent"></i> Configurações</span>
-                <button id="closeSettings" class="text-gray-400 hover:text-white"><i class="ph ph-x"></i></button>
+            class="hidden absolute bottom-32 left-1/2 -translate-x-1/2 w-[90%] max-w-sm glass-panel rounded-3xl flex flex-col shadow-2xl z-50 overflow-hidden transform transition-all duration-300">
+            <div class="p-4 bg-black/20 border-b border-white/5 flex items-center justify-between">
+                <span class="text-[11px] uppercase tracking-widest font-bold text-gray-300 flex items-center gap-2"><i
+                        class="ph ph-gear text-lg text-win-accent"></i> Opções</span>
+                <button id="closeSettings"
+                    class="w-8 h-8 rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors flex items-center justify-center"><i
+                        class="ph ph-x"></i></button>
             </div>
-            <div class="p-4 flex flex-col gap-4">
-                <!-- Virtual Background Selector -->
-                <div class="w-full">
-                    <label
-                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-2 block ml-1 flex items-center gap-1">
-                        <i class="ph ph-sparkle text-win-accent"></i> Alterar Fundo Virtual
-                    </label>
-
-                    <div
-                        class="flex overflow-x-auto gap-2 pb-2 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory">
-                        <!-- Controls -->
-                        <button onclick="setVirtualBackground('none', null, this.id)" id="vb-btn-none"
-                            class="flex-none snap-start flex flex-col items-center justify-center w-[5.5rem] h-16 rounded-xl bg-win-accent/10 border border-win-accent transition-all hover:bg-white/5 cursor-pointer">
-                            <i class="ph ph-prohibit text-xl text-gray-300 mb-1"></i>
-                            <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span>
-                        </button>
-                        <button onclick="setVirtualBackground('blur', null, this.id)" id="vb-btn-blur"
-                            class="flex-none snap-start flex flex-col items-center justify-center w-[5.5rem] h-16 rounded-xl bg-black/40 border border-win-border/40 transition-all hover:bg-white/5 cursor-pointer">
-                            <i class="ph ph-drop text-xl text-blue-400 mb-1"></i>
-                            <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span>
-                        </button>
-
-                        <!-- Static Images (5) -->
-                        <button onclick="setVirtualBackground('image', 'img/bg-living-room.png', this.id)"
-                            id="vb-btn-living"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
-                            <img src="img/bg-living-room.png" alt="Living" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                        </button>
-                        <button onclick="setVirtualBackground('image', 'img/bg-office-premium.png', this.id)"
-                            id="vb-btn-office-premium"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
-                            <img src="img/bg-office-premium.png" alt="Office" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                        </button>
-                        <button onclick="setVirtualBackground('image', 'img/bg-studio-pro.png', this.id)"
-                            id="vb-btn-studio-pro"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
-                            <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                        </button>
-                        <button onclick="setVirtualBackground('image', 'img/bg-loft.png', this.id)" id="vb-btn-loft"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
-                            <img src="img/bg-loft.png" alt="Loft" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                        </button>
-                        <button onclick="setVirtualBackground('image', 'img/bg-abstract.png', this.id)"
-                            id="vb-btn-abstract"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
-                            <img src="img/bg-abstract.png" alt="Abstract" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
-                        </button>
-
-                        <!-- Animated -->
-                        <button onclick="setVirtualBackground('anim-window', null, this.id)" id="vb-btn-anim-window"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-sky-400 to-green-700">
-                            <i class="ph ph-window text-white/60 text-lg absolute top-2"></i>
-                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
-                            <span class="mt-4 text-[8px] font-bold text-white uppercase tracking-widest">Janela</span>
-                        </button>
-                        <button onclick="setVirtualBackground('anim-studio', null, this.id)" id="vb-btn-anim-studio"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-br from-blue-900 to-black relative">
-                            <i class="ph ph-film-strip text-white/40 text-lg absolute top-3"></i>
-                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
-                            <span class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Premium</span>
-                        </button>
-                        <button onclick="setVirtualBackground('anim-particles', null, this.id)"
-                            id="vb-btn-anim-particles"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-tr from-purple-900 to-[#1a0a1f] relative">
-                            <i class="ph ph-sparkle text-white/40 text-lg absolute top-3"></i>
-                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
-                            <span
-                                class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Partículas</span>
-                        </button>
-                    </div>
+            <div class="p-5">
+                <label class="text-[10px] text-win-accent uppercase tracking-widest font-bold mb-3 block pl-1">Ajustar
+                    Fundo Virtual</label>
+                <!-- O mesmo bloco de fundos virtuais reusado para as configs on-the-fly -->
+                <div class="flex overflow-x-auto gap-3 pb-2 pl-1 pr-1 max-w-full hide-scroll-bar snap-x snap-mandatory">
+                    <button onclick="setVirtualBackground('none', null, this.id)" id="vb-btn-none"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-white/5 border border-white/10 transition-all hover:border-win-accent w-20 h-16 shadow-lg"><i
+                            class="ph ph-prohibit text-xl text-gray-300 mb-1"></i><span
+                            class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span></button>
+                    <button onclick="setVirtualBackground('blur', null, this.id)" id="vb-btn-blur"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-black/40 border border-white/10 transition-all hover:border-win-accent w-20 h-16 shadow-lg"><i
+                            class="ph ph-drop text-xl text-blue-400 mb-1"></i><span
+                            class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span></button>
+                    <!-- Somente imagens estáticas no live por performance se preferir, ou copiar o HTML completo aqui. -->
                 </div>
             </div>
         </div>
 
-        <!-- Camera Center -->
+        <!-- Camera Center (Fundo) -->
         <main class="flex-1 relative bg-black overflow-hidden" id="main-video-container">
             <video id="localVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
             <video id="pinnedVideo" class="w-full h-full object-cover hidden" autoplay playsinline></video>
 
-            <!-- Nome do participante em destaque (visível quando outro está pinned) -->
-            <div id="main-video-name" class="absolute top-4 left-4 z-30 hidden">
-                <div
-                    class="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10">
-                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                    <span class="text-[11px] font-bold uppercase tracking-widest text-white/90"
+            <!-- Nome do participante em destaque -->
+            <div id="main-video-name" class="absolute bottom-32 sm:bottom-6 left-4 sm:left-6 z-30 hidden">
+                <div class="glass-panel px-4 py-2 rounded-xl flex items-center gap-3 shadow-xl">
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-white/90"
                         id="main-video-name-text">Participante</span>
-                    <button id="unpin-btn" class="ml-2 text-gray-400 hover:text-white transition-colors"
-                        title="Desafixar">
-                        <i class="ph ph-push-pin-slash text-sm"></i>
+                    <div class="w-px h-4 bg-white/20 mx-1"></div>
+                    <button id="unpin-btn" class="text-gray-400 hover:text-white transition-colors" title="Desafixar">
+                        <i class="ph ph-arrows-out-simple text-sm"></i>
                     </button>
                 </div>
             </div>
 
             <!-- Lower Third Overlay (Animated) -->
-            <div id="lower-third" class="absolute bottom-32 left-8 opacity-0 pointer-events-none z-40">
+            <div id="lower-third"
+                class="absolute bottom-32 sm:bottom-20 left-0 sm:left-8 opacity-0 pointer-events-none z-40 transform origin-left">
                 <div
-                    class="glass-overlay px-6 py-3 flex flex-col min-w-[320px] rounded-r-win border-l-[6px] border-white">
+                    class="glass-overlay px-6 sm:px-8 py-4 sm:py-5 flex flex-col min-w-[280px] sm:min-w-[380px] rounded-r-2xl border-l-[6px] border-white backdrop-blur-2xl">
                     <span id="ov-display-name"
-                        class="text-3xl font-black uppercase tracking-tight leading-tight text-white">NOME DO
-                        CONVIDADO</span>
-                    <div class="h-[1px] w-16 bg-white/30 my-1.5"></div>
+                        class="text-2xl sm:text-4xl font-black uppercase tracking-tight leading-none text-white drop-shadow-md">NOME
+                        DO CONVIDADO</span>
+                    <div class="h-[2px] w-20 bg-white/40 my-2"></div>
                     <span id="ov-display-title"
-                        class="text-[11px] font-bold uppercase tracking-[0.25em] text-white/90">CARGO /
-                        TAGLINE</span>
+                        class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] text-white/90 drop-shadow-sm">CARGO
+                        / TAGLINE</span>
                 </div>
             </div>
 
@@ -603,164 +597,158 @@
             <span id="display-name" class="hidden"></span>
         </main>
 
-        <!-- Controles Inferiores -->
-        <div
-            class="bg-gradient-to-t from-black/80 to-transparent absolute bottom-0 left-0 right-0 p-8 pb-[max(2rem,env(safe-area-inset-bottom))] flex justify-center items-end gap-3 z-40">
+        <!-- Controles Inferiores Flutuantes (Mobile-First Glassmorphism) -->
+        <div class="absolute bottom-6 left-2 right-2 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto z-50">
+            <!-- Ilha de Controles Central -->
+            <div
+                class="glass-panel rounded-[2rem] p-2 flex items-center justify-between sm:justify-center gap-2 sm:gap-3 w-full shadow-[0_20px_50px_-10px_rgba(0,0,0,0.8)] border border-white/10 backdrop-blur-2xl relative">
 
-            <!-- Grupo Microfone -->
-            <div class="relative flex flex-col items-center">
-                <div id="mic-menu"
-                    class="hidden absolute bottom-full mb-3 w-48 bg-win-surface border border-win-border rounded-lg shadow-2xl p-2 flex flex-col gap-1 z-50">
-                    <div
-                        class="text-[10px] text-gray-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-win-border mb-1">
-                        Microfones</div>
-                    <div id="mic-list" class="flex flex-col gap-1 max-h-40 overflow-y-auto text-xs"></div>
+                <!-- Mic / Cam groups -->
+                <div class="relative flex flex-col items-center">
+                    <div id="mic-menu"
+                        class="hidden absolute bottom-[calc(100%+12px)] w-48 glass-panel rounded-2xl p-2 flex flex-col gap-1 z-50 shadow-2xl">
+                        <div
+                            class="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-2 pb-2 border-b border-white/10 mb-2">
+                            Microfones</div>
+                        <div id="mic-list"
+                            class="flex flex-col gap-1 max-h-40 overflow-y-auto custom-scrollbar text-xs"></div>
+                    </div>
+                    <div class="flex items-center bg-white/5 hover:bg-white/10 rounded-full transition-all border border-white/5"
+                        id="mic-group">
+                        <button id="toggleMic" class="w-12 h-12 flex items-center justify-center text-gray-200">
+                            <i class="ph ph-microphone text-[22px]"></i>
+                        </button>
+                        <div class="w-px h-6 bg-white/10"></div>
+                        <button id="btn-mic-menu"
+                            class="w-8 h-12 flex items-center justify-center text-gray-400 hover:text-white">
+                            <i class="ph ph-caret-up text-[10px]"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex items-center bg-win-surface/80 backdrop-blur-md border border-win-border rounded-2xl overflow-hidden shadow-lg transition-colors"
-                    id="mic-group">
-                    <button id="toggleMic"
-                        class="w-12 h-14 flex items-center justify-center hover:bg-white/5 active:bg-white/10 transition-colors">
-                        <i class="ph ph-microphone text-2xl"></i>
-                    </button>
-                    <div class="w-px h-8 bg-win-border"></div>
-                    <button id="btn-mic-menu"
-                        class="w-8 h-14 flex items-center justify-center hover:bg-white/5 active:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                        <i class="ph ph-caret-up text-sm"></i>
-                    </button>
+
+                <div class="relative flex flex-col items-center">
+                    <div id="cam-menu"
+                        class="hidden absolute bottom-[calc(100%+12px)] w-48 glass-panel rounded-2xl p-2 flex flex-col gap-1 z-50 shadow-2xl">
+                        <div
+                            class="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-2 pb-2 border-b border-white/10 mb-2">
+                            Câmeras</div>
+                        <div id="cam-list"
+                            class="flex flex-col gap-1 max-h-40 overflow-y-auto custom-scrollbar text-xs"></div>
+                    </div>
+                    <div class="flex items-center bg-white/5 hover:bg-white/10 rounded-full transition-all border border-white/5"
+                        id="cam-group">
+                        <button id="toggleVideo" class="w-12 h-12 flex items-center justify-center text-gray-200">
+                            <i class="ph ph-video-camera text-[22px]"></i>
+                        </button>
+                        <div class="w-px h-6 bg-white/10"></div>
+                        <button id="btn-cam-menu"
+                            class="w-8 h-12 flex items-center justify-center text-gray-400 hover:text-white">
+                            <i class="ph ph-caret-up text-[10px]"></i>
+                        </button>
+                    </div>
                 </div>
+
+                <div class="w-px h-6 bg-white/10 hidden sm:block"></div>
+
+                <!-- Botões utilitários -->
+                <div class="flex md:hidden mr-1"></div> <!-- Spacer mobile -->
+
+                <button id="btn-share-screen" onclick="toggleScreenShare()"
+                    class="hidden sm:flex w-12 h-12 items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 hover:border-win-accent transition-all group"
+                    title="Tela">
+                    <i class="ph ph-screencast text-[22px] text-gray-300 group-hover:text-white"></i>
+                </button>
+
+                <button id="toggleChat"
+                    class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all relative"
+                    title="Chat">
+                    <i class="ph ph-chat-text text-[22px] text-gray-300"></i>
+                    <span id="chat-badge"
+                        class="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-[#101a22] rounded-full text-[0px] hidden"></span>
+                </button>
+
+                <button id="switchCamera"
+                    class="w-12 h-12 sm:hidden flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
+                    title="Inverter">
+                    <i class="ph ph-camera-rotate text-[22px] text-gray-300"></i>
+                </button>
+
+                <!-- Lyncro Cam QR -->
+                <button id="openMobileCam"
+                    class="w-12 h-12 hidden md:flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-win-accent hover:border-win-accent transition-all group"
+                    title="Add Celular">
+                    <i class="ph ph-qr-code text-[22px] text-gray-300 group-hover:text-white"></i>
+                </button>
+
+                <button id="mediaDrop"
+                    class="w-12 h-12 hidden sm:flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 hover:text-win-accent transition-all group"
+                    title="Mídia">
+                    <i class="ph ph-paperclip text-[22px] text-gray-300"></i>
+                    <input type="file" id="fileInput" class="hidden">
+                </button>
+
+                <button id="toggleSettings"
+                    class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
+                    title="Preferências">
+                    <i class="ph ph-sliders text-[22px] text-gray-300"></i>
+                </button>
+
+                <!-- Botão Sair Crucial Destacado -->
+                <button id="leaveRoom"
+                    class="w-12 h-12 flex items-center justify-center rounded-full bg-red-600 border border-red-500 text-white hover:bg-red-700 hover:shadow-[0_0_20px_rgba(220,38,38,0.5)] transition-all ml-1"
+                    title="Sair">
+                    <i class="ph ph-phone-disconnect text-[22px]"></i>
+                </button>
             </div>
-
-            <!-- Grupo Câmera -->
-            <div class="relative flex flex-col items-center">
-                <div id="cam-menu"
-                    class="hidden absolute bottom-full mb-3 w-48 bg-win-surface border border-win-border rounded-lg shadow-2xl p-2 flex flex-col gap-1 z-50">
-                    <div
-                        class="text-[10px] text-gray-500 font-bold uppercase tracking-widest px-2 pb-1 border-b border-win-border mb-1">
-                        Câmeras</div>
-                    <div id="cam-list" class="flex flex-col gap-1 max-h-40 overflow-y-auto text-xs"></div>
-                </div>
-                <div class="flex items-center bg-win-surface/80 backdrop-blur-md border border-win-border rounded-2xl overflow-hidden shadow-lg transition-colors"
-                    id="cam-group">
-                    <button id="toggleVideo"
-                        class="w-12 h-14 flex items-center justify-center hover:bg-white/5 active:bg-white/10 transition-colors">
-                        <i class="ph ph-video-camera text-2xl"></i>
-                    </button>
-                    <div class="w-px h-8 bg-win-border"></div>
-                    <button id="btn-cam-menu"
-                        class="w-8 h-14 flex items-center justify-center hover:bg-white/5 active:bg-white/10 transition-colors text-gray-400 hover:text-white">
-                        <i class="ph ph-caret-up text-sm"></i>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Botões Soltos -->
-            <button id="btn-share-screen" onclick="toggleScreenShare()"
-                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all active:scale-90 shadow-lg group"
-                title="Compartilhar Tela">
-                <i class="ph ph-screencast text-2xl text-gray-400 group-hover:text-white transition-colors"></i>
-            </button>
-
-            <button id="toggleChat"
-                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all active:scale-90 shadow-lg relative"
-                title="Chat">
-                <i class="ph ph-chat-text text-2xl"></i>
-                <span id="chat-badge"
-                    class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-[9px] font-bold flex items-center justify-center hidden">!</span>
-            </button>
-
-            <!-- Botão Sair (Centro) -->
-            <button id="leaveRoom"
-                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-red-600/20 border border-red-500/40 text-red-500 transition-all active:scale-90 shadow-lg"
-                title="Sair da Sala">
-                <i class="ph ph-phone-disconnect text-2xl"></i>
-            </button>
-
-            <button id="switchCamera"
-                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all active:scale-90 shadow-lg"
-                title="Inverter Câmera">
-                <i class="ph ph-camera-rotate text-2xl"></i>
-            </button>
-
-            <!-- Botão Lyncro Cam (Só visível em Desktop) -->
-            <button id="openMobileCam"
-                class="w-14 h-14 hidden md:flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all hover:bg-win-accent hover:border-win-accent group active:scale-90 shadow-lg"
-                title="Usar Celular como Câmera (Lyncro Cam)">
-                <i
-                    class="ph ph-device-mobile-camera text-2xl text-gray-400 group-hover:text-white transition-colors"></i>
-            </button>
-
-            <button id="mediaDrop"
-                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all active:scale-90 shadow-lg"
-                title="Enviar Arquivo (Media Drop)">
-                <i class="ph ph-paperclip text-2xl"></i>
-                <input type="file" id="fileInput" class="hidden">
-            </button>
-
-            <button id="toggleSettings"
-                class="w-14 h-14 flex items-center justify-center rounded-2xl bg-win-surface/80 backdrop-blur-md border border-win-border transition-all active:scale-90 shadow-lg"
-                title="Configurações">
-                <i class="ph ph-gear text-2xl"></i>
-            </button>
         </div>
     </div>
 
     <!-- Overlay de Progresso de Arquivo -->
     <div id="file-progress-overlay"
-        class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-64 bg-win-surface border border-win-border p-3 rounded-xl shadow-2xl backdrop-blur-md">
-        <div class="flex flex-col gap-2">
-            <span class="progress-text text-[10px] font-bold text-gray-400 uppercase tracking-tighter">Recebendo
-                arquivo...</span>
-            <div class="h-1.5 w-full bg-black/40 rounded-full overflow-hidden">
-                <div class="progress-fill h-full bg-win-accent transition-all duration-300" style="width: 0%"></div>
+        class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-72 glass-panel p-4 rounded-2xl shadow-2xl backdrop-blur-2xl">
+        <div class="flex flex-col gap-3">
+            <span
+                class="progress-text text-[10px] font-bold text-win-accent uppercase tracking-[0.2em] flex items-center gap-2">
+                <i class="ph ph-cloud-arrow-down text-lg"></i> Recebendo mídia...
+            </span>
+            <div class="h-2 w-full bg-black/50 rounded-full overflow-hidden border border-white/5 inset-shadow">
+                <div class="progress-fill h-full bg-win-accent transition-all duration-300 shadow-[0_0_10px_rgba(0,120,212,0.8)]"
+                    style="width: 0%"></div>
             </div>
         </div>
     </div>
 
-    <!-- Modal QR Code Companion -->
+    <!-- QRCode companion code continues (retained from original file) -->
     <div id="qr-modal"
         class="hidden fixed inset-0 z-[110] bg-black/80 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center">
-        <div class="bg-win-surface border border-win-border rounded-xl p-6 shadow-2xl max-w-sm w-full relative">
-            <button id="close-qr-modal" class="absolute top-4 right-4 text-gray-400 hover:text-white transition-colors">
-                <i class="ph ph-x text-xl"></i>
+        <div class="glass-panel border-white/10 rounded-3xl p-8 shadow-2xl max-w-sm w-full relative text-gray-100">
+            <button id="close-qr-modal"
+                class="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-xl bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 transition-colors">
+                <i class="ph ph-x"></i>
             </button>
-            <h3 class="text-xl font-bold mb-2">Câmera Secundária</h3>
-            <p class="text-xs text-gray-400 mb-6">Escaneie o código abaixo com a câmera do seu celular para ativá-lo
-                como Lyncro Camera.</p>
-            <div class="bg-white p-4 rounded-lg inline-block mb-4">
+            <div
+                class="w-16 h-16 rounded-full bg-win-accent/20 flex items-center justify-center mx-auto mb-4 border border-win-accent/30">
+                <i class="ph ph-qr-code text-win-accent text-3xl"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2 font-sync tracking-tight">Lyncro Camera</h3>
+            <p class="text-xs text-gray-400 mb-6 font-sans">Escaneie o código com seu celular para adicioná-lo como
+                câmera secundária.</p>
+            <div class="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
                 <div id="qrcode-container"></div>
             </div>
-            <p class="text-[10px] text-gray-500 uppercase tracking-widest font-bold">O celular entrará em modo cego
-                automático</p>
+            <p class="text-[10px] text-win-accent uppercase tracking-widest font-bold font-sans">Emparelhamento
+                Silencioso</p>
         </div>
     </div>
 
     <!-- QRCode.js para Lyncro Cam -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- Script de Fundo Virtual Inteligente (MediaPipe) -->
+    <!-- Script de Fundo Virtual Inteligente -->
     <script src="js/virtual-background.js?v=3"></script>
     <script src="js/webrtc.js?v=3"></script>
     <script src="js/guest.js?v=5"></script>
     <script src="js/guest-chat.js"></script>
     <script src="js/theme.js"></script>
-    <script>
-        // Forçar atualização do Service Worker (resolve cache travado no mobile)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', async () => {
-                try {
-                    // Forçar limpeza de todos os caches antigos
-                    const cacheNames = await caches.keys();
-                    await Promise.all(cacheNames.map(name => caches.delete(name)));
-
-                    // Registrar e forçar atualização
-                    const reg = await navigator.serviceWorker.register('/sw.js');
-                    await reg.update(); // Busca nova versão do servidor
-                    console.log('SW atualizado com sucesso');
-                } catch (err) {
-                    console.log('SW error:', err);
-                }
-            });
-        }
-    </script>
 </body>
 
 </html>

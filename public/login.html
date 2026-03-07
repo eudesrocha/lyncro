@@ -3,7 +3,7 @@
 
 <head>
     <script>
-        (function(){var t=localStorage.getItem('lyncro-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();
+        (function () { var t = localStorage.getItem('lyncro-theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'); document.documentElement.setAttribute('data-theme', t); })();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,17 +21,54 @@
     <script src="js/auth.js"></script>
     <script src="js/theme.js"></script>
 </head>
+<style>
+    .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    }
 
-<body class="min-h-screen flex items-center justify-center p-6 font-sans">
+    [data-theme="light"] .glass-panel {
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
+    }
+
+    .bg-glow {
+        position: relative;
+    }
+
+    .bg-glow::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.12) 0%, transparent 60%);
+        z-index: -1;
+        pointer-events: none;
+    }
+
+    [data-theme="light"] .bg-glow::before {
+        background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.05) 0%, transparent 60%);
+    }
+</style>
+</head>
+
+<body
+    class="min-h-screen flex items-center justify-center p-6 font-sans bg-win-bg bg-glow transition-colors duration-300">
     <!-- Toggle de Tema (canto superior direito) -->
     <div class="fixed top-4 right-4 z-50">
-        <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
-            class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+        <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema" class="theme-toggle-btn"
+            aria-label="Alternar tema claro/escuro">
             <i class="ph ph-moon"></i>
         </button>
     </div>
 
-    <div class="w-full max-w-md mica-effect p-8 rounded-2xl shadow-2xl animate-reveal">
+    <div
+        class="w-full max-w-md glass-panel p-8 sm:p-10 rounded-3xl shadow-2xl animate-reveal border border-white/10 relative">
+        <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent rounded-3xl pointer-events-none">
+        </div>
         <header class="text-center mb-8">
             <h1 class="text-[2.5rem] font-logo font-[600] italic tracking-tight mb-2 leading-none theme-text">Lyncro
             </h1>
@@ -59,20 +96,20 @@
                 </button>
 
                 <button onclick="handleEmailLogin()" id="btn-email"
-                    class="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3 rounded-lg text-[10px] uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 active:scale-95 border border-white/5">
+                    class="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3.5 rounded-lg text-[10px] uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 active:scale-95 border border-white/10 shadow-lg">
                     <i class="ph ph-envelope-simple text-sm"></i> Enviar Link Mágico
                 </button>
             </div>
 
             <div class="relative flex items-center justify-center py-2">
                 <div class="w-full border-t border-white/10"></div>
-                <span
-                    class="absolute px-4 text-[10px] theme-text-secondary font-bold uppercase tracking-widest" style="background:var(--card)">ou</span>
+                <span class="absolute px-4 text-[10px] theme-text-secondary font-bold uppercase tracking-widest"
+                    style="background:var(--card)">ou</span>
             </div>
 
             <button onclick="window.LYNCRO_AUTH.loginWithGoogle()"
-                class="w-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold py-4 rounded-lg text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95">
-                <i class="ph ph-google-logo text-lg"></i>
+                class="w-full glass-panel hover:bg-white/10 border-white/20 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95 shadow-xl">
+                <i class="ph ph-google-logo text-xl"></i>
                 Entrar com Google
             </button>
         </div>
