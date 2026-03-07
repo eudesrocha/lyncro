@@ -47,19 +47,19 @@
 
 
     <!-- Header / Logo -->
-    <header id="main-header" class="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 z-50 animate-reveal">
-        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <header id="main-header" class="fixed top-0 left-0 w-full px-4 py-3 md:px-8 md:py-4 z-50 animate-reveal">
+        <div class="max-w-7xl mx-auto flex flex-nowrap items-center justify-between gap-2 min-w-0">
             <h1
-                class="text-2xl md:text-[2rem] font-logo font-[600] italic tracking-tight select-none leading-none" style="color:var(--text)">
+                class="text-xl md:text-2xl font-logo font-[600] italic tracking-tight select-none leading-none shrink-0" style="color:var(--text)">
                 Lyncro</h1>
 
-            <div class="flex items-center gap-3 md:gap-4 flex-wrap justify-end">
+            <div class="flex items-center gap-2 md:gap-3 flex-nowrap justify-end min-w-0">
                 <!-- Perfil do Host / Logout (Injetado via JS) -->
                 <div id="host-profile" style="display:none;"
-                    class="flex items-center gap-3 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-lg">
-                    <i class="ph ph-user-circle text-xl text-win-accent"></i>
-                    <div class="flex flex-col">
-                        <span id="user-email" class="text-[9px] font-bold theme-text truncate max-w-[140px]">...</span>
+                    class="flex items-center gap-2 bg-win-accent/10 border border-win-accent/20 px-2.5 py-1.5 rounded-lg min-w-0 shrink">
+                    <i class="ph ph-user-circle text-base text-win-accent shrink-0"></i>
+                    <div class="flex flex-col min-w-0">
+                        <span id="user-email" class="text-[9px] font-bold theme-text truncate max-w-[110px]">...</span>
                         <button onclick="window.LYNCRO_AUTH.logout()"
                             class="text-[8px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors text-left">Sair</button>
                     </div>
@@ -67,7 +67,7 @@
 
                 <!-- Botão Toggle de Tema -->
                 <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
-                    class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+                    class="theme-toggle-btn shrink-0" aria-label="Alternar tema claro/escuro">
                     <i class="ph ph-moon"></i>
                 </button>
             </div>
@@ -75,13 +75,13 @@
     </header>
 
     <main
-        class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-24 lg:pt-0 max-w-7xl mx-auto gap-12 lg:gap-24">
+        class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-20 lg:pt-16 max-w-7xl mx-auto gap-10 lg:gap-16 xl:gap-24">
 
         <!-- Lado Esquerdo: Narrativa -->
         <section id="narrative-section" class="flex-1 text-center lg:text-left">
             <div class="animate-reveal delay-1">
                 <h2
-                    class="text-5xl lg:text-7xl font-segoe-black leading-tight mb-6 uppercase tracking-tight theme-text">
+                    class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-segoe-black leading-tight mb-5 uppercase tracking-tight theme-text">
                     Sincronia Total.<br>
                     <span class="text-win-accent">Latência Zero.</span>
                 </h2>
@@ -114,7 +114,7 @@
         </section>
 
         <!-- Lado Direito: Ação (Glass Box) -->
-        <section class="w-full max-w-md relative animate-reveal delay-3">
+        <section class="w-full max-w-sm md:max-w-md relative animate-reveal delay-3 shrink-0">
             <div id="card-lobby"
                 class="mica-effect glass-shadow p-2 rounded-2xl overflow-hidden transition-all duration-500 ease-in-out">
                 <!-- Tabs -->
@@ -129,7 +129,7 @@
                     </button>
                 </div>
 
-                <div class="p-8 pt-10">
+                <div class="p-6 pt-8 md:p-8 md:pt-10">
                     <!-- Aba Criar Sala -->
                     <div id="panel-create" class="space-y-6">
                         <!-- Estado Autenticado: Formulário -->
