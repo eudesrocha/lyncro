@@ -105,32 +105,34 @@ async function enumerateDevices() {
         const videoInputs = devices.filter(device => device.kind === 'videoinput');
         const audioInputs = devices.filter(device => device.kind === 'audioinput');
 
-        const videoSelect = document.getElementById('local-video-device-select');
-        const audioSelect = document.getElementById('local-audio-device-select');
         const returnSelect = document.getElementById('return-audio-select');
 
-        // Preencher Vídeo
-        if (videoSelect) {
-            videoSelect.innerHTML = '<option value="">Câmera</option>';
+        // Preencher Dropdown de Vídeo (novo formato)
+        const camList = document.getElementById('cam-dropdown-list-local');
+        if (camList) {
+            camList.innerHTML = '';
             videoInputs.forEach(device => {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = device.label || `Câmera ${videoSelect.length}`;
-                videoSelect.appendChild(option);
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left px-2 py-1.5 text-[10px] text-gray-300 hover:bg-win-accent/20 hover:text-white rounded transition-all truncate';
+                btn.textContent = device.label || `Câmera ${camList.children.length + 1}`;
+                btn.onclick = () => { updateHostDevice('video', device.deviceId); closeAllCardDropdowns(); };
+                camList.appendChild(btn);
             });
-            videoSelect.onchange = (e) => updateHostDevice('video', e.target.value);
+            if (videoInputs.length === 0) camList.innerHTML = '<span class="px-2 py-1 text-[9px] text-gray-500">Nenhuma câmera</span>';
         }
 
-        // Preencher Áudio
-        if (audioSelect) {
-            audioSelect.innerHTML = '<option value="">Mic</option>';
+        // Preencher Dropdown de Áudio (novo formato)
+        const micList = document.getElementById('mic-dropdown-list-local');
+        if (micList) {
+            micList.innerHTML = '';
             audioInputs.forEach(device => {
-                const option = document.createElement('option');
-                option.value = device.deviceId;
-                option.text = device.label || `Mic ${audioSelect.length}`;
-                audioSelect.appendChild(option);
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left px-2 py-1.5 text-[10px] text-gray-300 hover:bg-win-accent/20 hover:text-white rounded transition-all truncate';
+                btn.textContent = device.label || `Mic ${micList.children.length + 1}`;
+                btn.onclick = () => { updateHostDevice('audio', device.deviceId); closeAllCardDropdowns(); };
+                micList.appendChild(btn);
             });
-            audioSelect.onchange = (e) => updateHostDevice('audio', e.target.value);
+            if (audioInputs.length === 0) micList.innerHTML = '<span class="px-2 py-1 text-[9px] text-gray-500">Nenhum mic</span>';
         }
 
         // Preencher Retorno de Áudio (Mix-Minus)
@@ -464,46 +466,72 @@ function renderParticipantCard(participant, isLocal = false) {
         `}
       </div>
 
-      <div class="p-3 flex justify-between items-center bg-white/5 border-t border-win-border">
-        <div class="flex gap-2 items-center">
-          <div class="flex items-center gap-1.5">
-            <button id="btn-audio-${participant.id}" class="${participant.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all" onclick="remoteMute('${participant.id}')">
-                <i class="ph ${participant.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>
-            </button>
-            ${isLocal ? `<select id="local-audio-device-select" class="device-select-compact"></select>` : ''}
+      <!-- Barra de Controles Compacta (4 botões) -->
+      <div class="p-2 flex items-center justify-between bg-white/5 border-t border-win-border gap-1">
+        <!-- Botão 1: Microfone + Dropdown -->
+        <div class="relative flex items-center">
+          <button id="btn-audio-${participant.id}" class="${participant.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-l-win transition-all" onclick="remoteMute('${participant.id}')">
+            <i class="ph ${participant.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>
+          </button>
+          ${isLocal ? `
+          <button onclick="toggleCardDropdown('mic-dropdown-${participant.id}')" class="p-1.5 border border-l-0 border-win-border rounded-r-win text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+            <i class="ph ph-caret-down text-[10px]"></i>
+          </button>
+          <div id="mic-dropdown-${participant.id}" class="hidden absolute top-full left-0 mt-1 bg-win-surface border border-win-border rounded shadow-2xl z-50 min-w-[180px] max-h-40 overflow-y-auto">
+            <div id="mic-dropdown-list-${participant.id}" class="flex flex-col p-1"></div>
           </div>
-
-          <div class="flex items-center gap-1.5">
-            <button id="btn-video-${participant.id}" class="${participant.videoMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-win transition-all" onclick="remoteMuteVideo('${participant.id}')">
-                <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>
-            </button>
-            ${isLocal ? `<select id="local-video-device-select" class="device-select-compact"></select>` : ''}
-          </div>
+          ` : ''}
         </div>
 
-        ${isLocal ? '' : `
-        <div class="flex items-center gap-1">
+        <!-- Botão 2: Câmera + Dropdown -->
+        <div class="relative flex items-center">
+          <button id="btn-video-${participant.id}" class="${participant.videoMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-l-win transition-all" onclick="remoteMuteVideo('${participant.id}')">
+            <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>
+          </button>
+          ${isLocal ? `
+          <button onclick="toggleCardDropdown('cam-dropdown-${participant.id}')" class="p-1.5 border border-l-0 border-win-border rounded-r-win text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+            <i class="ph ph-caret-down text-[10px]"></i>
+          </button>
+          <div id="cam-dropdown-${participant.id}" class="hidden absolute top-full left-0 mt-1 bg-win-surface border border-win-border rounded shadow-2xl z-50 min-w-[180px] max-h-40 overflow-y-auto">
+            <div id="cam-dropdown-list-${participant.id}" class="flex flex-col p-1"></div>
+          </div>
+          ` : ''}
+        </div>
+
+        <!-- Botão 3: Lower Third -->
+        <button onclick="toggleCardPanel('lt-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-win-accent hover:bg-win-accent/5 transition-all" title="Lower Third">
+          <i class="ph ph-text-aa text-sm"></i>
+        </button>
+
+        <!-- Botão 4: VB (Host) / Tally (Guest) -->
+        ${isLocal ? `
+        <button onclick="toggleCardPanel('vb-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-purple-400 hover:bg-purple-500/5 transition-all" title="Fundo Virtual">
+          <i class="ph ph-sparkle text-sm"></i>
+        </button>
+        ` : `
+        <div class="flex items-center gap-0.5">
           <button id="btn-prv-${participant.id}" onclick="handleTallyChange('${participant.id}', 'preview', '${participant.name}')" 
-            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40 shadow-[0_0_10px_rgba(34,197,94,0.2)]' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">PRV</button>
+            class="text-[8px] font-black px-1.5 py-1 rounded-l-win transition-all border ${participant.tallyState === 'preview' ? 'bg-green-600/20 text-green-500 border-green-500/40' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">PRV</button>
           <button id="btn-pgm-${participant.id}" onclick="handleTallyChange('${participant.id}', 'program', '${participant.name}')" 
-            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40 shadow-[0_0_10px_rgba(239,68,68,0.2)]' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">PGM</button>
+            class="text-[8px] font-black px-1.5 py-1 transition-all border border-l-0 ${participant.tallyState === 'program' ? 'bg-red-600/20 text-red-500 border-red-500/40' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">PGM</button>
           <button id="btn-off-${participant.id}" onclick="handleTallyChange('${participant.id}', 'off', '${participant.name}')" 
-            class="text-[9px] font-black px-2.5 py-1 rounded transition-all border ${participant.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">OFF</button>
+            class="text-[8px] font-black px-1.5 py-1 rounded-r-win transition-all border border-l-0 ${participant.tallyState === 'off' ? 'bg-gray-600/40 text-white border-white/20' : 'bg-win-surface/20 border-win-border hover:bg-white/5 text-gray-500'}">OFF</button>
         </div>
         `}
       </div>
 
-      <div id="overlay-controls-${participant.id}" class="px-3 pb-3 bg-white/5 border-t border-win-border/10">
+      <!-- Painel Colapsável: Lower Third -->
+      <div id="lt-panel-${participant.id}" class="hidden px-3 pb-3 bg-white/5 border-t border-win-border/10">
         <div class="flex flex-col gap-2 pt-3">
           <div class="flex justify-between items-center mb-1">
-            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none opacity-50">Lower Third (Overlay)</span>
+            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none opacity-50">Lower Third</span>
             <div class="flex items-center gap-2">
               ${isLocal ? '' : `
-              <button onclick="copyCleanFeed('${participant.id}')" title="Copiar Link Clean Feed Câmera" class="text-[9px] font-bold uppercase text-win-accent hover:text-white transition-all flex items-center gap-1">
+              <button onclick="copyCleanFeed('${participant.id}')" title="Copiar Link Clean Feed" class="text-[9px] font-bold uppercase text-win-accent hover:text-white transition-all flex items-center gap-1">
                 <i class="ph ph-copy"></i> Feed
               </button>
               ${participant.isScreenSharing ? `
-              <button onclick="copyCleanFeed('${participant.id}', 'screen')" title="Copiar Link Clean Feed Tela" class="text-[9px] font-bold uppercase text-blue-400 hover:text-white transition-all flex items-center gap-1">
+              <button onclick="copyCleanFeed('${participant.id}', 'screen')" title="Clean Feed Tela" class="text-[9px] font-bold uppercase text-blue-400 hover:text-white transition-all flex items-center gap-1">
                 <i class="ph ph-monitor"></i> Tela
               </button>
               ` : ''}
@@ -524,8 +552,8 @@ function renderParticipantCard(participant, isLocal = false) {
       </div>
 
       ${isLocal ? `
-      <!-- Virtual Background Selector (Host Only) -->
-      <div class="px-3 pb-3 bg-white/5 border-t border-win-border/10">
+      <!-- Painel Colapsável: Fundo Virtual (Host Only) -->
+      <div id="vb-panel-${participant.id}" class="hidden px-3 pb-3 bg-white/5 border-t border-win-border/10">
         <div class="flex flex-col gap-2 pt-3">
           <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-none opacity-50 flex items-center gap-1"><i class="ph ph-sparkle text-purple-400"></i> Fundo Virtual</span>
           <div class="flex overflow-x-auto gap-2 pb-2 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory">
@@ -982,6 +1010,43 @@ window.copyCleanFeed = (pId, type = 'camera') => {
         showToast(`Link de ${type === 'screen' ? 'Tela' : 'Câmera'} copiado para o OBS!`, 'success');
     });
 };
+
+// === TOGGLE PAINÉIS E DROPDOWNS ===
+window.toggleCardPanel = (panelId) => {
+    const panel = document.getElementById(panelId);
+    if (!panel) return;
+    // Fechar outros painéis do mesmo card
+    const card = panel.closest('[id^="video-card-"]');
+    if (card) {
+        card.querySelectorAll('[id^="lt-panel-"], [id^="vb-panel-"]').forEach(p => {
+            if (p.id !== panelId) p.classList.add('hidden');
+        });
+    }
+    panel.classList.toggle('hidden');
+};
+
+window.toggleCardDropdown = (dropdownId) => {
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+    // Fechar todos os outros dropdowns primeiro
+    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(dd => {
+        if (dd.id !== dropdownId) dd.classList.add('hidden');
+    });
+    dropdown.classList.toggle('hidden');
+};
+
+function closeAllCardDropdowns() {
+    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(dd => {
+        dd.classList.add('hidden');
+    });
+}
+
+// Fechar dropdowns ao clicar fora
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('[id^="mic-dropdown-"]') && !e.target.closest('[id^="cam-dropdown-"]') && !e.target.closest('[onclick*="toggleCardDropdown"]')) {
+        closeAllCardDropdowns();
+    }
+});
 
 window.copyInviteLink = async () => {
     let baseUrl = window.location.origin;
