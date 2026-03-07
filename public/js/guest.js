@@ -450,7 +450,7 @@ function setupWebSocket() {
                 console.log('My ID:', myId);
                 break;
             case 'participant-update':
-                const me = data.participants.find(p => p.name === userName);
+                const me = data.participants.find(p => p.id === myId);
                 if (me) updateTally(me.tallyState);
 
                 // Só inicia conexão passiva se eu já estiver 'accepted'
@@ -605,7 +605,7 @@ async function initiateConnection(targetId) {
     ws.send(JSON.stringify({ type: 'offer', roomId: roomName, to: targetId, offer }));
 }
 
-function handleRemoteTrack() { /* O convidado mobile foca apenas no host/própria câmera geralmente */ }
+// handleRemoteTrack já está definida na linha 287 — recebe tracks remotas (vídeo PiP + áudio)
 
 function handleIceCandidate(targetId, candidate) {
     ws.send(JSON.stringify({ type: 'ice-candidate', roomId: roomName, to: targetId, candidate }));
