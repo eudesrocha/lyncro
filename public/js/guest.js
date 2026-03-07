@@ -851,6 +851,25 @@ function setupWebSocket() {
                     if (navigator.vibrate) navigator.vibrate(50);
                 }
                 break;
+            case 'kicked':
+                // Parar tracks locais
+                if (localStream) {
+                    localStream.getTracks().forEach(t => t.stop());
+                }
+                // Fechar conexões RTC
+                if (rtcClient) {
+                    rtcClient.peers.forEach((pc, id) => { try { pc.close(); } catch (e) { } });
+                    rtcClient.peers.clear();
+                }
+                // Parar speaker detection
+                if (speakerDetectionInterval) {
+                    clearInterval(speakerDetectionInterval);
+                    speakerDetectionInterval = null;
+                }
+                // Mostrar mensagem e redirecionar
+                alert('Você foi removido da sala pelo produtor.');
+                window.location.href = 'index.html';
+                break;
             case 'error':
                 console.error('SERVER ERROR:', data.message);
                 alert(data.message);

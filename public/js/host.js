@@ -46,6 +46,8 @@ let currentVbMode = 'none';
 let currentVbImage = null;
 let currentParticipants = [];
 let isMonitorMuted = false;
+let isHostMicMuted = false;
+let isHostCamMuted = false;
 const vuAnalyzers = new Map(); // participantId -> { analyzer, dataArray, animationId }
 
 const videoGrid = document.getElementById('video-grid');
@@ -442,6 +444,14 @@ function renderParticipantCard(participant, isLocal = false) {
         <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold border border-win-border text-white/70">
           ${participant.name} ${isLocal ? '(Host)' : ''}
         </div>
+
+        ${isLocal ? '' : `
+        <button onclick="kickParticipant('${participant.id}', '${(participant.name || '').replace(/'/g, "\\'")}')"
+          class="absolute top-2.5 left-2.5 w-6 h-6 rounded bg-red-600/20 border border-red-500/30 text-red-400 hover:bg-red-600 hover:text-white transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 z-20"
+          title="Banir Convidado">
+          <i class="ph ph-x-circle text-sm"></i>
+        </button>
+        `}
       </div>
 
       <div class="p-3 flex justify-between items-center bg-white/5 border-t border-win-border">
@@ -838,6 +848,32 @@ window.toggleOverlay = (pId) => {
 };
 
 window.remoteMute = (pId) => {
+    // === Host Self-Mute ===
+    if (pId === 'local') {
+        isHostMicMuted = !isHostMicMuted;
+        if (localStream && localStream.getAudioTracks().length > 0) {
+            localStream.getAudioTracks()[0].enabled = !isHostMicMuted;
+        }
+        // Atualizar visual do botão
+        const btnAudio = document.getElementById('btn-audio-local');
+        if (btnAudio) {
+            btnAudio.className = `${isHostMicMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all`;
+            btnAudio.innerHTML = `<i class="ph ${isHostMicMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>`;
+        }
+        // Atualizar overlay visual
+        const overlay = document.getElementById('mute-overlay-local');
+        if (overlay) {
+            if (isHostMicMuted && !isHostCamMuted) {
+                overlay.classList.remove('hidden');
+                overlay.innerHTML = `<div class="bg-black/40 p-3 rounded-full border border-red-500/30"><i class="ph ph-microphone-slash text-3xl text-red-500 drop-shadow-lg"></i></div>`;
+            } else if (!isHostMicMuted && !isHostCamMuted) {
+                overlay.classList.add('hidden');
+            }
+        }
+        showToast(isHostMicMuted ? 'Microfone desligado' : 'Microfone ligado', 'info');
+        return;
+    }
+
     const p = currentParticipants.find(part => part.id === pId);
     if (p) {
         p.audioMuted = !p.audioMuted;
@@ -847,12 +883,87 @@ window.remoteMute = (pId) => {
 };
 
 window.remoteMuteVideo = (pId) => {
+    // === Host Self-Camera Toggle ===
+    if (pId === 'local') {
+        isHostCamMuted = !isHostCamMuted;
+        if (localStream && localStream.getVideoTracks().length > 0) {
+            localStream.getVideoTracks()[0].enabled = !isHostCamMuted;
+        }
+        // Atualizar visual do botão
+        const btnVideo = document.getElementById('btn-video-local');
+        if (btnVideo) {
+            btnVideo.className = `${isHostCamMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-win transition-all`;
+            btnVideo.innerHTML = `<i class="ph ${isHostCamMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>`;
+        }
+        // Atualizar overlay visual
+        const overlay = document.getElementById('mute-overlay-local');
+        if (overlay) {
+            if (isHostCamMuted) {
+                overlay.classList.remove('hidden');
+                overlay.innerHTML = `<i class="ph ph-video-camera-slash text-4xl text-red-600/80 drop-shadow-xl animate-pulse"></i>`;
+            } else if (!isHostMicMuted) {
+                overlay.classList.add('hidden');
+            } else {
+                overlay.innerHTML = `<div class="bg-black/40 p-3 rounded-full border border-red-500/30"><i class="ph ph-microphone-slash text-3xl text-red-500 drop-shadow-lg"></i></div>`;
+            }
+        }
+        showToast(isHostCamMuted ? 'Câmera desligada' : 'Câmera ligada', 'info');
+        return;
+    }
+
     const p = currentParticipants.find(part => part.id === pId);
     if (p) {
         p.videoMuted = !p.videoMuted;
         updateParticipantStatus(p);
         ws.send(JSON.stringify({ type: 'media-control', roomId: roomName, targetId: pId, mediaType: 'video', action: p.videoMuted ? 'mute' : 'unmute' }));
     }
+};
+
+// === KICK / BAN ===
+window.kickParticipant = (pId, pName) => {
+    // Modal de confirmação customizado
+    const existingModal = document.getElementById('kick-confirm-modal');
+    if (existingModal) existingModal.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'kick-confirm-modal';
+    modal.className = 'fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex items-center justify-center p-6';
+    modal.innerHTML = `
+        <div class="bg-win-surface border border-win-border rounded-lg p-6 shadow-2xl max-w-sm w-full text-center">
+            <div class="w-14 h-14 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center mx-auto mb-4">
+                <i class="ph ph-user-minus text-2xl text-red-500"></i>
+            </div>
+            <h3 class="text-lg font-bold text-white mb-2">Banir Convidado?</h3>
+            <p class="text-sm text-gray-400 mb-6">Tem certeza que deseja remover <strong class="text-white">${pName}</strong> da sala? Ele será desconectado imediatamente.</p>
+            <div class="flex gap-3 justify-center">
+                <button id="kick-cancel" class="px-5 py-2 bg-win-surface border border-win-border rounded text-sm font-bold text-gray-300 hover:bg-white/10 transition-all">
+                    Cancelar
+                </button>
+                <button id="kick-confirm" class="px-5 py-2 bg-red-600 border border-red-500 rounded text-sm font-bold text-white hover:bg-red-700 transition-all shadow-lg shadow-red-900/30">
+                    <i class="ph ph-user-minus mr-1"></i> Banir
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Fechar ao clicar fora
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.remove();
+    });
+
+    document.getElementById('kick-cancel').onclick = () => modal.remove();
+    document.getElementById('kick-confirm').onclick = () => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'kick',
+                roomId: roomName,
+                targetId: pId
+            }));
+        }
+        modal.remove();
+        showToast(`${pName} foi removido da sala.`, 'info');
+    };
 };
 
 window.copyCleanFeed = (pId, type = 'camera') => {

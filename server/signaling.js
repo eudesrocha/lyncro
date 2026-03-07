@@ -143,6 +143,35 @@ function setupSignaling(server) {
                         }
                         break;
 
+                    case 'kick':
+                        const rmKick = roomManager.getRoom(normalizedRoomId);
+                        if (rmKick && rmKick.host === participantId) {
+                            // Enviar notificação de kick ao convidado alvo
+                            sendToParticipant(normalizedRoomId, data.targetId, {
+                                type: 'kicked',
+                                message: 'Você foi removido da sala pelo produtor.'
+                            });
+
+                            // Fechar a conexão WebSocket do convidado
+                            const targetParts = roomManager.getParticipants(normalizedRoomId);
+                            const kickedP = targetParts.find(p => p.id === data.targetId);
+                            if (kickedP && kickedP.ws) {
+                                try { kickedP.ws.close(); } catch (e) { }
+                            }
+
+                            // Remover da sala
+                            roomManager.leaveRoom(normalizedRoomId, data.targetId);
+
+                            // Broadcast atualização
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'participant-update',
+                                participants: roomManager.getRoom(normalizedRoomId)?.participants || []
+                            });
+
+                            console.log(`[KICK] ${data.targetId} removido da sala ${normalizedRoomId} pelo host`);
+                        }
+                        break;
+
                     case 'media-status-change':
                         const updates = {
                             audioMuted: data.audioMuted,
