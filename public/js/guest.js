@@ -1038,38 +1038,42 @@ function setVideoEnabled(enabled) {
 document.getElementById('toggleMic').onclick = () => setMicEnabled(!isMicOn);
 document.getElementById('toggleVideo').onclick = () => setVideoEnabled(!isVideoOn);
 
-document.getElementById('switchCamera').onclick = async () => {
-    const tracks = localStream.getTracks();
-    tracks.forEach(t => t.stop());
+const switchCamBtn = document.getElementById('switchCamera');
+if (switchCamBtn) {
+    switchCamBtn.onclick = async () => {
+        const tracks = localStream.getTracks();
+        tracks.forEach(t => t.stop());
 
-    // Alternar entre user e environment (frente/trás) no mobile
-    const currentMode = localStream.getVideoTracks()[0].getSettings().facingMode;
-    const newMode = currentMode === 'user' ? 'environment' : 'user';
+        // Alternar entre user e environment (frente/trás) no mobile
+        const currentMode = localStream.getVideoTracks()[0].getSettings().facingMode;
+        const newMode = currentMode === 'user' ? 'environment' : 'user';
 
-    try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-            video: { facingMode: newMode },
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: { facingMode: newMode },
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+            mainVideo.srcObject = localStream;
+            rtcClient.setLocalStream(localStream);
+            // Ao invés de renegociar (initiateConnection), melhor usar replaceTrack se possível:
+            if (rtcClient) {
+                await rtcClient.replaceTrack(localStream.getVideoTracks()[0]);
+                await rtcClient.replaceTrack(localStream.getAudioTracks()[0]);
             }
-        });
-        mainVideo.srcObject = localStream;
-        rtcClient.setLocalStream(localStream);
-        // Ao invés de renegociar (initiateConnection), melhor usar replaceTrack se possível:
-        if (rtcClient) {
-            await rtcClient.replaceTrack(localStream.getVideoTracks()[0]);
-            await rtcClient.replaceTrack(localStream.getAudioTracks()[0]);
+        } catch (e) {
+            console.error('Camera switch failed:', e);
         }
-    } catch (e) {
-        console.error('Camera switch failed:', e);
-    }
-};
+    };
+}
 
-document.getElementById('leaveRoom').onclick = () => window.location.href = 'index.html';
-
-// === Unpin Button & Main Video Click ===
+const leaveBtn = document.getElementById('leaveRoom');
+if (leaveBtn) {
+    leaveBtn.onclick = () => window.location.href = 'index.html';
+}
 const unpinBtn = document.getElementById('unpin-btn');
 if (unpinBtn) unpinBtn.onclick = () => unpinParticipant();
 
@@ -1080,99 +1084,7 @@ if (pinnedVideoEl) {
     });
 }
 
-// 3.5. Compartilhamento de Tela (Screen Share)
-let isScreenSharing = false;
-let screenTrack = null;
 
-const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-const toggleScreenBtn = document.getElementById('toggleScreen');
-const screenIndicator = document.getElementById('screen-share-indicator');
-
-// Esconder botão no mobile para evitar travamentos
-if (isMobile && toggleScreenBtn) {
-    toggleScreenBtn.classList.add('hidden');
-}
-
-if (toggleScreenBtn) {
-    toggleScreenBtn.onclick = async () => {
-        if (isMobile) {
-            showToast("O compartilhamento de tela é otimizado para Desktop", "info");
-            return;
-        }
-        if (!isScreenSharing) {
-            try {
-                console.log('Iniciando compartilhamento de tela...');
-                const screenStream = await navigator.mediaDevices.getDisplayMedia({
-                    video: { cursor: "always" },
-                    audio: false
-                });
-                screenTrack = screenStream.getVideoTracks()[0];
-
-                // Ouvir quando o usuário para o compartilhamento via barra do navegador
-                screenTrack.onended = () => {
-                    console.log('Compartilhamento de tela encerrado pelo navegador.');
-                    stopScreenShare();
-                };
-
-                // Adicionar como rastro extra no WebRTC
-                if (rtcClient) {
-                    rtcClient.addExtraTrack(screenTrack, screenStream);
-                }
-
-                // Atualizar UI
-                toggleScreenBtn.classList.add('bg-win-accent', 'text-white');
-                toggleScreenBtn.classList.remove('bg-win-surface/80');
-                screenIndicator.classList.remove('hidden');
-
-                isScreenSharing = true;
-
-                // Notificar sistema sobre mudança de estado
-                ws.send(JSON.stringify({
-                    type: 'screen-status-change',
-                    roomId: roomName,
-                    isScreenSharing: true
-                }));
-
-            } catch (e) {
-                console.error('Erro ao compartilhar tela:', e);
-            }
-        } else {
-            stopScreenShare();
-        }
-    };
-}
-
-async function stopScreenShare() {
-    if (!isScreenSharing || !screenTrack) return;
-
-    console.log('Parando compartilhamento de tela...');
-    try {
-        if (rtcClient) {
-            rtcClient.removeExtraTrack(screenTrack);
-        }
-
-        screenTrack.stop();
-        screenTrack = null;
-
-        // Atualizar UI
-        toggleScreenBtn.classList.remove('bg-win-accent', 'text-white');
-        toggleScreenBtn.classList.add('bg-win-surface/80');
-        screenIndicator.classList.add('hidden');
-
-        isScreenSharing = false;
-
-        // Notificar sistema
-        ws.send(JSON.stringify({
-            type: 'screen-status-change',
-            roomId: roomName,
-            isScreenSharing: false
-        }));
-
-    } catch (e) {
-        console.error('Erro ao parar compartilhamento de tela:', e);
-        isScreenSharing = false;
-    }
-}
 
 // 4. Seleção Avançada de Dispositivos (Chevrons UI) e Settings
 const micMenu = document.getElementById('mic-menu');
@@ -1550,11 +1462,10 @@ if (openMobileBtn && qrModal && closeQrModal && qrContainer) {
 
 // Se EU SOU o celular da Câmera Secundária, escondo coisas desnecessárias para poupar processamento
 if (companionOf) {
-    if (openMobileBtn) openMobileBtn.classList.add('hidden');
     const toggleChat = document.getElementById('toggleChat');
-    const shareScreen = document.getElementById('shareScreen');
+    const shareScreenBtn = document.getElementById('btn-share-screen');
     if (toggleChat) toggleChat.classList.add('hidden');
-    if (shareScreen) shareScreen.classList.add('hidden');
+    if (shareScreenBtn) shareScreenBtn.classList.add('hidden');
 
     // Altera mensagens pra modo Companion Cego
     document.querySelector('#precall-screen h1').textContent = "Câmera Secundária";
