@@ -458,7 +458,7 @@ window.handleAdmission = (participantId, status) => {
 function renderParticipantCard(participant, isLocal = false) {
     const card = document.createElement('div');
     card.id = `video-card-${participant.id}`;
-    card.className = "bg-win-card border border-win-border rounded-win overflow-hidden shadow-xl flex flex-col";
+    card.className = "bg-win-card border border-win-border rounded-win shadow-xl flex flex-col";
 
     card.innerHTML = `
       <div class="aspect-video bg-black relative group rounded-t-win overflow-hidden">
@@ -921,6 +921,21 @@ window.toggleOverlay = (pId) => {
     updateParticipantStatus(p);
 };
 
+function updateLocalOverlay() {
+    const overlay = document.getElementById('mute-overlay-local');
+    if (!overlay) return;
+    if (isHostCamMuted) {
+        overlay.classList.remove('hidden');
+        overlay.innerHTML = `<i class="ph ph-video-camera-slash text-4xl text-red-600/80 drop-shadow-xl animate-pulse"></i>`;
+    } else if (isHostMicMuted) {
+        overlay.classList.remove('hidden');
+        overlay.innerHTML = `<div class="bg-black/40 p-3 rounded-full border border-red-500/30"><i class="ph ph-microphone-slash text-3xl text-red-500 drop-shadow-lg"></i></div>`;
+    } else {
+        overlay.classList.add('hidden');
+        overlay.innerHTML = '';
+    }
+}
+
 window.remoteMute = (pId) => {
     // === Host Self-Mute ===
     if (pId === 'local') {
@@ -931,19 +946,11 @@ window.remoteMute = (pId) => {
         // Atualizar visual do botão
         const btnAudio = document.getElementById('btn-audio-local');
         if (btnAudio) {
-            btnAudio.className = `${isHostMicMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-win transition-all`;
+            btnAudio.className = `${isHostMicMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-l-win transition-all`;
             btnAudio.innerHTML = `<i class="ph ${isHostMicMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>`;
         }
         // Atualizar overlay visual
-        const overlay = document.getElementById('mute-overlay-local');
-        if (overlay) {
-            if (isHostMicMuted && !isHostCamMuted) {
-                overlay.classList.remove('hidden');
-                overlay.innerHTML = `<div class="bg-black/40 p-3 rounded-full border border-red-500/30"><i class="ph ph-microphone-slash text-3xl text-red-500 drop-shadow-lg"></i></div>`;
-            } else if (!isHostMicMuted && !isHostCamMuted) {
-                overlay.classList.add('hidden');
-            }
-        }
+        updateLocalOverlay();
         showToast(isHostMicMuted ? 'Microfone desligado' : 'Microfone ligado', 'info');
         return;
     }
@@ -966,21 +973,11 @@ window.remoteMuteVideo = (pId) => {
         // Atualizar visual do botão
         const btnVideo = document.getElementById('btn-video-local');
         if (btnVideo) {
-            btnVideo.className = `${isHostCamMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-win transition-all`;
+            btnVideo.className = `${isHostCamMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-win-accent hover:bg-win-accent/5'} p-1.5 border rounded-l-win transition-all`;
             btnVideo.innerHTML = `<i class="ph ${isHostCamMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>`;
         }
         // Atualizar overlay visual
-        const overlay = document.getElementById('mute-overlay-local');
-        if (overlay) {
-            if (isHostCamMuted) {
-                overlay.classList.remove('hidden');
-                overlay.innerHTML = `<i class="ph ph-video-camera-slash text-4xl text-red-600/80 drop-shadow-xl animate-pulse"></i>`;
-            } else if (!isHostMicMuted) {
-                overlay.classList.add('hidden');
-            } else {
-                overlay.innerHTML = `<div class="bg-black/40 p-3 rounded-full border border-red-500/30"><i class="ph ph-microphone-slash text-3xl text-red-500 drop-shadow-lg"></i></div>`;
-            }
-        }
+        updateLocalOverlay();
         showToast(isHostCamMuted ? 'Câmera desligada' : 'Câmera ligada', 'info');
         return;
     }
