@@ -48,6 +48,8 @@ let currentParticipants = [];
 let isMonitorMuted = false;
 let isHostMicMuted = false;
 let isHostCamMuted = false;
+let isScreenSharing = false;
+let screenStream = null;
 const vuAnalyzers = new Map(); // participantId -> { analyzer, dataArray, animationId }
 
 const videoGrid = document.getElementById('video-grid');
@@ -1206,3 +1208,87 @@ if (openMobileBtn && qrModal && closeQrModal && qrContainer) {
     };
     closeQrModal.onclick = () => { qrModal.classList.add('hidden'); };
 }
+
+// ===== COMPARTILHAMENTO DE TELA ======
+window.toggleScreenShare = async () => {
+    if (isScreenSharing) {
+        // Parar compartilhamento
+        if (screenStream) {
+            screenStream.getTracks().forEach(t => t.stop());
+            screenStream = null;
+        }
+        isScreenSharing = false;
+
+        // Reverter para câmera
+        const activeStream = processedStream || localStream;
+        if (activeStream && rtcClient) {
+            const videoTrack = activeStream.getVideoTracks()[0];
+            if (videoTrack) {
+                rtcClient.replaceTrack(videoTrack);
+            }
+        }
+
+        // Atualizar preview local
+        const localVideoEl = document.querySelector('#video-card-local video');
+        if (localVideoEl) {
+            localVideoEl.srcObject = activeStream;
+            localVideoEl.style.objectFit = 'cover';
+        }
+
+        const btn = document.getElementById('btn-share-screen');
+        if (btn) {
+            btn.classList.remove('bg-win-accent', 'text-white');
+            btn.classList.add('text-gray-400');
+            btn.innerHTML = `<i class="ph ph-screencast text-sm text-win-accent group-hover:text-white transition-colors"></i> Tela`;
+        }
+
+        // Reabilitar VB local (botão de Fundo Personalizado do Host)
+        const vbToggle = document.getElementById('vb-toggle-local');
+        if (vbToggle) vbToggle.disabled = false;
+
+    } else {
+        // Iniciar compartilhamento
+        try {
+            screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+            isScreenSharing = true;
+
+            const screenTrack = screenStream.getVideoTracks()[0];
+
+            // Reverter automaticamente se usuário parar pelo navegador
+            screenTrack.onended = () => {
+                if (isScreenSharing) window.toggleScreenShare();
+            };
+
+            // Atualizar peers P2P
+            if (rtcClient) {
+                rtcClient.replaceTrack(screenTrack);
+            }
+
+            // Atualizar preview local (sem cortes com 'contain')
+            const localVideoEl = document.querySelector('#video-card-local video');
+            if (localVideoEl) {
+                localVideoEl.srcObject = screenStream;
+                localVideoEl.style.objectFit = 'contain';
+            }
+
+            const btn = document.getElementById('btn-share-screen');
+            if (btn) {
+                btn.classList.add('bg-win-accent', 'text-white');
+                btn.classList.remove('text-gray-400');
+                btn.innerHTML = `<i class="ph ph-screencast text-sm"></i> Parar Tela`;
+            }
+
+            // Pausar/Desabilitar VB enquanto tela estiver ativa
+            const vbToggle = document.getElementById('vb-toggle-local');
+            if (vbToggle) {
+                vbToggle.disabled = true;
+            }
+            if (currentVbMode !== 'none') {
+                showToast('Fundo Virtual oculto na tela compartilhada', 'info');
+            }
+
+        } catch (e) {
+            console.error("Erro ao compartilhar tela:", e);
+        }
+    }
+};

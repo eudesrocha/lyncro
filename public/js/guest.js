@@ -16,6 +16,8 @@ let processedStream = null; // Stream pós-IA (se ativo)
 let currentVbMode = 'none';
 let currentVbImage = null;
 let currentVbBtnId = 'vb-btn-none';
+let isScreenSharing = false;
+let screenStream = null;
 
 // === Speaker View State ===
 let pinnedParticipantId = null; // ID do participante fixado manualmente
@@ -1565,3 +1567,78 @@ if (companionOf) {
     const micGroup = document.getElementById('mic-group');
     if (micGroup) micGroup.classList.add('hidden');
 }
+
+// ===== COMPARTILHAMENTO DE TELA ======
+window.toggleScreenShare = async () => {
+    if (isScreenSharing) {
+        // Parar compartilhamento
+        if (screenStream) {
+            screenStream.getTracks().forEach(t => t.stop());
+            screenStream = null;
+        }
+        isScreenSharing = false;
+
+        // Reverter para câmera
+        const activeStream = processedStream || localStream;
+        if (activeStream && rtcClient) {
+            const videoTrack = activeStream.getVideoTracks()[0];
+            if (videoTrack) {
+                rtcClient.replaceTrack(videoTrack).catch(e => console.error(e));
+            }
+        }
+
+        // Atualizar preview local
+        const localVideoEl = document.getElementById('localVideo');
+        if (localVideoEl) {
+            localVideoEl.srcObject = activeStream;
+            localVideoEl.style.objectFit = 'cover';
+        }
+
+        const btn = document.getElementById('btn-share-screen');
+        if (btn) {
+            btn.classList.remove('bg-win-accent', 'text-white');
+            btn.classList.add('text-gray-400', 'bg-win-surface/80');
+            btn.innerHTML = `<i class="ph ph-screencast text-2xl text-gray-400 group-hover:text-white transition-colors"></i>`;
+        }
+
+    } else {
+        // Iniciar compartilhamento
+        try {
+            screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
+            isScreenSharing = true;
+
+            const screenTrack = screenStream.getVideoTracks()[0];
+
+            // Reverter automaticamente se usuário parar pelo navegador
+            screenTrack.onended = () => {
+                if (isScreenSharing) window.toggleScreenShare();
+            };
+
+            // Atualizar peers P2P
+            if (rtcClient) {
+                rtcClient.replaceTrack(screenTrack).catch(e => console.error("Falha ao substituir trilha no rtcClient", e));
+            }
+
+            // Atualizar preview local (sem cortes com 'contain')
+            const localVideoEl = document.getElementById('localVideo');
+            if (localVideoEl) {
+                localVideoEl.srcObject = screenStream;
+                localVideoEl.style.objectFit = 'contain';
+            }
+
+            const btn = document.getElementById('btn-share-screen');
+            if (btn) {
+                btn.classList.add('bg-win-accent', 'text-white');
+                btn.classList.remove('text-gray-400', 'bg-win-surface/80');
+                btn.innerHTML = `<i class="ph ph-screencast text-2xl"></i>`;
+            }
+
+            if (currentVbMode !== 'none') {
+                showToast('Fundo Virtual oculto na tela compartilhada', 'info');
+            }
+
+        } catch (e) {
+            console.error("Erro ao compartilhar tela:", e);
+        }
+    }
+};
