@@ -153,6 +153,17 @@
         .badge-pulse {
             animation: pulse-badge 1s infinite ease-in-out;
         }
+
+        #btn-record.recording-active {
+            background-color: rgba(220, 38, 38, 0.15);
+            color: #f87171;
+            border-color: rgba(239, 68, 68, 0.3);
+        }
+
+        #btn-record.recording-active i {
+            color: #ef4444;
+            animation: pulse-badge 1s infinite ease-in-out;
+        }
     </style>
 </head>
 
@@ -186,6 +197,12 @@
                     <i class="ph ph-screencast text-sm text-win-accent group-hover:text-white transition-colors"></i>
                     Tela
                 </button>
+                <div class="w-px h-4 bg-win-border mx-1"></div>
+                <button id="btn-record"
+                    class="flex items-center gap-2 hover:bg-red-600 hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
+                    <i class="ph ph-record text-sm text-red-500 group-hover:text-white transition-colors"></i>
+                    <span class="rec-label">Gravar</span>
+                </button>
             </div>
 
             <select id="return-audio-select"
@@ -204,6 +221,13 @@
 
             <div id="room-id-display"
                 class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-2 rounded-win border border-win-accent/20 shadow-inner">
+            </div>
+
+            <!-- REC indicator -->
+            <div id="rec-badge" class="hidden flex items-center gap-2 bg-red-600/15 border border-red-500/30 px-3 py-2 rounded-win">
+                <span class="w-2 h-2 rounded-full bg-red-500 badge-pulse inline-block"></span>
+                <span class="text-[10px] font-black uppercase tracking-widest text-red-400">REC</span>
+                <span id="rec-timer" class="text-[10px] font-mono font-bold text-red-300">00:00</span>
             </div>
 
             <!-- Botão Toggle de Tema -->
@@ -299,6 +323,7 @@
     <script src="js/webrtc.js"></script>
     <script src="js/host.js"></script>
     <script src="js/host-chat.js"></script>
+    <script src="js/host-recorder.js"></script>
     <script src="js/theme.js"></script>
 </body>
 

@@ -194,6 +194,7 @@ class WebRTCClient {
     }
 
     setupDataChannel(targetId, dc) {
+        dc.binaryType = 'arraybuffer';
         dc.onopen = () => this.log(`DataChannel with ${targetId} is OPEN`);
         dc.onclose = () => this.log(`DataChannel with ${targetId} is CLOSED`);
         dc.onerror = (e) => this.log(`DataChannel with ${targetId} ERROR: ${e.message}`);
@@ -254,7 +255,11 @@ class WebRTCClient {
                 return reject(new Error(`Canal de dados com ${targetId} não está aberto (Estado: ${dc ? dc.readyState : 'nulo'})`));
             }
 
-            const CHUNK_SIZE = 16384; // 16KB
+            const CHUNK_SIZE = 65536; // 64KB
+            const BUFFER_THRESHOLD = CHUNK_SIZE * 4;
+
+            dc.bufferedAmountLowThreshold = BUFFER_THRESHOLD;
+
             const meta = {
                 type: 'file-meta',
                 fileName: file.name,
@@ -268,52 +273,46 @@ class WebRTCClient {
                 return reject(new Error('Falha ao enviar meta-dados do arquivo: ' + e.message));
             }
 
-            const reader = new FileReader();
             let offset = 0;
 
-            const readNextChunk = () => {
-                const slice = file.slice(offset, offset + CHUNK_SIZE);
-                reader.readAsArrayBuffer(slice);
-            };
-
-            reader.onerror = (err) => reject(err);
-            reader.onload = (e) => {
-                const buffer = e.target.result;
-
-                const send = () => {
-                    if (dc.readyState !== 'open') {
-                        return reject(new Error('DataChannel fechado durante a transferência.'));
+            const sendNextChunk = () => {
+                if (offset >= file.size) {
+                    try {
+                        dc.send(JSON.stringify({ type: 'file-end' }));
+                        resolve();
+                    } catch (e) {
+                        reject(e);
                     }
+                    return;
+                }
 
+                if (dc.readyState !== 'open') {
+                    return reject(new Error('DataChannel fechado durante a transferência.'));
+                }
+
+                const slice = file.slice(offset, offset + CHUNK_SIZE);
+                slice.arrayBuffer().then(buffer => {
                     try {
                         dc.send(buffer);
                         offset += buffer.byteLength;
-
                         if (onProgress) onProgress((offset / file.size) * 100);
 
-                        if (offset < file.size) {
-                            if (dc.bufferedAmount > dc.bufferedAmountLowThreshold) {
-                                dc.onbufferedamountlow = () => {
-                                    dc.onbufferedamountlow = null;
-                                    send();
-                                };
-                            } else {
-                                // Pequeno delay para não sobrecarregar o buffer em redes móveis
-                                setTimeout(readNextChunk, 1);
-                            }
+                        if (dc.bufferedAmount > BUFFER_THRESHOLD) {
+                            // Wait for buffer to drain before sending next chunk
+                            dc.onbufferedamountlow = () => {
+                                dc.onbufferedamountlow = null;
+                                sendNextChunk();
+                            };
                         } else {
-                            dc.send(JSON.stringify({ type: 'file-end' }));
-                            resolve();
+                            sendNextChunk();
                         }
                     } catch (err) {
                         reject(err);
                     }
-                };
-
-                send();
+                }).catch(reject);
             };
 
-            readNextChunk();
+            sendNextChunk();
         });
     }
 
