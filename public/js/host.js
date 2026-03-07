@@ -36,16 +36,16 @@ async function handleNDIToggle(participantId, name) {
 const VIDEO_QUALITY_PRESETS = {
     '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
     '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
-    '720':     { label: '720p HD',     width: 1280, height: 720,  frameRate: 30 },
-    '480':     { label: '480p SD',     width: 854,  height: 480,  frameRate: 30 },
-    '360':     { label: '360p LQ',     width: 640,  height: 360,  frameRate: 30 },
+    '720': { label: '720p HD', width: 1280, height: 720, frameRate: 30 },
+    '480': { label: '480p SD', width: 854, height: 480, frameRate: 30 },
+    '360': { label: '360p LQ', width: 640, height: 360, frameRate: 30 },
 };
 
 function buildVideoConstraints(qualityKey, extras = {}) {
     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
     return {
-        width:     { ideal: p.width },
-        height:    { ideal: p.height },
+        width: { ideal: p.width },
+        height: { ideal: p.height },
         frameRate: { ideal: p.frameRate, max: p.frameRate },
         ...extras
     };
@@ -295,10 +295,12 @@ async function setupWebSocket() {
         rtcClient.setLocalStream(processedStream || localStream);
 
         // Obter sessão Supabase para ownership e autenticação
+        // Usa getFreshSession() que faz refresh automático se o token
+        // estiver prestes a expirar (<5min), evitando "Sessão expirada"
         let userId = null;
         let accessToken = null;
         try {
-            const session = await window.LYNCRO_AUTH.getSession();
+            const session = await window.LYNCRO_AUTH.getFreshSession();
             if (session && session.user) {
                 userId = session.user.id;
                 accessToken = session.access_token;
@@ -352,9 +354,26 @@ async function setupWebSocket() {
             case 'error':
                 console.error('[Server Error]', data.message);
                 if (data.message && data.message.includes('host negado')) {
-                    wsIntentionalClose = true;
-                    alert('Sessão expirada. Faça login novamente.');
-                    window.location.href = 'login.html';
+                    // Tentar refresh de sessão antes de desistir
+                    // (pode ser só token expirado, não logout real)
+                    (async () => {
+                        try {
+                            const freshSession = await window.LYNCRO_AUTH.getFreshSession();
+                            if (freshSession) {
+                                console.log('[Auth] Token renovado após rejeição. Reconectando...');
+                                showToast('Sessão renovada. Reconectando...', 'info');
+                                // Reconectar com o novo token
+                                setTimeout(setupWebSocket, 1000);
+                                return;
+                            }
+                        } catch (e) {
+                            console.warn('[Auth] Falha ao renovar sessão:', e);
+                        }
+                        // Se chegou aqui, sessão está realmente expirada
+                        wsIntentionalClose = true;
+                        alert('Sessão expirada. Faça login novamente.');
+                        window.location.href = 'login.html';
+                    })();
                 } else {
                     showToast(data.message || 'Erro no servidor.', 'error');
                 }
