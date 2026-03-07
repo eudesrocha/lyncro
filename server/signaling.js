@@ -38,6 +38,18 @@ function setupSignaling(server) {
                         }
 
                         const participant = roomManager.joinRoom(normalizedRoomId, { ...data.participant, ws });
+
+                        // Verificar se o join foi rejeitado por ownership
+                        if (participant.rejected) {
+                            console.log(`[JOIN REJECTED] Room: "${normalizedRoomId}" | Motivo: ${participant.reason}`);
+                            ws.send(JSON.stringify({
+                                type: 'error',
+                                message: participant.reason
+                            }));
+                            ws.close();
+                            return;
+                        }
+
                         participantId = participant.id;
 
                         console.log(`[JOIN] Room: "${normalizedRoomId}" | Participant: "${participant.name}" | Role: ${participant.role}`);

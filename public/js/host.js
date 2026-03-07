@@ -254,16 +254,26 @@ function setupWebSocket() {
     ws = new WebSocket(wsUrl);
     const storedPassword = localStorage.getItem(`room_pwd_${roomName}`);
 
-    ws.onopen = () => {
+    ws.onopen = async () => {
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, initiateConnection, null, handleDataMessage);
         rtcClient.setLocalStream(processedStream || localStream);
+
+        // Obter userId do Supabase para proteção de ownership
+        let userId = null;
+        try {
+            const session = await window.LYNCRO_AUTH.getSession();
+            if (session && session.user) userId = session.user.id;
+        } catch (e) {
+            console.warn('Sem sessão Supabase para ownership:', e);
+        }
 
         const payload = {
             type: 'join',
             roomId: roomName,
             participant: {
                 name: userName,
-                role: 'host'
+                role: 'host',
+                userId: userId
             }
         };
 

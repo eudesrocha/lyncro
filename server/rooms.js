@@ -10,6 +10,7 @@ class RoomManager {
             this.rooms.set(roomId, {
                 participants: new Map(),
                 host: null,
+                hostUserId: null, // Supabase user ID do dono da sala
                 password: password ? String(password).trim() : null
             });
         }
@@ -28,7 +29,7 @@ class RoomManager {
             id: participantId,
             name: participantData.name || 'Anonymous',
             role: participantData.role || 'guest',
-            status: participantData.role === 'host' || participantData.role === 'observer' ? 'accepted' : 'waiting', // Hosts e OBS entram direto
+            status: participantData.role === 'host' || participantData.role === 'observer' ? 'accepted' : 'waiting',
             tallyState: 'off',
             muted: false,
             audioMuted: false,
@@ -39,10 +40,21 @@ class RoomManager {
             ...participantData
         };
 
-        room.participants.set(participantId, participant);
-
+        // Validar ownership: se alguém tenta entrar como host numa sala que já tem dono
         if (participant.role === 'host') {
-            // Se já existia um host antigo (ex: aba duplicada), removemos ele para evitar fantasmas
+            const incomingUserId = participantData.userId || null;
+
+            if (room.hostUserId && incomingUserId && room.hostUserId !== incomingUserId) {
+                // Usuário diferente tentando ser host — REJEITAR
+                return { rejected: true, reason: 'Esta sala já pertence a outro usuário.' };
+            }
+
+            // Registrar ou manter o dono
+            if (!room.hostUserId && incomingUserId) {
+                room.hostUserId = incomingUserId;
+            }
+
+            // Se já existia um host antigo (ex: aba duplicada do MESMO usuário), removemos ele
             if (room.host && room.host !== participantId) {
                 const oldHost = room.participants.get(room.host);
                 if (oldHost && oldHost.ws) {
@@ -56,6 +68,7 @@ class RoomManager {
             room.host = participantId;
         }
 
+        room.participants.set(participantId, participant);
         return participant;
     }
 
@@ -69,11 +82,11 @@ class RoomManager {
 
         if (room.host === participantId) {
             room.host = null;
-            // Opcional: promover outro para host ou fechar sala
+            // Manter hostUserId para que só o dono possa reconectar como host
         }
 
         if (room.participants.size === 0) {
-            this.rooms.delete(roomId);
+            this.rooms.delete(roomId); // Limpa tudo incluindo hostUserId
         }
 
         return participant;
@@ -87,7 +100,7 @@ class RoomManager {
             id: roomId,
             host: room.host,
             participants: Array.from(room.participants.values()).map(p => {
-                const { ws, ...data } = p; // Remove WebSocket do retorno
+                const { ws, userId, ...data } = p; // Remove WebSocket e userId do retorno
                 return data;
             })
         };
