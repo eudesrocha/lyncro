@@ -1292,3 +1292,121 @@ window.toggleScreenShare = async () => {
         }
     }
 };
+
+// ==========================================
+// Seleção de Câmera/Microfone (Host)
+// ==========================================
+window.toggleCardDropdown = async (dropdownId) => {
+    // Esconder outros dropdowns abertos
+    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(el => {
+        if (el.id !== dropdownId) el.classList.add('hidden');
+    });
+
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) return;
+
+    dropdown.classList.toggle('hidden');
+
+    // Se o dropdown foi aberto, enumerar os dispositivos e carregar a lista
+    if (!dropdown.classList.contains('hidden')) {
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            const listId = dropdownId.replace('-dropdown-', '-dropdown-list-');
+            const listEl = document.getElementById(listId);
+            if (!listEl) return;
+
+            listEl.innerHTML = '';
+
+            let currentAudioId = '';
+            let currentVideoId = '';
+            if (localStream) {
+                const audioTracks = localStream.getAudioTracks();
+                if (audioTracks.length > 0) currentAudioId = audioTracks[0].getSettings().deviceId;
+                const videoTracks = localStream.getVideoTracks();
+                if (videoTracks.length > 0) currentVideoId = videoTracks[0].getSettings().deviceId;
+            }
+
+            const isMic = dropdownId.startsWith('mic-');
+            const kind = isMic ? 'audioinput' : 'videoinput';
+            const filteredDevices = devices.filter(d => d.kind === kind);
+
+            if (filteredDevices.length === 0) {
+                listEl.innerHTML = '<div class="text-[10px] text-gray-500 p-2 text-center pointer-events-none">Nenhum dispositivo detectado</div>';
+                return;
+            }
+
+            filteredDevices.forEach((device, index) => {
+                const isSelected = device.deviceId === (isMic ? currentAudioId : currentVideoId);
+                const label = device.label || `${isMic ? 'Microfone' : 'Câmera'} ${index + 1}`;
+                listEl.innerHTML += `
+                    <button onclick="switchHostDevice('${device.deviceId}', '${isMic ? 'audio' : 'video'}')" class="text-left w-full px-3 py-2 hover:bg-win-accent rounded transition-colors truncate text-[11px] ${isSelected ? 'text-win-accent font-bold bg-white/5' : 'text-gray-300'}">
+                        ${label}
+                    </button>
+                `;
+            });
+        } catch (e) {
+            console.error('Erro ao enumerar dispositivos para o dropdown:', e);
+        }
+    }
+};
+
+window.switchHostDevice = async (deviceId, kind) => {
+    // Fechar dropdowns
+    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(el => el.classList.add('hidden'));
+
+    try {
+        const constraints = {
+            audio: kind === 'audio' ? { deviceId: { exact: deviceId } } : false,
+            video: kind === 'video' ? { deviceId: { exact: deviceId } } : false
+        };
+
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const newTrack = kind === 'video' ? newStream.getVideoTracks()[0] : newStream.getAudioTracks()[0];
+
+        // Manter o estado atual de Mute (se a câmera/mic antigo estava desligado)
+        let currentState = true;
+        if (kind === 'audio') {
+            const oldAudio = localStream.getAudioTracks()[0];
+            if (oldAudio) currentState = oldAudio.enabled;
+            newTrack.enabled = currentState;
+        } else if (kind === 'video') {
+            const oldVideo = localStream.getVideoTracks()[0];
+            if (oldVideo) currentState = oldVideo.enabled;
+            newTrack.enabled = currentState;
+        }
+
+        // Remover track original e plugar o novo no stream local
+        const oldTrack = kind === 'video' ? localStream.getVideoTracks()[0] : localStream.getAudioTracks()[0];
+        if (oldTrack) {
+            localStream.removeTrack(oldTrack);
+            oldTrack.stop();
+        }
+        localStream.addTrack(newTrack);
+
+        // Atualizar todas as conexões RTCPeerConnection ativas na sala
+        if (rtcClient) {
+            await rtcClient.replaceTrack(newTrack);
+        }
+
+        // Atualiza a pré-visualização na interface do host
+        if (kind === 'video') {
+            const myCard = document.getElementById('video-card-' + myId);
+            if (myCard) {
+                const vid = myCard.querySelector('video');
+                if (vid) vid.srcObject = localStream;
+            }
+        }
+
+        console.log(`Dispositivo [${kind}] do Host alterado para: ${deviceId}`);
+    } catch (e) {
+        console.error(`Erro ao trocar de ${kind} no Host:`, e);
+        alert('Mídia bloqueada ou ocupada. Tente novamente.');
+    }
+};
+
+// Global click event para desmarcar os popups se clicar fora
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('[id^="mic-dropdown-"]') && !e.target.closest('[id^="cam-dropdown-"]') && !e.target.closest('.ph-caret-down') && !e.target.closest('button[onclick^="toggleCardDropdown"]')) {
+        document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(el => el.classList.add('hidden'));
+    }
+});
