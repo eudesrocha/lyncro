@@ -48,8 +48,8 @@
     --text:          #111114;
     --text-secondary:#5c5c6e;
     --text-muted:    rgba(0, 0, 0, 0.35);
-    --input-bg:      rgba(255, 255, 255, 0.9);
-    --input-border:  rgba(0, 0, 0, 0.12);
+    --input-bg:      #f0f1f4;
+    --input-border:  rgba(0, 0, 0, 0.16);
     --input-focus:   #0078d4;
     --shadow:        0 8px 40px rgba(0, 0, 0, 0.10);
     --shadow-sm:     0 2px 12px rgba(0, 0, 0, 0.07);
