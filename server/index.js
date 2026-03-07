@@ -52,6 +52,12 @@ app.get('/api/rooms', (req, res) => {
     res.json(rooms);
 });
 
+app.get('/api/rooms/:id', (req, res) => {
+    const room = roomManager.getRoom(req.params.id);
+    if (!room) return res.status(404).json({ error: 'Sala não encontrada' });
+    res.json(room);
+});
+
 app.post('/api/rooms', (req, res) => {
     const { name, password } = req.body;
     const roomId = roomManager.createRoom(name, password);

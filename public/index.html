@@ -221,7 +221,7 @@
                                 class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400 dark:placeholder:text-gray-700"
                                 oninput="clearFieldError('err-join-room')">
                             <p id="err-join-room" class="hidden text-[11px] text-red-400 font-semibold ml-1 flex items-center gap-1">
-                                <i class="ph ph-warning-circle"></i> Informe o ID da sala
+                                <i class="ph ph-warning-circle"></i> <span id="err-join-room-msg">Informe o ID da sala</span>
                             </p>
                         </div>
                         <div class="space-y-1.5">
@@ -383,7 +383,7 @@
             if (el) el.classList.add('hidden');
         }
 
-        function handleJoinRoom() {
+        async function handleJoinRoom() {
             const room = document.getElementById('joinRoomId').value.trim();
             const name = document.getElementById('userNameGuest').value.trim();
             let valid = true;
@@ -391,6 +391,28 @@
             if (!room) { showFieldError('err-join-room'); valid = false; }
             if (!name) { showFieldError('err-join-name'); valid = false; }
             if (!valid) return;
+
+            // Verificar se a sala existe antes de redirecionar
+            const btn = document.querySelector('#panel-join button[onclick]');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'Verificando...';
+
+            try {
+                const res = await fetch(`/api/rooms/${encodeURIComponent(room)}`);
+                if (!res.ok) {
+                    document.getElementById('err-join-room-msg').textContent = 'Sala não encontrada. Verifique o ID.';
+                    showFieldError('err-join-room');
+                    return;
+                }
+            } catch {
+                document.getElementById('err-join-room-msg').textContent = 'Erro de conexão. Tente novamente.';
+                showFieldError('err-join-room');
+                return;
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
 
             localStorage.setItem('sv_last_name', name);
             window.location.href = `guest.html?room=${room}&name=${name}`;
