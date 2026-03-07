@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <script>
         // Anti-flash: aplica tema ANTES do CSS carregar. Usa preferência salva ou tema do sistema.
@@ -11,31 +10,119 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>LYNCRO - Sincronia Total. Latência Zero.</title>
-    <!-- Google Fonts: Inter para fallback premium no iOS e Outfit para Logo -->
+    
+    <!-- SEO & Open Graph -->
+    <title>Lyncro - Sincronia Total. Latência Zero.</title>
+    <meta name="description" content="Lyncro é a ponte definitiva entre seus convidados e o seu OBS. Transmissão ao vivo profissional com latência zero, Clean Feed nativo e acesso com um clique direto pelo navegador celular.">
+    <meta name="keywords" content="livestream, obs studio, clean feed, latência zero, transmissão ao vivo, rtmp, webrtc, estúdio">
+    <meta property="og:title" content="Lyncro - Sincronia Total. Latência Zero.">
+    <meta property="og:description" content="A ponte definitiva entre seus convidados e o seu OBS. Gere links de Clean Feed instantâneos e transmita com qualidade de estúdio direto pelo navegador.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lyncro.live">
+    <!-- Adicionar imagem OG depois se houver uma específica -->
+
+    <!-- Google Fonts: Inter para leitura e Outfit para Destaques/Logo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/themes.css">
+    
     <style>
+        /* CSS Específico da Home Premium (Cinematic e Animations) */
+        
+        /* 1. Splash Screen Animation */
+        #splash-screen {
+            position: fixed;
+            inset: 0;
+            background: #060b10;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s;
+        }
+        .splash-logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            font-style: italic;
+            color: #ffffff;
+            opacity: 0;
+            transform: scale(0.9) translateY(20px);
+            animation: splashEntrance 2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            letter-spacing: -0.02em;
+        }
+        .splash-logo span {
+            color: #0078d4; /* win-accent */
+        }
+        @keyframes splashEntrance {
+            0% { opacity: 0; transform: scale(0.85) translateY(20px); filter: blur(10px); }
+            30% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+            70% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+            100% { opacity: 0; transform: scale(1.1) translateY(-10px); filter: blur(8px); }
+        }
+
+        /* 2. Formas Geométricas / Partículas de Fundo (Visível principalmente no Tema Escuro) */
+        .ambient-glow {
+            position: fixed;
+            inset: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: -1;
+            /* Fundo base radial para dar mais vida ao dark mode nativo */
+            background: radial-gradient(circle at top center, rgba(0,120,212,0.03) 0%, transparent 60%);
+        }
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+        }
+        .p1 { top: 10%; left: 15%; width: 300px; height: 300px; background: rgba(0, 120, 212, 0.08); animation: float 12s infinite ease-in-out; }
+        .p2 { top: 40%; right: 10%; width: 400px; height: 400px; background: rgba(147, 51, 234, 0.04); animation: float 18s infinite ease-in-out reverse; }
+        .p3 { bottom: 0%; left: 30%; width: 250px; height: 250px; background: rgba(0, 120, 212, 0.06); animation: float 15s infinite ease-in-out 3s; }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -30px) scale(1.05); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        /* 3. Glass Card Premium (para a caixa de ação) */
+        .glass-card-premium {
+            background: var(--mica);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--mica-border);
+            /* Glow sutil azul se dark mode */
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.03);
+            transition: all 0.5s ease;
+        }
+        
+        [data-theme="dark"] .glass-card-premium {
+            box-shadow: 0 0 40px rgba(0, 120, 212, 0.05), inset 0 0 0 1px rgba(255,255,255,0.03);
+        }
+
+        /* 4. Loader do botão gerador */
         .win-loader {
-            width: 24px;
-            height: 24px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
             border-top: 3px solid #fff;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .glass-shadow {
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6),
-                inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        /* Substituindo a fonte principal do título */
+        .font-sync {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.01em;
         }
     </style>
+    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
@@ -43,240 +130,292 @@
     <script src="js/theme.js"></script>
 </head>
 
-<body class="font-segoe selection:bg-win-accent selection:text-white min-h-screen overflow-x-hidden">
+<body class="font-segoe selection:bg-win-accent selection:text-white min-h-screen overflow-x-hidden relative">
 
+    <!-- Splash Screen (Animação Intro) -->
+    <div id="splash-screen">
+        <div class="splash-logo">Lyncro<span>.</span></div>
+    </div>
+    <script>
+        // Remove tela de splash suavemente após 1.8 segundos
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                splash.style.opacity = '0';
+                splash.style.visibility = 'hidden';
+                setTimeout(() => splash.remove(), 800);
+            }, 1800);
+        });
+    </script>
+
+    <!-- Fundo Ambivalente Cinematográfico -->
+    <div class="ambient-glow">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+    </div>
 
     <!-- Header / Logo -->
-    <header id="main-header" class="fixed top-0 left-0 w-full px-4 py-3 md:px-8 md:py-4 z-50 animate-reveal">
+    <header id="main-header" class="fixed top-0 left-0 w-full px-4 py-4 md:px-8 z-50 animate-reveal delay-1">
         <div class="max-w-7xl mx-auto flex flex-nowrap items-center justify-between gap-2 min-w-0">
-            <h1
-                class="text-xl md:text-2xl font-logo font-[600] italic tracking-tight select-none leading-none shrink-0" style="color:var(--text)">
-                Lyncro</h1>
+            <h2 class="text-2xl md:text-3xl font-logo font-black italic tracking-tight select-none leading-none shrink-0" style="color:var(--text)">
+                Lyncro
+            </h2>
 
-            <div class="flex items-center gap-2 md:gap-3 flex-nowrap justify-end min-w-0">
+            <div class="flex items-center gap-4 flex-nowrap justify-end min-w-0">
                 <!-- Perfil do Host / Logout (Injetado via JS) -->
                 <div id="host-profile" style="display:none;"
-                    class="flex items-center gap-2 bg-win-accent/10 border border-win-accent/20 px-2.5 py-1.5 rounded-lg min-w-0 shrink">
-                    <i class="ph ph-user-circle text-base text-win-accent shrink-0"></i>
-                    <div class="flex flex-col min-w-0">
-                        <span id="user-email" class="text-[9px] font-bold theme-text truncate max-w-[110px]">...</span>
+                    class="flex items-center gap-2 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-xl min-w-0 shrink transition-colors hover:bg-win-accent/20">
+                    <i class="ph ph-user-circle text-lg text-win-accent shrink-0"></i>
+                    <div class="flex flex-col min-w-0 pt-0.5">
+                        <span id="user-email" class="text-[10px] font-bold theme-text truncate max-w-[120px] leading-tight">...</span>
                         <button onclick="window.LYNCRO_AUTH.logout()"
-                            class="text-[8px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors text-left">Sair</button>
+                            class="text-[9px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors text-left leading-none mt-0.5">Sair</button>
                     </div>
                 </div>
 
                 <!-- Botão Toggle de Tema -->
                 <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
-                    class="theme-toggle-btn shrink-0" aria-label="Alternar tema claro/escuro">
+                    class="theme-toggle-btn shrink-0 rounded-xl" aria-label="Alternar tema claro/escuro">
                     <i class="ph ph-moon"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <main
-        class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-20 lg:pt-16 max-w-7xl mx-auto gap-10 lg:gap-16 xl:gap-24">
+    <main class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-24 max-w-7xl mx-auto gap-12 lg:gap-16 xl:gap-24 relative z-10">
 
-        <!-- Lado Esquerdo: Narrativa -->
+        <!-- Lado Esquerdo: Narrativa (SEO Otimizado) -->
         <section id="narrative-section" class="flex-1 text-center lg:text-left">
-            <div class="animate-reveal delay-1">
-                <h2
-                    class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-segoe-black leading-tight mb-5 uppercase tracking-tight theme-text">
+            <div class="animate-reveal delay-2">
+                <span class="text-win-accent text-xs font-bold tracking-[0.2em] uppercase mb-4 block opacity-80">Streaming de Elite</span>
+                <h1 class="font-sync text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[0.9] mb-6 uppercase theme-text italic">
                     Sincronia Total.<br>
-                    <span class="text-win-accent">Latência Zero.</span>
-                </h2>
-                <p class="text-lg lg:text-xl theme-text-secondary mb-10 max-w-xl leading-relaxed">
-                    A ponte definitiva entre seus convidados e o seu OBS. Gere links de <span
-                        class="text-white font-bold">Clean Feed</span> instantâneos e transmita com
-                    qualidade de estúdio
-                    direto pelo navegador.
+                    <span class="text-win-accent not-italic">Latência Zero.</span>
+                </h1>
+                <p class="text-lg lg:text-xl theme-text-secondary mb-12 max-w-xl leading-relaxed font-segoe">
+                    A ponte definitiva entre seus convidados e o seu OBS. Gere links de <span class="theme-text font-bold">Clean Feed</span> instantâneos e transmita com qualidade de estúdio direto pelo navegador.
                 </p>
             </div>
 
             <!-- Pilares -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-80 animate-reveal delay-2">
-                <div class="flex flex-col items-center lg:items-start gap-2">
-                    <i class="ph ph-broadcast text-win-accent text-3xl"></i>
-                    <h3 class="font-bold text-xs uppercase tracking-widest theme-text">Clean Feed Nativo</h3>
-                    <p class="text-[11px] theme-text-secondary">Vídeo e áudio puros para sua Fonte de Navegador.</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 animate-reveal delay-3">
+                <div class="flex flex-col items-center lg:items-start gap-3 p-4 rounded-xl border border-white/5 bg-white/5 hover:border-win-accent/30 transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-win-accent/10 flex items-center justify-center border border-win-accent/20">
+                        <i class="ph ph-broadcast text-win-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xs uppercase tracking-widest theme-text mb-1">Clean Feed Nativo</h3>
+                        <p class="text-[11px] theme-text-secondary leading-relaxed">Vídeo e áudio puros para sua Fonte de Navegador.</p>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center lg:items-start gap-2 border-l border-white/5 pl-0 lg:pl-4">
-                    <i class="ph ph-device-mobile text-win-accent text-3xl"></i>
-                    <h3 class="font-bold text-xs uppercase tracking-widest theme-text">Mobile-First</h3>
-                    <p class="text-[11px] theme-text-secondary">Seu convidado entra pelo celular com um clique.</p>
+                <div class="flex flex-col items-center lg:items-start gap-3 p-4 rounded-xl border border-white/5 bg-white/5 hover:border-win-accent/30 transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-win-accent/10 flex items-center justify-center border border-win-accent/20">
+                        <i class="ph ph-device-mobile text-win-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xs uppercase tracking-widest theme-text mb-1">Mobile-First</h3>
+                        <p class="text-[11px] theme-text-secondary leading-relaxed">Seu convidado entra pelo celular com um clique.</p>
+                    </div>
                 </div>
-                <div class="flex flex-col items-center lg:items-start gap-2 border-l border-white/5 pl-0 lg:pl-4">
-                    <i class="ph ph-gauge text-win-accent text-3xl"></i>
-                    <h3 class="font-bold text-xs uppercase tracking-widest theme-text">Produção Integrada</h3>
-                    <p class="text-[11px] theme-text-secondary">Controle Lower Thirds e chat em tempo real.</p>
+                <div class="flex flex-col items-center lg:items-start gap-3 p-4 rounded-xl border border-white/5 bg-white/5 hover:border-win-accent/30 transition-colors">
+                    <div class="w-10 h-10 rounded-lg bg-win-accent/10 flex items-center justify-center border border-win-accent/20">
+                        <i class="ph ph-faders text-win-accent text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-xs uppercase tracking-widest theme-text mb-1">Produção Integrada</h3>
+                        <p class="text-[11px] theme-text-secondary leading-relaxed">Controle Lower Thirds e chat em tempo real.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Lado Direito: Ação (Glass Box) -->
-        <section class="w-full max-w-sm md:max-w-md relative animate-reveal delay-3 shrink-0">
-            <div id="card-lobby"
-                class="mica-effect glass-shadow p-2 rounded-2xl overflow-hidden transition-all duration-500 ease-in-out">
+        <!-- Lado Direito: Ação (Glass Box Premium) -->
+        <section class="w-full max-w-sm md:max-w-md relative animate-reveal delay-4 shrink-0">
+            <!-- Glow effect behind the card for cinematic look -->
+            <div class="absolute -inset-1 bg-win-accent/20 rounded-3xl blur-xl opacity-50 z-0 hidden lg:block"></div>
+            
+            <div id="card-lobby" class="glass-card-premium p-2 rounded-2xl overflow-hidden transition-all duration-500 ease-in-out relative z-10">
                 <!-- Tabs -->
-                <div id="card-tabs" class="flex border-b border-win-border">
+                <nav id="card-tabs" class="flex border-b border-win-border">
                     <button id="tab-create" onclick="switchTab('create')"
-                        class="flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active transition-all">
+                        class="flex-1 py-4 text-xs font-black uppercase tracking-widest tab-active transition-all outline-none">
                         Criar Sala
                     </button>
                     <button id="tab-join" onclick="switchTab('join')"
-                        class="flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-inactive transition-all">
+                        class="flex-1 py-4 text-xs font-black uppercase tracking-widest tab-inactive transition-all outline-none">
                         Entrar
                     </button>
-                </div>
+                </nav>
 
                 <div class="p-6 pt-8 md:p-8 md:pt-10">
                     <!-- Aba Criar Sala -->
                     <div id="panel-create" class="space-y-6">
                         <!-- Estado Autenticado: Formulário -->
                         <div id="state-auth" class="hidden space-y-6">
-                            <h3 class="font-segoe-black text-xl mb-4 tracking-tighter uppercase theme-text">
-                                CRIAR NOVA SALA</h3>
+                            <h3 class="font-sync text-2xl mb-2 tracking-tight uppercase theme-text font-black text-center lg:text-left">
+                                INICIAR SESSÃO
+                            </h3>
                             <div class="space-y-5">
-                                <div class="space-y-1.5">
-                                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">ID
-                                        da Sessão</label>
-                                    <input type="text" id="hostRoomId" placeholder="Ex: podcast-semanal"
-                                        class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400"
-                                        oninput="clearFieldError('err-create-room')">
-                                    <p id="err-create-room" class="hidden text-[11px] text-red-400 font-semibold ml-1 flex items-center gap-1">
+                                <div class="space-y-1.5 focus-within-glow">
+                                    <label class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">ID da Sessão</label>
+                                    <div class="relative">
+                                        <i class="ph ph-hash absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
+                                        <input type="text" id="hostRoomId" placeholder="Ex: podcast-semanal"
+                                            class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
+                                            oninput="clearFieldError('err-create-room')">
+                                    </div>
+                                    <p id="err-create-room" class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
                                         <i class="ph ph-warning-circle"></i> Informe o ID da sessão
                                     </p>
                                 </div>
                                 <div class="space-y-1.5">
-                                    <label
-                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Senha
-                                        de Acesso (Opcional)</label>
-                                    <input type="password" id="roomPassword" placeholder="••••••••"
-                                        class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400">
+                                    <label class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Senha de Acesso <span class="text-gray-500">(Opcional)</span></label>
+                                    <div class="relative">
+                                        <i class="ph ph-lock-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
+                                        <input type="password" id="roomPassword" placeholder="••••••••"
+                                            class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none">
+                                    </div>
                                 </div>
                                 <div class="space-y-1.5">
-                                    <label
-                                        class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Seu
-                                        Nome</label>
-                                    <input type="text" id="userNameHost" placeholder="Nome do Host"
-                                        class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400"
-                                        oninput="clearFieldError('err-create-name')">
-                                    <p id="err-create-name" class="hidden text-[11px] text-red-400 font-semibold ml-1 flex items-center gap-1">
+                                    <label class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Nome do Produtor</label>
+                                    <div class="relative">
+                                        <i class="ph ph-user-circle absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
+                                        <input type="text" id="userNameHost" placeholder="Como quer ser chamado?"
+                                            class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
+                                            oninput="clearFieldError('err-create-name')">
+                                    </div>
+                                    <p id="err-create-name" class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
                                         <i class="ph ph-warning-circle"></i> Informe seu nome
                                     </p>
                                 </div>
                                 <button onclick="handleCreateRoom()" id="btn-create"
-                                    class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
-                                    <span id="btn-create-text">Gerar Acesso</span>
+                                    class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/30 transition-all flex items-center justify-center gap-3 active:scale-[0.98] mt-2">
+                                    <span id="btn-create-text">GERAR ACESSO</span>
                                     <div id="btn-create-loader" class="win-loader hidden"></div>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Estado Não Autenticado: Botão de Login -->
-                        <div id="state-no-auth" class="space-y-6 py-4 text-center">
-                            <i
-                                class="ph ph-identification-card text-5xl text-win-accent opacity-50 mb-4 inline-block"></i>
-                            <h3 class="font-segoe-black text-xl tracking-tighter uppercase theme-text">
-                                Portaria do Host</h3>
-                            <p class="text-sm theme-text-secondary leading-relaxed mb-6">Esta área é
-                                reservada para produtores. Por favor, identifique-se para começar a gerenciar sua
-                                transmissão.</p>
+                        <div id="state-no-auth" class="space-y-6 py-6 text-center">
+                            <div class="w-20 h-20 mx-auto bg-win-accent/10 rounded-full flex items-center justify-center mb-6 border border-win-accent/20">
+                                <i class="ph ph-identification-badge text-4xl text-win-accent opacity-80"></i>
+                            </div>
+                            <h3 class="font-sync text-2xl tracking-tight uppercase theme-text font-black">
+                                Portaria do Host
+                            </h3>
+                            <p class="text-sm theme-text-secondary leading-relaxed mb-6 px-4">
+                                Esta área é reservada para produtores. Identifique-se para gerenciar sua transmissão com qualidade de estúdio.
+                            </p>
                             <button onclick="window.location.href='login.html'"
-                                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all active:scale-[0.98]">
-                                Identificar-se agora
+                                class="w-full border-2 border-win-accent bg-win-accent/10 hover:bg-win-accent text-win-accent hover:text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] transition-all active:scale-[0.98]">
+                                IDENTIFICAR-SE AGORA
                             </button>
                         </div>
 
                         <!-- Estado 2: Sucesso (Link Gerado) -->
                         <div id="state-success"
                             class="absolute top-0 w-full transition-all duration-500 ease-in-out opacity-0 translate-y-10 pointer-events-none pb-8 pr-16 box-content">
-                            <h3 class="font-segoe-black text-xl mb-4 tracking-tighter text-win-accent uppercase">SALA
-                                PRONTA!</h3>
+                            
+                            <div class="flex items-center gap-3 mb-6">
+                                <i class="ph ph-check-circle text-green-500 text-3xl"></i>
+                                <h3 class="font-sync text-2xl tracking-tighter text-win-accent uppercase font-black">SALA PRONTA!</h3>
+                            </div>
 
-                            <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2">Link do
-                                Painel (Host)</p>
-                            <div class="flex gap-2 mb-8">
+                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">Link do Painel (Host)</p>
+                            <div class="flex gap-2 mb-8 bg-black/20 p-1.5 rounded-xl border border-win-border">
                                 <input type="text" id="invite-link-input" readonly
-                                    class="flex-1 px-4 py-4 rounded-win bg-black/40 border border-win-border text-xs text-gray-300 outline-none">
+                                    class="flex-1 px-3 py-3 rounded-lg bg-transparent text-xs text-gray-300 outline-none font-mono">
                                 <button id="btn-copy-link" onclick="copyInviteLink()"
-                                    class="px-5 bg-white/10 hover:bg-white/20 border border-win-border rounded-win transition-all">
+                                    class="px-5 bg-win-accent/20 hover:bg-win-accent/40 text-win-accent border border-win-accent/30 rounded-lg transition-all flex items-center justify-center">
                                     <i id="copy-icon" class="ph ph-copy text-lg"></i>
                                 </button>
                             </div>
 
                             <button onclick="goToHost()"
-                                class="w-full border-2 border-win-accent text-win-accent hover:bg-win-accent hover:text-white py-4 rounded-win font-segoe-black text-xs uppercase tracking-widest shadow-lg transition-all active:scale-[0.98]">
-                                ENTRAR NO DASHBOARD
+                                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-black py-5 rounded-xl text-xs uppercase tracking-widest shadow-lg shadow-win-accent/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
+                                ENTRAR NO DASHBOARD <i class="ph ph-arrow-right font-bold text-base"></i>
                             </button>
                         </div>
                     </div>
 
                     <!-- Aba Entrar na Sala -->
-                    <div id="panel-join" class="hidden space-y-5">
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">ID da
-                                Sala</label>
-                            <input type="text" id="joinRoomId" placeholder="ID fornecido pelo host"
-                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400 dark:placeholder:text-gray-700"
-                                oninput="clearFieldError('err-join-room')">
-                            <p id="err-join-room" class="hidden text-[11px] text-red-400 font-semibold ml-1 flex items-center gap-1">
-                                <i class="ph ph-warning-circle"></i> <span id="err-join-room-msg">Informe o ID da sala</span>
-                            </p>
+                    <div id="panel-join" class="hidden space-y-6">
+                        <div class="text-center mb-6">
+                            <h3 class="font-sync text-2xl tracking-tight uppercase theme-text font-black">
+                                ACESSAR SALA
+                            </h3>
+                            <p class="text-xs theme-text-secondary mt-2">Conecte-se instantaneamente usando seu celular ou navegador.</p>
                         </div>
-                        <div class="space-y-1.5">
-                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Seu
-                                Nome</label>
-                            <input type="text" id="userNameGuest" placeholder="Como quer ser chamado?"
-                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400 dark:placeholder:text-gray-700"
-                                oninput="clearFieldError('err-join-name')">
-                            <p id="err-join-name" class="hidden text-[11px] text-red-400 font-semibold ml-1 flex items-center gap-1">
-                                <i class="ph ph-warning-circle"></i> Informe seu nome
-                            </p>
+                        
+                        <div class="space-y-5">
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">ID da Sala</label>
+                                <div class="relative">
+                                    <i class="ph ph-hash absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
+                                    <input type="text" id="joinRoomId" placeholder="ID fornecido pelo produtor"
+                                        class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
+                                        oninput="clearFieldError('err-join-room')">
+                                </div>
+                                <p id="err-join-room" class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
+                                    <i class="ph ph-warning-circle"></i> <span id="err-join-room-msg">Informe o ID da sala</span>
+                                </p>
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Seu Nome</label>
+                                <div class="relative">
+                                    <i class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
+                                    <input type="text" id="userNameGuest" placeholder="Como quer ser chamado na live?"
+                                        class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
+                                        oninput="clearFieldError('err-join-name')">
+                                </div>
+                                <p id="err-join-name" class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
+                                    <i class="ph ph-warning-circle"></i> Informe seu nome
+                                </p>
+                            </div>
+                            <button onclick="handleJoinRoom()"
+                                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/30 transition-all active:scale-[0.98] mt-4 flex items-center justify-center gap-2">
+                                <i class="ph ph-video-camera font-bold text-base"></i> ACESSAR SESSÃO
+                            </button>
                         </div>
-                        <button onclick="handleJoinRoom()"
-                            class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all active:scale-[0.98] mt-2">
-                            Acessar Sessão
-                        </button>
                     </div>
                 </div>
             </div>
 
-            <!-- Mobile Focus Badge -->
-            <div
-                class="mt-8 flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-win-accent/5 border border-win-accent/10 text-gray-400 animate-reveal delay-4">
-                <i class="ph ph-rss-simple text-win-accent text-xl animate-pulse"></i>
+            <!-- Mobile Focus Badge (Reformulado) -->
+            <div class="mt-8 flex items-center justify-center gap-4 px-6 py-4 rounded-2xl bg-win-card border border-win-border shadow-sm animate-reveal delay-5">
+                <div class="w-10 h-10 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0">
+                    <i class="ph ph-rss-simple text-win-accent text-xl animate-pulse"></i>
+                </div>
                 <div class="text-left">
-                    <p class="text-[10px] font-bold uppercase tracking-widest text-win-accent">Conectividade Mobile
-                        Instantânea</p>
-                    <p class="text-[9px] text-gray-400">Seus convidados atendem pelo celular sem baixar nada.</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest text-win-accent mb-0.5">Conectividade Instantânea</p>
+                    <p class="text-[10px] text-gray-400 font-medium">Convidados atendem pelo celular sem baixar nenhum app.</p>
                 </div>
             </div>
         </section>
     </main>
 
     <!-- Footer -->
-    <footer id="main-footer" class="fixed bottom-0 left-0 w-full p-8 hidden md:block">
-        <div class="max-w-7xl mx-auto flex items-center justify-between opacity-30">
-            <div class="flex gap-8">
-                <div class="flex items-center gap-2">
+    <footer id="main-footer" class="fixed bottom-0 left-0 w-full p-6 lg:p-8 hidden md:block z-10 pointer-events-none">
+        <div class="max-w-7xl mx-auto flex items-center justify-between opacity-40">
+            <div class="flex gap-8 pointer-events-auto">
+                <div class="flex items-center gap-2 text-gray-400">
                     <i class="ph ph-device-mobile"></i>
                     <span class="text-[9px] font-bold uppercase tracking-widest">Mobile Ready</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 text-gray-400">
                     <i class="ph ph-monitor-play"></i>
                     <span class="text-[9px] font-bold uppercase tracking-widest">OBS Optimized</span>
                 </div>
             </div>
-            <span class="text-[9px] font-bold uppercase tracking-widest font-segoe-black tracking-[0.2em]">LYNCRO CORE
-                v3.0</span>
+            <span class="text-[9px] font-black uppercase font-sync tracking-[0.3em] theme-text">LYNCRO CORE v3.0</span>
         </div>
     </footer>
 
+    <!-- Lógica JavaScript (Toda Preservada) -->
     <script>
         let currentRoomData = null;
-
-
 
         function switchTab(tab) {
             const btnCreate = document.getElementById('tab-create');
@@ -285,13 +424,13 @@
             const panelJoin = document.getElementById('panel-join');
 
             if (tab === 'create') {
-                btnCreate.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active transition-all';
-                btnJoin.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-inactive transition-all';
+                btnCreate.className = 'flex-1 py-4 text-xs font-black uppercase tracking-widest tab-active transition-all outline-none';
+                btnJoin.className = 'flex-1 py-4 text-xs font-black uppercase tracking-widest tab-inactive transition-all outline-none';
                 panelCreate.classList.remove('hidden');
                 panelJoin.classList.add('hidden');
             } else {
-                btnCreate.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-inactive transition-all';
-                btnJoin.className = 'flex-1 py-4 text-xs font-bold uppercase tracking-widest tab-active transition-all';
+                btnCreate.className = 'flex-1 py-4 text-xs font-black uppercase tracking-widest tab-inactive transition-all outline-none';
+                btnJoin.className = 'flex-1 py-4 text-xs font-black uppercase tracking-widest tab-active transition-all outline-none';
                 panelCreate.classList.add('hidden');
                 panelJoin.classList.remove('hidden');
             }
@@ -337,7 +476,6 @@
                 const inviteUrl = `${window.location.origin}/index.html?room=${data.roomId}`;
                 document.getElementById('invite-link-input').value = inviteUrl;
 
-                // Micro-interação de Sucesso
                 triggerSuccessState();
 
             } catch (err) {
@@ -350,24 +488,19 @@
         }
 
         function triggerSuccessState() {
-            const card = document.getElementById('card-lobby');
             const cardTabs = document.getElementById('card-tabs');
             const stateInput = document.getElementById('state-auth');
             const stateSuccess = document.getElementById('state-success');
 
-            // 1. Inicia saída do formulário
             stateInput.classList.remove('opacity-100', 'translate-y-0');
             stateInput.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
 
-            // 2. Transição das abas (esconder para dar foco ao sucesso)
             cardTabs.style.maxHeight = '0px';
             cardTabs.style.opacity = '0';
             cardTabs.style.pointerEvents = 'none';
 
-            // 3. Após delay, troca fluxos
             setTimeout(() => {
                 stateInput.classList.add('hidden');
-
                 stateSuccess.classList.remove('absolute', 'pointer-events-none');
                 stateSuccess.classList.add('relative', 'opacity-100', 'translate-y-0');
             }, 300);
@@ -392,26 +525,26 @@
             if (!name) { showFieldError('err-join-name'); valid = false; }
             if (!valid) return;
 
-            // Verificar se a sala existe antes de redirecionar
             const btn = document.querySelector('#panel-join button[onclick]');
-            const originalText = btn.textContent;
+            const originalTextHTML = btn.innerHTML;
             btn.disabled = true;
-            btn.textContent = 'Verificando...';
+            btn.innerHTML = 'Verificando... <div class="win-loader ml-2 inline-block"></div>';
 
             try {
                 const res = await fetch(`/api/rooms/${encodeURIComponent(room)}`);
                 if (!res.ok) {
                     document.getElementById('err-join-room-msg').textContent = 'Sala não encontrada. Verifique o ID.';
                     showFieldError('err-join-room');
+                    btn.disabled = false;
+                    btn.innerHTML = originalTextHTML;
                     return;
                 }
             } catch {
                 document.getElementById('err-join-room-msg').textContent = 'Erro de conexão. Tente novamente.';
                 showFieldError('err-join-room');
-                return;
-            } finally {
                 btn.disabled = false;
-                btn.textContent = originalText;
+                btn.innerHTML = originalTextHTML;
+                return;
             }
 
             localStorage.setItem('sv_last_name', name);
@@ -424,15 +557,14 @@
             const icon = document.getElementById('copy-icon');
 
             navigator.clipboard.writeText(input.value).then(() => {
-                // Feedback Tátil
-                btn.classList.replace('bg-white/10', 'bg-win-accent/20');
-                btn.classList.add('border-win-accent');
-                icon.className = 'ph ph-check-circle text-lg text-win-accent';
+                btn.classList.add('bg-green-500/20', 'text-green-500', 'border-green-500/50');
+                btn.classList.remove('bg-win-accent/20', 'text-win-accent', 'border-win-accent/30');
+                icon.className = 'ph ph-check-circle text-lg';
 
                 setTimeout(() => {
-                    btn.classList.replace('bg-win-accent/20', 'bg-white/10');
-                    btn.classList.remove('border-win-accent');
-                    icon.className = 'ph ph-copy text-lg text-white';
+                    btn.classList.remove('bg-green-500/20', 'text-green-500', 'border-green-500/50');
+                    btn.classList.add('bg-win-accent/20', 'text-win-accent', 'border-win-accent/30');
+                    icon.className = 'ph ph-copy text-lg';
                 }, 2000);
             });
         }
@@ -445,36 +577,32 @@
 
         const urlParams = new URLSearchParams(window.location.search);
         const prefillRoom = urlParams.get('room');
+        
         if (prefillRoom) {
-            // Modo "Link de Convidado": Focar apenas no card
             const narrative = document.getElementById('narrative-section');
-            const headerExtra = document.getElementById('header-extra');
             const footer = document.getElementById('main-footer');
-            const mobileBadge = document.querySelector('.mt-8.flex.items-center.justify-center'); // O badge mobile
+            const mobileBadge = document.querySelector('.mt-8'); // Badge mobile
 
             if (narrative) narrative.classList.add('hidden');
-            if (headerExtra) headerExtra.classList.add('hidden');
             if (footer) footer.classList.add('hidden');
             if (mobileBadge) mobileBadge.classList.add('hidden');
 
-            // Garantir que o header seja visível imediatamente no modo link
             const mainHeader = document.getElementById('main-header');
             if (mainHeader) {
                 mainHeader.classList.remove('opacity-0');
                 mainHeader.style.opacity = '1';
+                mainHeader.style.animation = 'none'; // Desabilita animação normal
             }
 
-            // Centralizar o Card
             const mainContent = document.querySelector('main');
             if (mainContent) {
-                mainContent.className = "min-h-screen flex items-center justify-center p-6";
-                mainContent.style.paddingTop = "env(safe-area-inset-top)"; // Suporte para iPhone
+                mainContent.className = "min-h-screen flex items-center justify-center p-6 relative z-10";
+                mainContent.style.paddingTop = "env(safe-area-inset-top)";
             }
 
             switchTab('join');
             document.getElementById('joinRoomId').value = prefillRoom;
 
-            // Scroll suave automático para o card
             setTimeout(() => {
                 const card = document.getElementById('card-lobby');
                 if (card) {
@@ -483,7 +611,6 @@
             }, 500);
         }
 
-        // Gerenciamento de Sessão e UI de Autenticação
         window.addEventListener('supabase-ready', (e) => {
             const session = e.detail.session;
             const stateAuth = document.getElementById('state-auth');
@@ -509,9 +636,7 @@
             document.getElementById('userNameGuest').value = lastName;
         }
 
-    </script>
-    <script>
-        // Limpar Service Workers antigos ao visitar a Home (resolve cache travado no mobile)
+        // Limpar Service Workers na Home (resolve cache preso no mobile)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(regs => {
                 regs.forEach(reg => reg.unregister());
@@ -522,5 +647,4 @@
         }
     </script>
 </body>
-
 </html>
