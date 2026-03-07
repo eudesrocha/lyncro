@@ -177,19 +177,13 @@
     class="min-h-screen dark:bg-win-bg bg-white dark:text-gray-100 text-gray-900 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
 
     <header class="flex justify-between items-center mb-8 border-b border-win-border pb-5">
-        <div class="flex items-center gap-4">
-            <div class="flex flex-col">
+        <!-- Esquerda: Logo + Controles gerais -->
+        <div class="flex items-center gap-6">
+            <div class="flex items-baseline gap-2.5">
                 <h1
                     class="text-3xl font-segoe-black font-[900] italic tracking-[-0.02em] text-white leading-none uppercase">
                     LYNCRO</h1>
-                <span class="text-[10px] font-bold text-win-accent tracking-[0.3em] mt-1 uppercase">Host
-                    Monitor</span>
-            </div>
-        </div>
-
-        <div class="flex gap-4 items-center">
-            <div id="room-id-display"
-                class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-1.5 rounded-sm border border-win-accent/20 shadow-inner">
+                <span class="text-sm font-bold text-win-accent tracking-[0.2em] uppercase">Host Monitor</span>
             </div>
 
             <div class="flex items-center gap-1 bg-white/5 border border-win-border p-1 rounded-win">
@@ -204,25 +198,30 @@
                     <i class="ph ph-camera text-sm text-win-accent group-hover:text-white transition-colors"></i>
                     Lyncro Cam
                 </button>
-                <div class="w-px h-4 bg-win-border mx-1"></div>
-                <button onclick="copyInviteLink()"
-                    class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
-                    <i class="ph ph-link text-sm text-win-accent group-hover:text-white transition-colors"></i>
-                    Convidar
-                </button>
             </div>
 
             <select id="return-audio-select"
                 class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-32 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
                 <option value="">Sem Retorno</option>
-                <!-- Preenchido via JS -->
             </select>
         </div>
 
-        <button onclick="window.location.href='index.html'"
-            class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win bg-red-600/5 hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
-            Encerrar
-        </button>
+        <!-- Direita: Convidar + Sala + Encerrar -->
+        <div class="flex items-center gap-3">
+            <button onclick="copyInviteLink()"
+                class="flex items-center gap-2 bg-white/5 border border-win-border hover:bg-win-accent hover:text-white hover:border-win-accent px-4 py-2 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
+                <i class="ph ph-link text-sm text-win-accent group-hover:text-white transition-colors"></i>
+                Convidar
+            </button>
+
+            <div id="room-id-display"
+                class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-2 rounded-win border border-win-accent/20 shadow-inner">
+            </div>
+
+            <button onclick="window.location.href='index.html'"
+                class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
+                Encerrar
+            </button>
         </div>
     </header>
 
