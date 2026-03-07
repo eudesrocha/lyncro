@@ -17,6 +17,18 @@ let currentVbMode = 'none';
 let currentVbImage = null;
 let currentVbBtnId = 'vb-btn-none';
 
+// === Speaker View State ===
+let pinnedParticipantId = null; // ID do participante fixado manualmente
+let activeSpeakerId = null; // ID do speaker ativo detectado automaticamente
+let remoteStreams = new Map(); // targetId -> MediaStream
+let remoteNames = new Map(); // targetId -> name
+let speakerAnalyzers = new Map(); // targetId -> { analyser, dataArray, source }
+let speakerDetectionInterval = null;
+let speakerAudioCtx = null;
+const SPEAKER_THRESHOLD = 15; // Limiar mínimo de volume para considerar como "falando"
+const SPEAKER_SWITCH_DELAY = 800; // ms para trocar speaker (evita flicker)
+let lastSpeakerSwitch = 0;
+
 const preVideo = document.getElementById('pre-localVideo');
 const mainVideo = document.getElementById('localVideo');
 const tallyIndicator = document.getElementById('tally-indicator');
@@ -287,6 +299,9 @@ joinBtn.onclick = () => {
 function handleRemoteTrack(targetId, stream) {
     console.log('Receiving remote track from:', targetId, '| Tracks:', stream.getTracks().map(t => t.kind));
 
+    // Guardar referência ao stream remoto
+    remoteStreams.set(targetId, stream);
+
     const remoteContainer = document.getElementById('remote-videos');
 
     // --- Áudio: sempre tocar ---
@@ -303,27 +318,286 @@ function handleRemoteTrack(targetId, stream) {
         }
         audioEl.srcObject = stream;
         audioEl.play().catch(e => console.error('Erro ao tocar áudio remoto:', e));
+
+        // Iniciar detecção de speaker para este participante
+        setupSpeakerAnalyzer(targetId, stream);
     }
 
     // --- Vídeo: renderizar como PiP ---
     const videoTrack = stream.getVideoTracks()[0];
     if (videoTrack && remoteContainer) {
         console.log('Rendering remote video PiP from:', targetId);
-        let card = document.getElementById(`remote-card-${targetId}`);
-        if (!card) {
-            card = document.createElement('div');
-            card.id = `remote-card-${targetId}`;
-            card.className = 'relative w-36 h-24 rounded-lg overflow-hidden border border-white/20 shadow-2xl bg-black/80 backdrop-blur-sm transition-all hover:scale-105 cursor-pointer';
-            card.innerHTML = `
-                <video autoplay playsinline muted class="w-full h-full object-cover"></video>
-                <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
-                    <span class="text-[8px] font-bold uppercase tracking-widest text-white/80" id="remote-name-${targetId}">Participante</span>
-                </div>
-            `;
-            remoteContainer.appendChild(card);
+        createOrUpdatePipCard(targetId, stream);
+
+        // Se este participante está pinned, atualizar o vídeo principal
+        if (pinnedParticipantId === targetId) {
+            const pinnedVideo = document.getElementById('pinnedVideo');
+            if (pinnedVideo) pinnedVideo.srcObject = stream;
         }
-        const videoEl = card.querySelector('video');
-        videoEl.srcObject = stream;
+    }
+
+    // Iniciar detecção global de speaker se ainda não está rodando
+    startSpeakerDetection();
+}
+
+function createOrUpdatePipCard(targetId, stream) {
+    const remoteContainer = document.getElementById('remote-videos');
+    if (!remoteContainer) return;
+
+    let card = document.getElementById(`remote-card-${targetId}`);
+    if (!card) {
+        card = document.createElement('div');
+        card.id = `remote-card-${targetId}`;
+        card.className = 'relative w-36 h-24 rounded-lg overflow-hidden border-2 border-white/20 shadow-2xl bg-black/80 backdrop-blur-sm transition-all duration-300 hover:scale-105 cursor-pointer';
+        card.innerHTML = `
+            <video autoplay playsinline muted class="w-full h-full object-cover"></video>
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
+                <span class="text-[8px] font-bold uppercase tracking-widest text-white/80" id="remote-name-${targetId}">Participante</span>
+            </div>
+            <div class="absolute top-1 right-1 bg-black/50 rounded px-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <i class="ph ph-push-pin text-white text-[8px]"></i>
+            </div>
+        `;
+        // Tap/Click para fixar no main
+        card.addEventListener('click', () => pinParticipant(targetId));
+        remoteContainer.appendChild(card);
+    }
+    const videoEl = card.querySelector('video');
+    videoEl.srcObject = stream;
+    return card;
+}
+
+// === PIN / UNPIN ===
+function pinParticipant(targetId) {
+    const stream = remoteStreams.get(targetId);
+    if (!stream) return;
+
+    const pinnedVideo = document.getElementById('pinnedVideo');
+    const localVideoEl = document.getElementById('localVideo');
+    const nameOverlay = document.getElementById('main-video-name');
+    const nameText = document.getElementById('main-video-name-text');
+
+    // Se já está pinned no mesmo, desafixar
+    if (pinnedParticipantId === targetId) {
+        unpinParticipant();
+        return;
+    }
+
+    pinnedParticipantId = targetId;
+
+    // Trocar: remoto → main, local → PiP
+    pinnedVideo.srcObject = stream;
+    pinnedVideo.classList.remove('hidden');
+    localVideoEl.classList.add('hidden');
+
+    // Mostrar nome
+    const name = remoteNames.get(targetId) || 'Participante';
+    if (nameText) nameText.textContent = name;
+    if (nameOverlay) nameOverlay.classList.remove('hidden');
+
+    // Criar/mostrar self-pip (meu vídeo local como miniatura)
+    ensureSelfPip();
+
+    // Atualizar visual das cards
+    updatePipHighlights();
+
+    console.log('Pinned participant:', targetId, name);
+}
+
+function unpinParticipant() {
+    pinnedParticipantId = null;
+
+    const pinnedVideo = document.getElementById('pinnedVideo');
+    const localVideoEl = document.getElementById('localVideo');
+    const nameOverlay = document.getElementById('main-video-name');
+
+    // Voltar: local → main
+    if (pinnedVideo) {
+        pinnedVideo.classList.add('hidden');
+        pinnedVideo.srcObject = null;
+    }
+    if (localVideoEl) localVideoEl.classList.remove('hidden');
+    if (nameOverlay) nameOverlay.classList.add('hidden');
+
+    // Remover self-pip
+    removeSelfPip();
+
+    // Atualizar visuals
+    updatePipHighlights();
+
+    console.log('Unpinned. Voltando ao modo auto-speaker.');
+}
+
+// Auto-switch para speaker ativo (sem pin manual)
+function autoSwitchToSpeaker(speakerId) {
+    if (pinnedParticipantId) return; // Se tem pin manual, não auto-switch
+    if (!speakerId || speakerId === myId) return;
+
+    const stream = remoteStreams.get(speakerId);
+    if (!stream) return;
+
+    const pinnedVideo = document.getElementById('pinnedVideo');
+    const localVideoEl = document.getElementById('localVideo');
+    const nameOverlay = document.getElementById('main-video-name');
+    const nameText = document.getElementById('main-video-name-text');
+
+    // Trocar para o speaker
+    pinnedVideo.srcObject = stream;
+    pinnedVideo.classList.remove('hidden');
+    localVideoEl.classList.add('hidden');
+
+    const name = remoteNames.get(speakerId) || 'Participante';
+    if (nameText) nameText.textContent = name;
+    if (nameOverlay) {
+        nameOverlay.classList.remove('hidden');
+        // Esconder botão de unpin no modo auto
+        const unpinBtn = document.getElementById('unpin-btn');
+        if (unpinBtn) unpinBtn.classList.add('hidden');
+    }
+
+    ensureSelfPip();
+    updatePipHighlights();
+}
+
+function autoSwitchBack() {
+    if (pinnedParticipantId) return;
+
+    const pinnedVideo = document.getElementById('pinnedVideo');
+    const localVideoEl = document.getElementById('localVideo');
+    const nameOverlay = document.getElementById('main-video-name');
+
+    if (pinnedVideo) {
+        pinnedVideo.classList.add('hidden');
+        pinnedVideo.srcObject = null;
+    }
+    if (localVideoEl) localVideoEl.classList.remove('hidden');
+    if (nameOverlay) nameOverlay.classList.add('hidden');
+
+    removeSelfPip();
+    updatePipHighlights();
+}
+
+// === SELF PIP (meu vídeo local como miniatura) ===
+function ensureSelfPip() {
+    const remoteContainer = document.getElementById('remote-videos');
+    if (!remoteContainer) return;
+
+    let selfCard = document.getElementById('remote-card-self');
+    if (!selfCard) {
+        selfCard = document.createElement('div');
+        selfCard.id = 'remote-card-self';
+        selfCard.className = 'relative w-36 h-24 rounded-lg overflow-hidden border-2 shadow-2xl bg-black/80 backdrop-blur-sm transition-all duration-300 hover:scale-105 cursor-pointer pip-self-card';
+        selfCard.innerHTML = `
+            <video autoplay playsinline muted class="w-full h-full object-cover"></video>
+            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-2 py-1">
+                <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Você</span>
+            </div>
+        `;
+        selfCard.addEventListener('click', () => unpinParticipant());
+        // Inserir no topo (primeiro item)
+        remoteContainer.insertBefore(selfCard, remoteContainer.firstChild);
+    }
+    const selfVideo = selfCard.querySelector('video');
+    selfVideo.srcObject = processedStream || localStream;
+}
+
+function removeSelfPip() {
+    const selfCard = document.getElementById('remote-card-self');
+    if (selfCard) selfCard.remove();
+}
+
+// === SPEAKER DETECTION (Web Audio API) ===
+function setupSpeakerAnalyzer(targetId, stream) {
+    try {
+        if (!speakerAudioCtx) {
+            speakerAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // Limpar anterior se existir
+        if (speakerAnalyzers.has(targetId)) {
+            const old = speakerAnalyzers.get(targetId);
+            try { old.source.disconnect(); } catch (e) { }
+            speakerAnalyzers.delete(targetId);
+        }
+
+        const source = speakerAudioCtx.createMediaStreamSource(stream);
+        const analyser = speakerAudioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        analyser.smoothingTimeConstant = 0.5;
+        source.connect(analyser);
+        // NÃO conectar ao destination para evitar eco
+
+        const dataArray = new Uint8Array(analyser.frequencyBinCount);
+        speakerAnalyzers.set(targetId, { analyser, dataArray, source });
+    } catch (e) {
+        console.error('Erro ao criar speaker analyzer:', e);
+    }
+}
+
+function startSpeakerDetection() {
+    if (speakerDetectionInterval) return;
+
+    speakerDetectionInterval = setInterval(() => {
+        let maxLevel = 0;
+        let maxId = null;
+
+        speakerAnalyzers.forEach((data, targetId) => {
+            data.analyser.getByteFrequencyData(data.dataArray);
+            let sum = 0;
+            for (let i = 0; i < data.dataArray.length; i++) {
+                sum += data.dataArray[i];
+            }
+            const avg = sum / data.dataArray.length;
+
+            if (avg > SPEAKER_THRESHOLD && avg > maxLevel) {
+                maxLevel = avg;
+                maxId = targetId;
+            }
+        });
+
+        const now = Date.now();
+        if (maxId && maxId !== activeSpeakerId && (now - lastSpeakerSwitch) > SPEAKER_SWITCH_DELAY) {
+            activeSpeakerId = maxId;
+            lastSpeakerSwitch = now;
+            updatePipHighlights();
+
+            // Auto-switch para o speaker se não tem pin manual e há mais de 1 remoto
+            if (!pinnedParticipantId && remoteStreams.size > 1) {
+                autoSwitchToSpeaker(maxId);
+            }
+        } else if (!maxId && activeSpeakerId) {
+            // Ninguém falando
+            activeSpeakerId = null;
+            updatePipHighlights();
+
+            // Se tinha auto-switch ativo, voltar ao local
+            if (!pinnedParticipantId && remoteStreams.size > 1) {
+                autoSwitchBack();
+            }
+        }
+    }, 200);
+}
+
+function updatePipHighlights() {
+    // Limpar highlights de todas as cards
+    document.querySelectorAll('[id^="remote-card-"]').forEach(card => {
+        card.classList.remove('pip-active-speaker', 'pip-card-pinned');
+    });
+
+    // Highlight speaker ativo
+    if (activeSpeakerId) {
+        const speakerCard = document.getElementById(`remote-card-${activeSpeakerId}`);
+        if (speakerCard) speakerCard.classList.add('pip-active-speaker');
+    }
+
+    // Highlight card pinado
+    if (pinnedParticipantId) {
+        const pinnedCard = document.getElementById(`remote-card-${pinnedParticipantId}`);
+        if (pinnedCard) pinnedCard.classList.add('pip-card-pinned');
+
+        // Mostrar botão de unpin
+        const unpinBtn = document.getElementById('unpin-btn');
+        if (unpinBtn) unpinBtn.classList.remove('hidden');
     }
 }
 
@@ -331,8 +605,15 @@ function handleRemoteTrack(targetId, stream) {
 function updateRemoteNames(participants) {
     if (!participants) return;
     participants.forEach(p => {
+        remoteNames.set(p.id, p.name || 'Participante');
         const nameEl = document.getElementById(`remote-name-${p.id}`);
         if (nameEl) nameEl.textContent = p.name || 'Participante';
+
+        // Atualizar nome no main se este participante está em destaque
+        if ((pinnedParticipantId === p.id || activeSpeakerId === p.id)) {
+            const nameText = document.getElementById('main-video-name-text');
+            if (nameText) nameText.textContent = p.name || 'Participante';
+        }
     });
 
     // Limpar cards de participantes que saíram
@@ -341,13 +622,35 @@ function updateRemoteNames(participants) {
         const currentIds = participants.map(p => p.id);
         Array.from(remoteContainer.children).forEach(card => {
             const cardId = card.id.replace('remote-card-', '');
+            if (cardId === 'self') return; // Não limpar self-pip
             if (!currentIds.includes(cardId)) {
                 card.remove();
-                // Remover áudio também
+                // Remover áudio e stream
                 const audioEl = document.getElementById(`remote-audio-${cardId}`);
                 if (audioEl) audioEl.remove();
+                remoteStreams.delete(cardId);
+                remoteNames.delete(cardId);
+
+                // Limpar speaker analyzer
+                if (speakerAnalyzers.has(cardId)) {
+                    try { speakerAnalyzers.get(cardId).source.disconnect(); } catch (e) { }
+                    speakerAnalyzers.delete(cardId);
+                }
+
+                // Se o participante que saiu era o pinned, desafixar
+                if (pinnedParticipantId === cardId) unpinParticipant();
+                if (activeSpeakerId === cardId) {
+                    activeSpeakerId = null;
+                    if (!pinnedParticipantId) autoSwitchBack();
+                }
             }
         });
+    }
+
+    // Se só tem 1 remoto e ninguém pinado, auto-pin nele
+    if (remoteStreams.size === 1 && !pinnedParticipantId) {
+        const [onlyId] = remoteStreams.keys();
+        autoSwitchToSpeaker(onlyId);
     }
 }
 
@@ -704,6 +1007,17 @@ document.getElementById('switchCamera').onclick = async () => {
 };
 
 document.getElementById('leaveRoom').onclick = () => window.location.href = 'index.html';
+
+// === Unpin Button & Main Video Click ===
+const unpinBtn = document.getElementById('unpin-btn');
+if (unpinBtn) unpinBtn.onclick = () => unpinParticipant();
+
+const pinnedVideoEl = document.getElementById('pinnedVideo');
+if (pinnedVideoEl) {
+    pinnedVideoEl.addEventListener('click', () => {
+        if (pinnedParticipantId) unpinParticipant();
+    });
+}
 
 // 3.5. Compartilhamento de Tela (Screen Share)
 let isScreenSharing = false;
