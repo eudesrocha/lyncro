@@ -1435,44 +1435,39 @@ window.switchHostDevice = async (deviceId, kind) => {
 };
 
 // ===== SETTINGS MODAL =====
+function _settingsModalSetActive(styleKey) {
+    document.querySelectorAll('.lt-preview-btn').forEach(btn => {
+        const thumb = btn.querySelector('.lt-preview-thumb');
+        const label = btn.querySelector('.lt-preview-name');
+        const isActive = btn.dataset.lt === styleKey;
+        if (thumb) thumb.classList.toggle('lt-selected', isActive);
+        if (label) label.style.color = isActive ? '#60a5fa' : '';
+        btn.classList.toggle('lt-active', isActive);
+    });
+}
+
 window.openSettingsModal = () => {
     const modal = document.getElementById('settings-modal');
     if (!modal) return;
-    modal.classList.remove('hidden');
-
-    // Highlight active LT style
-    const current = getLTStyle();
-    document.querySelectorAll('.lt-preview-btn').forEach(btn => {
-        const isActive = btn.dataset.lt === current;
-        btn.querySelector('div').style.borderColor = isActive ? 'var(--color-win-accent, #0078d4)' : 'transparent';
-        btn.querySelector('span').style.color = isActive ? '#e5e7eb' : '';
-    });
+    modal.style.display = 'flex';
+    _settingsModalSetActive(getLTStyle());
 };
 
 window.closeSettingsModal = () => {
     const modal = document.getElementById('settings-modal');
-    if (modal) modal.classList.add('hidden');
+    if (modal) modal.style.display = 'none';
 };
 
 window.selectLTStyle = (style, btn) => {
     localStorage.setItem('lyncro_lt_style', style);
-
-    // Update visual selection
-    document.querySelectorAll('.lt-preview-btn').forEach(b => {
-        b.querySelector('div').style.borderColor = 'transparent';
-        b.querySelector('span').style.color = '';
-    });
-    if (btn) {
-        btn.querySelector('div').style.borderColor = 'var(--color-win-accent, #0078d4)';
-        btn.querySelector('span').style.color = '#e5e7eb';
-    }
+    _settingsModalSetActive(style);
     showToast(`Estilo "${style}" selecionado`, 'success');
 };
 
 // Close settings modal on backdrop click
 document.addEventListener('click', (e) => {
     const modal = document.getElementById('settings-modal');
-    if (modal && e.target === modal) modal.classList.add('hidden');
+    if (modal && e.target === modal) modal.style.display = 'none';
 });
 
 window.changeHostQuality = async (qualityKey) => {
