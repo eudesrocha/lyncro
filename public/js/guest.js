@@ -25,6 +25,7 @@ let remoteNames = new Map(); // targetId -> name
 let speakerAnalyzers = new Map(); // targetId -> { analyser, dataArray, source }
 let speakerDetectionInterval = null;
 let speakerAudioCtx = null;
+let currentFullscreenId = null; // ID de quem está sendo exibido em fullscreen (pin ou auto)
 const SPEAKER_THRESHOLD = 15; // Limiar mínimo de volume para considerar como "falando"
 const SPEAKER_SWITCH_DELAY = 800; // ms para trocar speaker (evita flicker)
 let lastSpeakerSwitch = 0;
@@ -367,6 +368,19 @@ function createOrUpdatePipCard(targetId, stream) {
     return card;
 }
 
+// === HIDE/SHOW PiP cards (evitar redundância quando está em fullscreen) ===
+function hidePipCard(targetId) {
+    if (!targetId) return;
+    const card = document.getElementById(`remote-card-${targetId}`);
+    if (card) card.classList.add('hidden');
+}
+
+function showPipCard(targetId) {
+    if (!targetId) return;
+    const card = document.getElementById(`remote-card-${targetId}`);
+    if (card) card.classList.remove('hidden');
+}
+
 // === PIN / UNPIN ===
 function pinParticipant(targetId) {
     const stream = remoteStreams.get(targetId);
@@ -383,7 +397,11 @@ function pinParticipant(targetId) {
         return;
     }
 
+    // Mostrar card do participante anteriormente em fullscreen (se houver)
+    showPipCard(pinnedParticipantId || currentFullscreenId);
+
     pinnedParticipantId = targetId;
+    currentFullscreenId = targetId;
 
     // Trocar: remoto → main, local → PiP
     pinnedVideo.srcObject = stream;
@@ -398,6 +416,9 @@ function pinParticipant(targetId) {
     // Criar/mostrar self-pip (meu vídeo local como miniatura)
     ensureSelfPip();
 
+    // Esconder PiP card de quem está em fullscreen
+    hidePipCard(targetId);
+
     // Atualizar visual das cards
     updatePipHighlights();
 
@@ -405,7 +426,9 @@ function pinParticipant(targetId) {
 }
 
 function unpinParticipant() {
+    const previousId = pinnedParticipantId || currentFullscreenId;
     pinnedParticipantId = null;
+    currentFullscreenId = null;
 
     const pinnedVideo = document.getElementById('pinnedVideo');
     const localVideoEl = document.getElementById('localVideo');
@@ -418,6 +441,9 @@ function unpinParticipant() {
     }
     if (localVideoEl) localVideoEl.classList.remove('hidden');
     if (nameOverlay) nameOverlay.classList.add('hidden');
+
+    // Mostrar PiP card de quem saiu do fullscreen
+    showPipCard(previousId);
 
     // Remover self-pip
     removeSelfPip();
@@ -441,6 +467,11 @@ function autoSwitchToSpeaker(speakerId) {
     const nameOverlay = document.getElementById('main-video-name');
     const nameText = document.getElementById('main-video-name-text');
 
+    // Mostrar card do anterior
+    showPipCard(currentFullscreenId);
+
+    currentFullscreenId = speakerId;
+
     // Trocar para o speaker
     pinnedVideo.srcObject = stream;
     pinnedVideo.classList.remove('hidden');
@@ -455,12 +486,18 @@ function autoSwitchToSpeaker(speakerId) {
         if (unpinBtn) unpinBtn.classList.add('hidden');
     }
 
+    // Esconder PiP de quem está em fullscreen
+    hidePipCard(speakerId);
+
     ensureSelfPip();
     updatePipHighlights();
 }
 
 function autoSwitchBack() {
     if (pinnedParticipantId) return;
+
+    const previousId = currentFullscreenId;
+    currentFullscreenId = null;
 
     const pinnedVideo = document.getElementById('pinnedVideo');
     const localVideoEl = document.getElementById('localVideo');
@@ -472,6 +509,9 @@ function autoSwitchBack() {
     }
     if (localVideoEl) localVideoEl.classList.remove('hidden');
     if (nameOverlay) nameOverlay.classList.add('hidden');
+
+    // Mostrar PiP de quem saiu do fullscreen
+    showPipCard(previousId);
 
     removeSelfPip();
     updatePipHighlights();
