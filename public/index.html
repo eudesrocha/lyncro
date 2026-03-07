@@ -67,8 +67,9 @@
             background: linear-gradient(to right, #ffffff 50%, transparent 50%);
             background-size: 200% 100%;
             background-position: 100% 0;
+            background-clip: text;
             -webkit-background-clip: text;
-            animation: textReveal 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.2s;
+            animation: textReveal 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.1s;
             letter-spacing: -0.02em;
         }
 
@@ -78,7 +79,7 @@
             -webkit-text-stroke: 0;
             background: none;
             opacity: 0;
-            animation: dotFadeIn 0.5s forwards 1.4s;
+            animation: dotFadeIn 0.35s forwards 0.9s;
         }
 
         @keyframes textReveal {
@@ -184,28 +185,46 @@
         }
 
         /* 4. Carrossel de Funcionalidades */
+        .features-carousel-outer {
+            margin-top: 2rem;
+            width: 100%;
+        }
+
         .features-carousel-container {
             position: relative;
             width: 100%;
+            height: 120px;
             overflow: hidden;
-            margin-top: 2rem;
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+
+        @media (min-width: 1024px) {
+            .features-carousel-container {
+                height: 130px;
+            }
         }
 
         .features-track {
             display: flex;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
-            width: 1000%;
-            /* 10 features = 1000% */
+            flex-direction: column;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.3, 1);
+            height: 1000%;
+            /* 10 features = 1000% altura */
+            width: 100%;
         }
 
         .feature-slide {
-            width: 10%;
+            height: 10%;
             /* 1/10 da track */
+            width: 100%;
             flex-shrink: 0;
-            padding: 0 10px;
-            opacity: 0.4;
+            padding: 5px 0px;
+            opacity: 0.3;
             transform: scale(0.95);
-            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: all 0.6s cubic-bezier(0.25, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
         }
 
         .feature-slide.active {
@@ -299,7 +318,7 @@
                 splash.style.opacity = '0';
                 splash.style.visibility = 'hidden';
                 setTimeout(() => splash.remove(), 800);
-            }, 2300); // Dar tempo para a animação do texto concluir e brilhar
+            }, 1400); // Dar tempo para a animação do texto concluir e brilhar
         });
     </script>
 
@@ -345,191 +364,209 @@
             <div class="animate-reveal delay-2">
                 <span
                     class="text-win-accent text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-4 block opacity-90 drop-shadow-md">
-                    O Padrão Ouro em Produção Remota
+                    O Futuro da Produção Remota
                 </span>
                 <h1
                     class="font-sync text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[0.95] mb-6 uppercase theme-text italic">
-                    Sincronia Total.<br>
-                    <span class="text-win-accent not-italic">Latência Zero.</span>
+                    Sua Live.<br>
+                    <span class="text-win-accent not-italic">Sem Limites.</span>
                 </h1>
                 <p
                     class="text-base md:text-lg lg:text-xl theme-text-secondary mb-8 max-w-xl leading-relaxed font-segoe mx-auto lg:mx-0">
-                    Pare de brigar com delays do Zoom ou ferramentas amadoras. O Lyncro é o elo invisível entre seus
-                    convidados e o seu <strong>OBS Studio</strong>. Produza lives de nível televisivo através de um
-                    Clean Feed puro e imaculado, direto pelo navegador.
+                    Conecte-se com quem importa através de uma plataforma desenhada para fluidez e impacto. Abandone a
+                    complexidade, foque na sua mensagem e entregue uma transmissão excepcional com a estabilidade e
+                    qualidade que a sua audiência merece.
                 </p>
             </div>
 
             <!-- Slideshow de 10 Funcionalidades -->
-            <div class="features-carousel-container animate-reveal delay-3">
-                <div class="features-track" id="features-track">
-                    <!-- Slide 1 -->
-                    <div class="feature-slide" data-index="0">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+            <div class="features-carousel-outer animate-reveal delay-3">
+                <div class="features-carousel-container" id="carousel-container">
+                    <div class="features-track" id="features-track">
+                        <!-- Slide 1 -->
+                        <div class="feature-slide" data-index="0">
                             <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-rocket-launch text-win-accent text-2xl drop-shadow-md"></i>
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-rocket-launch text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Mobile
+                                        First, Sempre
+                                    </h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Convide pessoas de
+                                        qualquer lugar. Eles entram pelo celular e você recebe áudio e vídeo em
+                                        altíssima qualidade — sem burocracias.</p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Acesso Mobile
-                                    1-Click</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Seus convidados entram pelo
-                                    celular sem instalar nenhum app. Literalmente um clique e estão no ar.</p>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="feature-slide" data-index="1">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-broadcast text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">A Ponte
+                                        Perfeita (Clean Feed)
+                                    </h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Puxe fontes imaculadas
+                                        (Clean Feed) diretas para seu OBS Studio ou vMix, sem interfaces ou popups da
+                                        chamada vazando no ar.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 3 -->
+                        <div class="feature-slide" data-index="2">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-waveform text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Áudio
+                                        Quality
+                                        Studio</h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Desabilite cancelamentos
+                                        agressivos. Transmita o áudio limpo dos microfones como se estivessem no mesmo
+                                        estúdio.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 4 -->
+                        <div class="feature-slide" data-index="3">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-chats-teardrop text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Chat
+                                        Backstage
+                                    </h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Converse em tempo real
+                                        com
+                                        sua equipe e convidados de forma privada durante a transmissão.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 5 -->
+                        <div class="feature-slide" data-index="4">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-text-aa text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Lower Thirds
+                                        (GCs)</h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Injete letreiros
+                                        animados
+                                        com nome e profissão diretamente no feed visual dos participantes
+                                        instantaneamente.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 6 -->
+                        <div class="feature-slide" data-index="5">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-video-camera text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Multi-Cam
+                                        Suporte</h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Troque fluidamente entre
+                                        a
+                                        câmera frontal ou traseira (mobile) e selecione placas de captura (desktop).</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 7 -->
+                        <div class="feature-slide" data-index="6">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-sliders text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Controle de
+                                        Mute
+                                        Total</h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">O diretor domina o
+                                        painel.
+                                        Corte ou libere o áudio dos convidados remotamente.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 8 -->
+                        <div class="feature-slide" data-index="7">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-files text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Media Drop /
+                                        Arquivos</h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Envie roteiros, pautas,
+                                        ou
+                                        imagens arrastando pro painel usando WebRTC (ponto a ponto, sem provedor no
+                                        meio).
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 9 -->
+                        <div class="feature-slide" data-index="8">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-image-square text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Fundo
+                                        Virtual
+                                        Borrado</h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Convidados
+                                        desorganizados?
+                                        Use IA em tempo real para desfocar o fundo ou aplicar imagens corporativas.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Slide 10 -->
+                        <div class="feature-slide" data-index="9">
+                            <div
+                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
+                                    <i class="ph ph-shield-check text-win-accent text-2xl drop-shadow-md"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Rotas
+                                        Criptografadas</h3>
+                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Conexões WebRTC
+                                        Peer-to-Peer
+                                        fortemente criptografadas. O que acontece na live, fica na live.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Slide 2 -->
-                    <div class="feature-slide" data-index="1">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-broadcast text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Integração OBS
-                                    Nativa</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Puxe fontes web dedicadas
-                                    (Clean Feed) diretas para seu OBS Studio, vMix ou Wirecast sem cortes.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 3 -->
-                    <div class="feature-slide" data-index="2">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-waveform text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Áudio Quality
-                                    Studio</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Desabilite cancelamentos
-                                    agressivos. Transmita o áudio limpo dos microfones como se estivessem no mesmo
-                                    estúdio.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 4 -->
-                    <div class="feature-slide" data-index="3">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-chats-teardrop text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Chat Backstage
-                                </h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Converse em tempo real com
-                                    sua equipe e convidados de forma privada durante a transmissão.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 5 -->
-                    <div class="feature-slide" data-index="4">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-text-aa text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Lower Thirds
-                                    (GCs)</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Injete letreiros animados
-                                    com nome e profissão diretamente no feed visual dos participantes instantaneamente.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 6 -->
-                    <div class="feature-slide" data-index="5">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-video-camera text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Multi-Cam
-                                    Suporte</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Troque fluidamente entre a
-                                    câmera frontal ou traseira (mobile) e selecione placas de captura (desktop).</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 7 -->
-                    <div class="feature-slide" data-index="6">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-sliders text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Controle de Mute
-                                    Total</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">O diretor domina o painel.
-                                    Corte ou libere o áudio dos convidados remotamente.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 8 -->
-                    <div class="feature-slide" data-index="7">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-files text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Media Drop /
-                                    Arquivos</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Envie roteiros, pautas, ou
-                                    imagens arrastando pro painel usando WebRTC (ponto a ponto, sem provedor no meio).
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 9 -->
-                    <div class="feature-slide" data-index="8">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-image-square text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Fundo Virtual
-                                    Borrado</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Convidados desorganizados?
-                                    Use IA em tempo real para desfocar o fundo ou aplicar imagens corporativas.</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Slide 10 -->
-                    <div class="feature-slide" data-index="9">
-                        <div
-                            class="flex flex-col lg:flex-row items-center lg:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                            <div
-                                class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                <i class="ph ph-shield-check text-win-accent text-2xl drop-shadow-md"></i>
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Rotas
-                                    Criptografadas</h3>
-                                <p class="text-[12px] theme-text-secondary leading-relaxed">Conexões WebRTC Peer-to-Peer
-                                    fortemente criptografadas. O que acontece na live, fica na live.</p>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Controls -->
+                    <div class="carousel-dots" id="carousel-dots"></div>
                 </div>
-                <!-- Controls -->
-                <div class="carousel-dots" id="carousel-dots"></div>
-            </div>
         </section>
 
         <!-- Lado Direito: Ação -->
@@ -807,8 +844,8 @@
             const slides = document.querySelectorAll('.feature-slide');
             const dots = document.querySelectorAll('.dot');
 
-            const offset = -(currentSlide * 10); // Cada slide tem 10% da track total
-            track.style.transform = `translateX(${offset}%)`;
+            const offset = -(currentSlide * 10); // Cada slide tem 10% da track total height
+            track.style.transform = `translateY(${offset}%)`;
 
             slides.forEach((slide, i) => {
                 slide.classList.toggle('active', i === currentSlide);

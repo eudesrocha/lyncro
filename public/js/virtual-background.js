@@ -54,7 +54,7 @@ class VirtualBackground {
                 });
 
                 this.segmentation.setOptions({
-                    modelSelection: 1 // 0 = General (alta qualidade), 1 = Landscape (rápido/mobile)
+                    modelSelection: 0 // 0 = General (alta qualidade e mais estável no desktop Windows)
                 });
 
                 this.segmentation.onResults((results) => this.onResults(results));

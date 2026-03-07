@@ -81,6 +81,13 @@ const videoGrid = document.getElementById('video-grid');
 const roomIdDisplay = document.getElementById('room-id-display');
 if (roomIdDisplay) roomIdDisplay.innerHTML = `<span class="text-win-accent">SALA</span> <span class="text-gray-300">${roomName}</span>`;
 
+// Preencher invite link imediatamente caso o input exista
+const inviteInput = document.getElementById('invite-link-input');
+if (inviteInput) {
+    const baseUrl = window.location.origin;
+    inviteInput.value = `${baseUrl}/guest.html?room=${encodeURIComponent(roomName)}`;
+}
+
 async function init() {
     // 1. Iniciar WebSocket imediatamente para ver a fila de espera
     setupWebSocket();
