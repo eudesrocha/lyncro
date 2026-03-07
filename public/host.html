@@ -176,16 +176,10 @@
             <div class="flex items-baseline gap-2.5">
                 <h1 class="text-3xl font-logo font-[600] italic tracking-tight text-white leading-none">
                     Lyncro</h1>
-                <span class="text-sm font-bold text-win-accent tracking-[0.2em] uppercase">Host Monitor</span>
+                <span class="text-sm font-bold text-gray-500 tracking-[0.2em] uppercase">Host Monitor</span>
             </div>
 
             <div class="flex items-center gap-1 bg-white/5 border border-win-border p-1 rounded-win">
-                <button id="btn-mute-monitor" onclick="toggleMonitorMute()"
-                    class="flex items-center justify-center w-8 h-8 hover:bg-win-accent hover:text-white rounded-win transition-all text-gray-400 group"
-                    title="Silenciar Áudio Local (Monitor)">
-                    <i class="ph ph-speaker-high text-xl transition-colors"></i>
-                </button>
-                <div class="w-px h-4 bg-win-border mx-1"></div>
                 <button id="openMobileCam"
                     class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
                     <i class="ph ph-camera text-sm text-win-accent group-hover:text-white transition-colors"></i>
@@ -194,8 +188,8 @@
                 <div class="w-px h-4 bg-win-border mx-1"></div>
                 <button id="btn-share-screen" onclick="toggleScreenShare()"
                     class="flex items-center gap-2 hover:bg-win-accent hover:text-white px-4 py-1.5 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
-                    <i class="ph ph-screencast text-sm text-win-accent group-hover:text-white transition-colors"></i>
-                    Tela
+                    <i class="ph ph-monitor-arrow-up text-sm text-win-accent group-hover:text-white transition-colors"></i>
+                    Compartilhar Tela
                 </button>
                 <div class="w-px h-4 bg-win-border mx-1"></div>
                 <button id="btn-record"
@@ -205,23 +199,34 @@
                 </button>
             </div>
 
-            <select id="return-audio-select"
-                class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-32 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
-                <option value="">Sem Retorno</option>
-            </select>
+            <!-- Monitor de áudio + Retorno + Qualidade agrupados -->
+            <div class="flex items-center gap-2">
+                <button id="btn-mute-monitor" onclick="toggleMonitorMute()"
+                    class="flex items-center justify-center w-8 h-8 hover:bg-win-accent hover:text-white rounded-win transition-all text-gray-400 border border-win-border bg-white/5"
+                    title="Silenciar Áudio Local (Monitor)">
+                    <i class="ph ph-speaker-high text-xl transition-colors"></i>
+                </button>
 
-            <select id="host-quality-select" onchange="changeHostQuality(this.value)"
-                title="Qualidade do vídeo da câmera"
-                class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
-                <option value="1080_60">1080p 60fps</option>
-                <option value="1080_30">1080p 30fps</option>
-                <option value="720" selected>720p HD</option>
-                <option value="480">480p SD</option>
-                <option value="360">360p LQ</option>
-            </select>
+                <select id="return-audio-select"
+                    class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-32 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
+                    <option value="">Sem Retorno</option>
+                </select>
+
+                <div class="w-px h-4 bg-win-border"></div>
+
+                <select id="host-quality-select" onchange="changeHostQuality(this.value)"
+                    title="Qualidade do vídeo da câmera"
+                    class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
+                    <option value="1080_60">1080p 60fps</option>
+                    <option value="1080_30">1080p 30fps</option>
+                    <option value="720" selected>720p HD</option>
+                    <option value="480">480p SD</option>
+                    <option value="360">360p LQ</option>
+                </select>
+            </div>
         </div>
 
-        <!-- Direita: Convidar + Sala + Tema + Encerrar -->
+        <!-- Direita: Convidar + Sala + REC + Encerrar + Tema (canto) -->
         <div class="flex items-center gap-3">
             <button onclick="copyInviteLink()"
                 class="flex items-center gap-2 bg-white/5 border border-win-border hover:bg-win-accent hover:text-white hover:border-win-accent px-4 py-2 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
@@ -230,7 +235,7 @@
             </button>
 
             <div id="room-id-display"
-                class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-2 rounded-win border border-win-accent/20 shadow-inner">
+                class="text-[11px] font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-2 rounded-win border border-win-accent/20 shadow-inner">
             </div>
 
             <!-- REC indicator -->
@@ -240,15 +245,15 @@
                 <span id="rec-timer" class="text-[10px] font-mono font-bold text-red-300">00:00</span>
             </div>
 
-            <!-- Botão Toggle de Tema -->
-            <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
-                class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
-                <i class="ph ph-moon"></i>
-            </button>
-
             <button onclick="wsIntentionalClose = true; window.location.href='index.html'"
                 class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
                 Encerrar
+            </button>
+
+            <!-- Toggle de Tema: canto extremo direito -->
+            <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
+                class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+                <i class="ph ph-moon"></i>
             </button>
         </div>
     </header>

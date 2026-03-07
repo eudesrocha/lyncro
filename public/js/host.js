@@ -79,7 +79,7 @@ const vuAnalyzers = new Map(); // participantId -> { analyzer, dataArray, animat
 
 const videoGrid = document.getElementById('video-grid');
 const roomIdDisplay = document.getElementById('room-id-display');
-if (roomIdDisplay) roomIdDisplay.textContent = `Sala: ${roomName}`;
+if (roomIdDisplay) roomIdDisplay.innerHTML = `<span class="text-win-accent">SALA</span> <span class="text-gray-300">${roomName}</span>`;
 
 async function init() {
     // 1. Iniciar WebSocket imediatamente para ver a fila de espera
