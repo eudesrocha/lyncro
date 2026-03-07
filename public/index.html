@@ -3,8 +3,8 @@
 
 <head>
     <script>
-        // Anti-flash: aplica tema ANTES do CSS carregar
-        (function(){var t=localStorage.getItem('lyncro-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+        // Anti-flash: aplica tema ANTES do CSS carregar. Usa preferência salva ou tema do sistema.
+        (function(){var t=localStorage.getItem('lyncro-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -205,21 +205,29 @@
                     </div>
 
                     <!-- Aba Entrar na Sala -->
-                    <div id="panel-join" class="hidden space-y-6">
-                        <div class="space-y-2">
+                    <div id="panel-join" class="hidden space-y-5">
+                        <div class="space-y-1.5">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">ID da
                                 Sala</label>
                             <input type="text" id="joinRoomId" placeholder="ID fornecido pelo host"
-                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400 dark:placeholder:text-gray-700">
+                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400 dark:placeholder:text-gray-700"
+                                oninput="clearFieldError('err-join-room')">
+                            <p id="err-join-room" class="hidden text-[11px] text-red-400 font-semibold ml-1 flex items-center gap-1">
+                                <i class="ph ph-warning-circle"></i> Informe o ID da sala
+                            </p>
                         </div>
-                        <div class="space-y-2">
+                        <div class="space-y-1.5">
                             <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Seu
                                 Nome</label>
                             <input type="text" id="userNameGuest" placeholder="Como quer ser chamado?"
-                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400 dark:placeholder:text-gray-700">
+                                class="w-full px-4 py-4 rounded-win win-input text-sm text-white placeholder:text-gray-400 dark:placeholder:text-gray-700"
+                                oninput="clearFieldError('err-join-name')">
+                            <p id="err-join-name" class="hidden text-[11px] text-red-400 font-semibold ml-1 flex items-center gap-1">
+                                <i class="ph ph-warning-circle"></i> Informe seu nome
+                            </p>
                         </div>
                         <button onclick="handleJoinRoom()"
-                            class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all active:scale-[0.98] mt-4">
+                            class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-win text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/20 transition-all active:scale-[0.98] mt-2">
                             Acessar Sessão
                         </button>
                     </div>
@@ -357,14 +365,24 @@
             }, 300);
         }
 
+        function showFieldError(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('hidden');
+        }
+
+        function clearFieldError(id) {
+            const el = document.getElementById(id);
+            if (el) el.classList.add('hidden');
+        }
+
         function handleJoinRoom() {
             const room = document.getElementById('joinRoomId').value.trim();
             const name = document.getElementById('userNameGuest').value.trim();
+            let valid = true;
 
-            if (!room || !name) {
-                alert('Preencha os campos!');
-                return;
-            }
+            if (!room) { showFieldError('err-join-room'); valid = false; }
+            if (!name) { showFieldError('err-join-name'); valid = false; }
+            if (!valid) return;
 
             localStorage.setItem('sv_last_name', name);
             window.location.href = `guest.html?room=${room}&name=${name}`;

@@ -11,6 +11,12 @@
         try { return localStorage.getItem(STORAGE_KEY); } catch { return null; }
     }
 
+    function getSystemTheme() {
+        try {
+            return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+        } catch { return DEFAULT_THEME; }
+    }
+
     function store(theme) {
         try { localStorage.setItem(STORAGE_KEY, theme); } catch {}
     }

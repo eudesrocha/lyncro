@@ -3,7 +3,7 @@
 
 <head>
     <script>
-        (function(){var t=localStorage.getItem('lyncro-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+        (function(){var t=localStorage.getItem('lyncro-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);})();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport"
