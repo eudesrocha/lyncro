@@ -2,6 +2,9 @@
 <html lang="pt-BR">
 
 <head>
+    <script>
+        (function(){var t=localStorage.getItem('lyncro-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyncro - Host Monitor</title>
@@ -12,6 +15,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/css/tailwind.css">
+    <link rel="stylesheet" href="/css/themes.css">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -190,7 +194,7 @@
             </select>
         </div>
 
-        <!-- Direita: Convidar + Sala + Encerrar -->
+        <!-- Direita: Convidar + Sala + Tema + Encerrar -->
         <div class="flex items-center gap-3">
             <button onclick="copyInviteLink()"
                 class="flex items-center gap-2 bg-white/5 border border-win-border hover:bg-win-accent hover:text-white hover:border-win-accent px-4 py-2 rounded-win transition-all text-[11px] font-bold uppercase tracking-widest text-gray-400 group">
@@ -201,6 +205,12 @@
             <div id="room-id-display"
                 class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-2 rounded-win border border-win-accent/20 shadow-inner">
             </div>
+
+            <!-- Botão Toggle de Tema -->
+            <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
+                class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+                <i class="ph ph-moon"></i>
+            </button>
 
             <button onclick="wsIntentionalClose = true; window.location.href='index.html'"
                 class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
@@ -289,6 +299,7 @@
     <script src="js/webrtc.js"></script>
     <script src="js/host.js"></script>
     <script src="js/host-chat.js"></script>
+    <script src="js/theme.js"></script>
 </body>
 
 </html>

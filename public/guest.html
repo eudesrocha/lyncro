@@ -2,6 +2,9 @@
 <html lang="pt-BR">
 
 <head>
+    <script>
+        (function(){var t=localStorage.getItem('lyncro-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -19,6 +22,7 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/css/tailwind.css">
+    <link rel="stylesheet" href="/css/themes.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         /* Custom Dropdown Styles */
@@ -227,11 +231,15 @@
                 <div class="w-10 h-10 bg-win-accent rounded-win flex items-center justify-center shadow-md shrink-0">
                     <i class="ph ph-video-camera text-xl text-white"></i>
                 </div>
-                <div class="flex flex-col text-left">
+                <div class="flex flex-col text-left flex-1">
                     <h1 class="text-[18px] font-bold leading-tight">Configure sua Entrada</h1>
-                    <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">Teste sua câmera e microfone
-                    </p>
+                    <p class="text-[9px] theme-text-secondary uppercase tracking-widest mt-0.5">Teste sua câmera e microfone</p>
                 </div>
+                <!-- Toggle de Tema -->
+                <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
+                    class="theme-toggle-btn shrink-0" aria-label="Alternar tema claro/escuro">
+                    <i class="ph ph-moon"></i>
+                </button>
             </div>
 
             <div
@@ -733,6 +741,7 @@
     <script src="js/webrtc.js?v=3"></script>
     <script src="js/guest.js?v=5"></script>
     <script src="js/guest-chat.js"></script>
+    <script src="js/theme.js"></script>
     <script>
         // Forçar atualização do Service Worker (resolve cache travado no mobile)
         if ('serviceWorker' in navigator) {

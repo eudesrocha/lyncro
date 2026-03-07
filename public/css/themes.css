@@ -1,0 +1,205 @@
+/* =============================================
+   Lyncro — Sistema de Temas (Dark / Light)
+   Aplicado via data-theme="dark"|"light" no <html>
+   ============================================= */
+
+/* ── Variáveis Dark (padrão) ── */
+:root,
+[data-theme="dark"] {
+    --bg:            #111113;
+    --bg-secondary:  #18181b;
+    --surface:       rgba(30, 30, 34, 0.95);
+    --surface-hover: rgba(40, 40, 46, 0.95);
+    --card:          #1e1e22;
+    --card-alt:      #26262c;
+    --border:        rgba(255, 255, 255, 0.07);
+    --border-hover:  rgba(255, 255, 255, 0.15);
+    --text:          #f2f2f3;
+    --text-secondary:#9a9aa8;
+    --text-muted:    rgba(255, 255, 255, 0.3);
+    --input-bg:      rgba(0, 0, 0, 0.35);
+    --input-border:  rgba(255, 255, 255, 0.08);
+    --input-focus:   #0078d4;
+    --shadow:        0 8px 40px rgba(0, 0, 0, 0.6);
+    --shadow-sm:     0 2px 12px rgba(0, 0, 0, 0.4);
+    --mica:          rgba(28, 28, 32, 0.55);
+    --mica-border:   rgba(255, 255, 255, 0.06);
+    --tab-active-color: #ffffff;
+    --tab-inactive-color: rgba(255, 255, 255, 0.4);
+    --toggle-bg:     rgba(255, 255, 255, 0.06);
+    --toggle-border: rgba(255, 255, 255, 0.1);
+    --toggle-icon:   #9a9aa8;
+    --footer-text:   rgba(255, 255, 255, 0.25);
+    --gradient-body: radial-gradient(ellipse at 60% 0%, rgba(0,120,212,0.08) 0%, transparent 60%),
+                     radial-gradient(ellipse at 0% 80%, rgba(120,80,220,0.06) 0%, transparent 60%),
+                     #111113;
+}
+
+/* ── Variáveis Light ── */
+[data-theme="light"] {
+    --bg:            #f4f5f7;
+    --bg-secondary:  #ebedf0;
+    --surface:       rgba(255, 255, 255, 0.92);
+    --surface-hover: rgba(255, 255, 255, 1);
+    --card:          #ffffff;
+    --card-alt:      #f8f9fb;
+    --border:        rgba(0, 0, 0, 0.08);
+    --border-hover:  rgba(0, 120, 212, 0.3);
+    --text:          #111114;
+    --text-secondary:#5c5c6e;
+    --text-muted:    rgba(0, 0, 0, 0.35);
+    --input-bg:      rgba(255, 255, 255, 0.9);
+    --input-border:  rgba(0, 0, 0, 0.12);
+    --input-focus:   #0078d4;
+    --shadow:        0 8px 40px rgba(0, 0, 0, 0.10);
+    --shadow-sm:     0 2px 12px rgba(0, 0, 0, 0.07);
+    --mica:          rgba(255, 255, 255, 0.75);
+    --mica-border:   rgba(0, 0, 0, 0.08);
+    --tab-active-color: #111114;
+    --tab-inactive-color: rgba(0, 0, 0, 0.4);
+    --toggle-bg:     rgba(0, 0, 0, 0.05);
+    --toggle-border: rgba(0, 0, 0, 0.1);
+    --toggle-icon:   #5c5c6e;
+    --footer-text:   rgba(0, 0, 0, 0.3);
+    --gradient-body: radial-gradient(ellipse at 60% 0%, rgba(0,120,212,0.07) 0%, transparent 55%),
+                     radial-gradient(ellipse at 0% 100%, rgba(100,60,200,0.04) 0%, transparent 55%),
+                     #f4f5f7;
+}
+
+/* ── Reset Global com Variáveis ── */
+body {
+    background: var(--gradient-body) !important;
+    color: var(--text) !important;
+    transition: background 0.35s ease, color 0.2s ease;
+}
+
+/* ── Painel Mica / Glass ── */
+.mica-effect {
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    background: var(--mica) !important;
+    border-color: var(--mica-border) !important;
+}
+
+/* ── Inputs temáticos ── */
+.win-input {
+    background: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--text) !important;
+}
+.win-input::placeholder { color: var(--text-muted) !important; }
+.win-input:focus        { border-bottom-color: var(--input-focus) !important; }
+
+/* Inputs HTML nativos dentro de formulários temáticos */
+input[class*="border"], input[class*="bg-black"], input[class*="bg-white"] {
+    background: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--text) !important;
+}
+input[class*="border"]::placeholder,
+input[class*="bg-black"]::placeholder,
+input[class*="bg-white"]::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* ── Tabs ── */
+.tab-active   { color: var(--tab-active-color);   border-bottom: 2px solid #0078d4; }
+.tab-inactive { color: var(--tab-inactive-color); border-bottom: 2px solid transparent; }
+
+/* ── Cards / Superfícies ── */
+.theme-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+[data-theme="light"] .theme-card { box-shadow: 0 2px 16px rgba(0,0,0,0.08); }
+
+/* ── Texto temático ── */
+.theme-text           { color: var(--text) !important; }
+.theme-text-secondary { color: var(--text-secondary) !important; }
+.theme-text-muted     { color: var(--text-muted) !important; }
+
+/* ── Botão Toggle de Tema ── */
+.theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid var(--toggle-border);
+    background: var(--toggle-bg);
+    color: var(--toggle-icon);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+.theme-toggle-btn:hover {
+    border-color: #0078d4;
+    color: #0078d4;
+    background: rgba(0, 120, 212, 0.08);
+}
+
+/* ── Bordas de separação temáticas ── */
+[data-theme="light"] .border-win-border,
+[data-theme="light"] [class*="border-white/"] {
+    border-color: var(--border) !important;
+}
+
+/* ── Texto branco fixo → adaptado ao tema ── */
+[data-theme="light"] .text-white      { color: var(--text) !important; }
+[data-theme="light"] .text-gray-400   { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-gray-500   { color: var(--text-muted) !important; }
+[data-theme="light"] .text-gray-300   { color: var(--text-secondary) !important; }
+[data-theme="light"] .text-gray-200   { color: var(--text) !important; }
+[data-theme="light"] .text-gray-100   { color: var(--text) !important; }
+
+/* ── Backgrounds escuros → tema claro ── */
+[data-theme="light"] .bg-win-bg,
+[data-theme="light"] .bg-\[\#121212\],
+[data-theme="light"] .bg-\[\#1c1c1c\]   { background: var(--bg) !important; }
+
+[data-theme="light"] .bg-win-card,
+[data-theme="light"] .bg-win-surface     { background: var(--card) !important; }
+
+[data-theme="light"] .bg-white\/5,
+[data-theme="light"] .bg-white\/10,
+[data-theme="light"] .bg-black\/40,
+[data-theme="light"] .bg-black\/20,
+[data-theme="light"] .bg-black\/30      { background: rgba(0,0,0,0.04) !important; }
+
+[data-theme="light"] .bg-win-card\/40,
+[data-theme="light"] .bg-win-card\/60   { background: rgba(255,255,255,0.85) !important; }
+
+/* ── Overlay/Modal escuro ── */
+[data-theme="light"] .backdrop-blur-sm.bg-black\/70 { background: rgba(0,0,0,0.5) !important; }
+
+/* ── Chat input no tema claro ── */
+[data-theme="light"] #chat-input {
+    background: rgba(0,0,0,0.04) !important;
+    color: var(--text) !important;
+    border-color: var(--border) !important;
+}
+
+/* ── Sidebar/aside no tema claro ── */
+[data-theme="light"] aside section,
+[data-theme="light"] .bg-win-card\/40.rounded-win {
+    background: rgba(255,255,255,0.9) !important;
+    border-color: var(--border) !important;
+}
+
+/* ── Animação de entrada ── */
+@keyframes revealUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+.animate-reveal {
+    opacity: 0;
+    animation: revealUp 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.delay-1 { animation-delay: 0.08s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.35s; }
+.delay-4 { animation-delay: 0.5s; }

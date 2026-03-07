@@ -2,6 +2,10 @@
 <html lang="pt-BR">
 
 <head>
+    <script>
+        // Anti-flash: aplica tema ANTES do CSS carregar
+        (function(){var t=localStorage.getItem('lyncro-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -15,58 +19,8 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="/css/tailwind.css">
+    <link rel="stylesheet" href="/css/themes.css">
     <style>
-        body {
-            background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
-            min-height: 100vh;
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        .mica-effect {
-            backdrop-filter: blur(40px) saturate(150%);
-            -webkit-backdrop-filter: blur(40px) saturate(150%);
-            background: rgba(43, 43, 43, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .win-input {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            outline: none;
-            transition: all 0.2s;
-            color: #fff;
-        }
-
-        .win-input:focus {
-            background: rgba(0, 0, 0, 0.5);
-            border-bottom-color: #0078d4;
-        }
-
-        .win-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-
-        /* Tabs do Lobby */
-        .tab-active {
-            color: #fff;
-            border-bottom: 3px solid #0078d4;
-        }
-
-        .tab-inactive {
-            color: rgba(255, 255, 255, 0.5);
-            border-bottom: 3px solid transparent;
-        }
-
-
-
-        .win-input:focus {
-            background: rgba(0, 0, 0, 0.5);
-            border-bottom-color: #0078d4;
-            outline: none;
-        }
-
         .win-loader {
             width: 24px;
             height: 24px;
@@ -75,73 +29,10 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Motion Design: Staggered Reveal */
-        @keyframes revealUp {
-            from {
-                opacity: 0;
-                transform: translateY(24px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-reveal {
-            opacity: 0;
-            animation: revealUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-        }
-
-        .delay-1 {
-            animation-delay: 0.1s;
-        }
-
-        .delay-2 {
-            animation-delay: 0.3s;
-        }
-
-        .delay-3 {
-            animation-delay: 0.5s;
-        }
-
-        .delay-4 {
-            animation-delay: 0.7s;
-        }
-
-        html.dark .tab-active {
-            color: #fff;
-            border-bottom: 3px solid #0078d4;
-        }
-
-        html:not(.dark) .tab-active {
-            color: #121212;
-            border-bottom: 3px solid #0078d4;
-        }
-
-        html.dark .tab-inactive {
-            color: rgba(255, 255, 255, 0.5);
-            border-bottom: 3px solid transparent;
-        }
-
-        html:not(.dark) .tab-inactive {
-            color: rgba(0, 0, 0, 0.5);
-            border-bottom: 3px solid transparent;
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .glass-shadow {
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8),
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6),
                 inset 0 0 0 1px rgba(255, 255, 255, 0.05);
         }
     </style>
@@ -149,30 +40,36 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
     <script src="js/config.js"></script>
+    <script src="js/theme.js"></script>
 </head>
 
-<body
-    class="font-segoe selection:bg-win-accent selection:text-white transition-colors duration-300 bg-[#121212] text-white">
+<body class="font-segoe selection:bg-win-accent selection:text-white min-h-screen overflow-x-hidden">
 
 
     <!-- Header / Logo -->
     <header id="main-header" class="fixed top-0 left-0 w-full px-4 py-4 md:px-8 md:py-6 z-50 animate-reveal">
         <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
             <h1
-                class="text-2xl md:text-[2rem] font-logo font-[600] italic tracking-tight select-none text-white leading-none">
+                class="text-2xl md:text-[2rem] font-logo font-[600] italic tracking-tight select-none leading-none" style="color:var(--text)">
                 Lyncro</h1>
 
-            <div class="flex items-center gap-3 md:gap-6 flex-wrap justify-end">
+            <div class="flex items-center gap-3 md:gap-4 flex-wrap justify-end">
                 <!-- Perfil do Host / Logout (Injetado via JS) -->
                 <div id="host-profile" style="display:none;"
-                    class="flex items-center gap-3 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-lg order-first md:order-none">
+                    class="flex items-center gap-3 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-lg">
                     <i class="ph ph-user-circle text-xl text-win-accent"></i>
                     <div class="flex flex-col">
-                        <span id="user-email" class="text-[9px] font-bold text-white truncate max-w-[140px]">...</span>
+                        <span id="user-email" class="text-[9px] font-bold theme-text truncate max-w-[140px]">...</span>
                         <button onclick="window.LYNCRO_AUTH.logout()"
                             class="text-[8px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors text-left">Sair</button>
                     </div>
                 </div>
+
+                <!-- Botão Toggle de Tema -->
+                <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
+                    class="theme-toggle-btn" aria-label="Alternar tema claro/escuro">
+                    <i class="ph ph-moon"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -184,11 +81,11 @@
         <section id="narrative-section" class="flex-1 text-center lg:text-left">
             <div class="animate-reveal delay-1">
                 <h2
-                    class="text-5xl lg:text-7xl font-segoe-black leading-tight mb-6 uppercase tracking-tight text-white">
+                    class="text-5xl lg:text-7xl font-segoe-black leading-tight mb-6 uppercase tracking-tight theme-text">
                     Sincronia Total.<br>
                     <span class="text-win-accent">Latência Zero.</span>
                 </h2>
-                <p class="text-lg lg:text-xl text-gray-400 mb-10 max-w-xl leading-relaxed">
+                <p class="text-lg lg:text-xl theme-text-secondary mb-10 max-w-xl leading-relaxed">
                     A ponte definitiva entre seus convidados e o seu OBS. Gere links de <span
                         class="text-white font-bold">Clean Feed</span> instantâneos e transmita com
                     qualidade de estúdio
@@ -200,21 +97,18 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 opacity-80 animate-reveal delay-2">
                 <div class="flex flex-col items-center lg:items-start gap-2">
                     <i class="ph ph-broadcast text-win-accent text-3xl"></i>
-                    <h3 class="font-bold text-xs uppercase tracking-widest text-white">Clean Feed
-                        Nativo</h3>
-                    <p class="text-[11px] text-gray-400">Vídeo e áudio puros para sua Fonte de Navegador.</p>
+                    <h3 class="font-bold text-xs uppercase tracking-widest theme-text">Clean Feed Nativo</h3>
+                    <p class="text-[11px] theme-text-secondary">Vídeo e áudio puros para sua Fonte de Navegador.</p>
                 </div>
                 <div class="flex flex-col items-center lg:items-start gap-2 border-l border-white/5 pl-0 lg:pl-4">
                     <i class="ph ph-device-mobile text-win-accent text-3xl"></i>
-                    <h3 class="font-bold text-xs uppercase tracking-widest text-white">Mobile-First
-                    </h3>
-                    <p class="text-[11px] text-gray-400">Seu convidado entra pelo celular com um clique.</p>
+                    <h3 class="font-bold text-xs uppercase tracking-widest theme-text">Mobile-First</h3>
+                    <p class="text-[11px] theme-text-secondary">Seu convidado entra pelo celular com um clique.</p>
                 </div>
                 <div class="flex flex-col items-center lg:items-start gap-2 border-l border-white/5 pl-0 lg:pl-4">
                     <i class="ph ph-gauge text-win-accent text-3xl"></i>
-                    <h3 class="font-bold text-xs uppercase tracking-widest text-white">Produção
-                        Integrada</h3>
-                    <p class="text-[11px] text-gray-400">Controle Lower Thirds e chat em tempo real.</p>
+                    <h3 class="font-bold text-xs uppercase tracking-widest theme-text">Produção Integrada</h3>
+                    <p class="text-[11px] theme-text-secondary">Controle Lower Thirds e chat em tempo real.</p>
                 </div>
             </div>
         </section>
@@ -240,7 +134,7 @@
                     <div id="panel-create" class="space-y-6">
                         <!-- Estado Autenticado: Formulário -->
                         <div id="state-auth" class="hidden space-y-6">
-                            <h3 class="font-segoe-black text-xl mb-4 tracking-tighter uppercase text-white">
+                            <h3 class="font-segoe-black text-xl mb-4 tracking-tighter uppercase theme-text">
                                 CRIAR NOVA SALA</h3>
                             <div class="space-y-6">
                                 <div class="space-y-2">
@@ -275,9 +169,9 @@
                         <div id="state-no-auth" class="space-y-6 py-4 text-center">
                             <i
                                 class="ph ph-identification-card text-5xl text-win-accent opacity-50 mb-4 inline-block"></i>
-                            <h3 class="font-segoe-black text-xl tracking-tighter uppercase text-white">
+                            <h3 class="font-segoe-black text-xl tracking-tighter uppercase theme-text">
                                 Portaria do Host</h3>
-                            <p class="text-sm text-gray-400 dark:text-gray-400 leading-relaxed mb-6">Esta área é
+                            <p class="text-sm theme-text-secondary leading-relaxed mb-6">Esta área é
                                 reservada para produtores. Por favor, identifique-se para começar a gerenciar sua
                                 transmissão.</p>
                             <button onclick="window.location.href='login.html'"
