@@ -178,13 +178,7 @@ function setupSignaling(server) {
                                     roomManager.updateParticipant(normalizedRoomId, data.targetId, { hostMuted: true });
                                 } else if (data.action === 'unmute') {
                                     // if the guest muted themselves, the host cannot unmute them
-                                    if (targetParticipant.guestMutedSelf) {
-                                        sendToParticipant(normalizedRoomId, participantId, {
-                                            type: 'error',
-                                            message: 'O convidado silenciou o próprio microfone por privacidade.'
-                                        });
-                                        return; // Intercept command
-                                    }
+                                    // MVP: Permitir que o Produtor (Host) tenha soberania para desmutar
                                     roomManager.updateParticipant(normalizedRoomId, data.targetId, { hostMuted: false });
                                 }
                             }
@@ -329,7 +323,7 @@ function setupSignaling(server) {
                             // Fechar conexões dos convidados após breve delay para garantir entrega
                             setTimeout(() => {
                                 roomManager.getParticipants(currentRoomId).forEach(p => {
-                                    if (p.ws) try { p.ws.close(); } catch (_) {}
+                                    if (p.ws) try { p.ws.close(); } catch (_) { }
                                 });
                             }, 2000);
                         }

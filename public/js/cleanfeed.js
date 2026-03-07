@@ -116,7 +116,7 @@ function updateOverlay(action, name, title, style) {
     if (!overlay || !nameEl || !titleEl) return;
 
     const useBottomAnim = BOTTOM_ANIM_STYLES.has(style);
-    const animIn  = useBottomAnim ? 'overlay-in-bottom'  : 'overlay-animated-in';
+    const animIn = useBottomAnim ? 'overlay-in-bottom' : 'overlay-animated-in';
     const animOut = useBottomAnim ? 'overlay-out-bottom' : 'overlay-animated-out';
 
     if (action === 'show') {
@@ -147,25 +147,27 @@ async function initiateConnection(targetId) {
 }
 
 const targetType = urlParams.get('type') || 'camera'; // 'camera' ou 'screen'
-let videoTrackCount = 0;
+let participantVideoCount = {};
 
 function handleRemoteTrack(targetId, stream, track) {
     if (track.kind !== 'video') return;
 
-    videoTrackCount++;
-    console.log(`Receiving remote track ${videoTrackCount} (${track.kind}) for clean feed: ${targetId}`);
+    participantVideoCount[targetId] = (participantVideoCount[targetId] || 0) + 1;
+    const count = participantVideoCount[targetId];
+
+    console.log(`Receiving remote track ${count} (${track.kind}) for clean feed: ${targetId}`);
 
     const statusEl = document.getElementById('status');
 
     if (targetId === targetParticipantId) {
         // Lógica de seleção: 
-        // Se type=camera, pegamos o primeiro rastro de vídeo.
-        // Se type=screen, pegamos o segundo rastro de vídeo.
+        // Se type=camera, pegamos o primeiro rastro de vídeo do participante
+        // Se type=screen, pegamos o segundo rastro de vídeo do participante
         const isScreen = targetType === 'screen';
-        const shouldShowThisTrack = (isScreen && videoTrackCount === 2) || (!isScreen && videoTrackCount === 1);
+        const shouldShowThisTrack = (isScreen && count === 2) || (!isScreen && count === 1);
 
         if (!shouldShowThisTrack) {
-            console.log(`Pulando rastro ${videoTrackCount} (Alvo é ${targetType})`);
+            console.log(`Pulando rastro ${count} de ${targetId} (Alvo é ${targetType})`);
             return;
         }
 

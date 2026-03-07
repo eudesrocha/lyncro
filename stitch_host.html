@@ -1,0 +1,221 @@
+<html class="dark"><head>
+<meta charset="utf-8"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1074c6",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101a22",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .bg-glow {
+            background: radial-gradient(circle at 50% 0%, rgba(16, 116, 198, 0.15) 0%, transparent 70%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden bg-glow">
+<!-- TopAppBar -->
+<nav class="flex items-center justify-between px-4 py-3 border-b border-primary/20 glass-panel sticky top-0 z-50">
+<div class="flex items-center gap-2">
+<div class="text-primary flex size-8 items-center justify-center">
+<span class="material-symbols-outlined text-3xl">broadcast_on_home</span>
+</div>
+<span class="font-bold text-lg tracking-tight hidden sm:block">Lyncro</span>
+</div>
+<div class="flex flex-col items-center">
+<span class="text-[10px] uppercase tracking-widest text-primary font-bold">Room ID</span>
+<h2 class="text-slate-100 text-sm font-semibold leading-tight">Masterclass-Tech</h2>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex size-10 items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="size-8 rounded-full bg-primary/30 border border-primary/50 flex items-center justify-center overflow-hidden">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+</div>
+</nav>
+<main class="flex flex-col lg:flex-row gap-4 p-4">
+<!-- Main Workspace -->
+<div class="flex-1 flex flex-col gap-4">
+<!-- Program Monitor -->
+<div class="relative glass-panel rounded-xl overflow-hidden aspect-video group">
+<div class="absolute top-4 left-4 z-10 flex items-center gap-2">
+<div class="bg-red-600 text-[10px] font-bold px-2 py-0.5 rounded-sm flex items-center gap-1 shadow-lg">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-red-100"></span>
+</span>
+                            LIVE
+                        </div>
+<div class="bg-black/40 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-medium border border-white/10">
+                            HOST - ALEX REED
+                        </div>
+</div>
+<div class="w-full h-full bg-slate-800 flex items-center justify-center bg-cover bg-center" data-alt="Professional host in a modern dark studio setting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB0vty4GxgjC6EK6209WwjMeewiYS-mIo21IpWFeyA9a4J4EiYTs7-6LRY1GWXcGEGVPlLZCgJnUp8isxTxm6rkR4U4-HNz8AUBFpx5IACTqgOlQmhU8gkd3XJrOhhlsIJ3hkXt3wtDGLSg3mIXJUyO81pUQtJtQBLwuH-SQFDxZvkpRRAwaKwLTkpCy_C4d4IjsAFG33mADljys6jTYKW6j7T1u6hST3hQSWdCIPCgBk64Spy8zyaMPCDHv1bOgzsHPeslSNoYisM');">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+</div>
+<!-- Overlay Controls -->
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="size-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-primary transition-colors">
+<span class="material-symbols-outlined">mic</span>
+</button>
+<button class="size-10 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center hover:bg-primary transition-colors">
+<span class="material-symbols-outlined">videocam</span>
+</button>
+<button class="size-10 rounded-full bg-red-500/80 backdrop-blur-md border border-red-400/50 flex items-center justify-center">
+<span class="material-symbols-outlined">call_end</span>
+</button>
+</div>
+</div>
+<!-- Guest Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+<!-- Guest 1 -->
+<div class="relative glass-panel rounded-lg aspect-video overflow-hidden group">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Business woman on a video call" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBetcK8m5XRgbQ2DwsXpFDMBbz0NVxyA44E7nZMD5U_7_VztjYyPJkflQEFm2BkOZrtYYR0iil3bpgG-hFCGxwll9I9XCPeeo0g5guXb13C66TIBC47zSHFkRo59txWlquddb_k6ekF-b2ezcbGgPSk_FOmo0HGO1D6gnhP0Gs34kcXB7i4xtFAtKhIMnn6p6JpEdLgctun0aqNF-WniFObHGlUyTI1iY_ihDIdG19K6K0fqjxAzg_tiIGcVRGrITtm5XU2UOt4Or4');"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-2 left-2 flex flex-col gap-1">
+<span class="text-[10px] font-bold text-white truncate">GUEST 1 (SARA)</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-green-400">mic</span>
+<span class="text-[8px] font-bold text-green-400 uppercase">MIC ON</span>
+</div>
+</div>
+</div>
+<!-- Guest 2 -->
+<div class="relative glass-panel rounded-lg aspect-video overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center grayscale" data-alt="Young man on a video call profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC-VhiudPDt3GJD5L_kWGD7iTPHwbkkEQF4yozkN2mHua0Gb0o2tBFHdDuLu0CHLJH2HydNtj8qEzEl2HtMMjzj-mIqnkjLWGgPfQUSGm_mFRm8cp_q7qAZbeFP-VF95wlXHQZ_qZE-sQ9yyLfm5UzswtPNERmWXgSqKDH1rgcGUxQIqasBiiuXP8Lxc2ekiEr9wnrbnIlY5gcA4wc9SpGhasBIJfBm1JqmfoHlwSCO_IiuXacz1L30j3gJoj2AL9yJSWubp6PakU4');"></div>
+<div class="absolute inset-0 bg-black/40"></div>
+<div class="absolute bottom-2 left-2 flex flex-col gap-1">
+<span class="text-[10px] font-bold text-white/70 truncate">GUEST 2 (TOM)</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-red-400">mic_off</span>
+<span class="text-[8px] font-bold text-red-400 uppercase">MIC OFF</span>
+</div>
+</div>
+</div>
+<!-- Guest 3 -->
+<div class="relative glass-panel rounded-lg aspect-video overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Portrait of a smiling woman in office" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAqrM4dfFL11IV_5Muy7UfmI1vi_6UGFVoJqluAFos_HcQELOqnKUE9wvCfsoyk_zGx7J4-hBMYJ5p6Ifb5CL_Q7g8zDEyM4QUiItnCNeglJlAaX0lL1zKs1FITQfGaK3X236gDnoC5uucvP19vTqtU6eggyDt7T1yMdWAuVsFVGNMcAc33fhQTIdSF_uVwP4V3ZrZ49aeDQ-B7dSlRXsF9l-6doFI3EoY6AYe1QKPjL7iUMchodAfcCJh2K-sVx5_HVRIysZvnSUo');"></div>
+<div class="absolute bottom-2 left-2 flex flex-col gap-1">
+<span class="text-[10px] font-bold text-white truncate">GUEST 3 (ANA)</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-green-400">mic</span>
+<span class="text-[8px] font-bold text-green-400 uppercase">MIC ON</span>
+</div>
+</div>
+</div>
+<!-- Guest 4 -->
+<div class="relative glass-panel rounded-lg aspect-video overflow-hidden border-2 border-primary/50">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Executive man in a white shirt" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCdME7QdEfhIu9gH10kW4M6nEV9XA2skA1DUQj2yh499ugbkiOOzGr3n3LSOj6KlS49wxo5_CU49lfRuIM_LgvJ0q1YffhgfU8ZGVzr5QKpBRTU94YKwL9XO4TeQVnwdsGB56mpQVJdLYUkj9nYT5z0FzWnmsEVlWuqk_Fn_LpQ5yEY6tWZgfaO-wiDnt7G-q3Ogs7dJGE2TZWCX7yQBRu0lM-OhjYM_RdgV470xu3BgpNCaFKgPXAL7dX1_1F2YJMLvEuyzzCT3XU');"></div>
+<div class="absolute bottom-2 left-2 flex flex-col gap-1">
+<span class="text-[10px] font-bold text-white truncate">GUEST 4 (LEO)</span>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[12px] text-green-400">mic</span>
+<span class="text-[8px] font-bold text-green-400 uppercase">MIC ON</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Sidebar -->
+<aside class="w-full lg:w-80 flex flex-col gap-4">
+<!-- Invite Link -->
+<div class="glass-panel rounded-xl p-4 flex flex-col gap-2">
+<label class="text-[10px] font-bold text-primary uppercase tracking-wider">Link de Convite</label>
+<div class="flex items-center gap-2 bg-black/20 rounded-lg p-2 border border-white/5">
+<input class="bg-transparent border-none text-xs text-slate-300 w-full focus:ring-0" readonly="" type="text" value="lyncro.live/mtc-24"/>
+<button class="text-primary hover:text-primary/80 transition-colors">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+</button>
+</div>
+</div>
+<!-- Chat Section -->
+<div class="glass-panel rounded-xl p-4 flex flex-col gap-3 h-[300px]">
+<div class="flex items-center justify-between border-b border-white/5 pb-2">
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider">Chat ao Vivo</span>
+<span class="text-[10px] text-slate-400">24 Participantes</span>
+</div>
+<div class="flex-1 overflow-y-auto flex flex-col gap-3 pr-1">
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-primary">Moderador</span>
+<p class="text-xs text-slate-300 bg-white/5 p-2 rounded-lg">Bem-vindos à Masterclass! O chat está liberado.</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400">Sara</span>
+<p class="text-xs text-slate-300 bg-white/5 p-2 rounded-lg">Qual o tempo previsto de apresentação?</p>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-[10px] font-bold text-slate-400">Leo</span>
+<p class="text-xs text-slate-300 bg-white/5 p-2 rounded-lg">Estou ouvindo bem, áudio nota 10.</p>
+</div>
+</div>
+<div class="relative">
+<input class="w-full bg-black/20 border border-white/10 rounded-lg py-2 px-3 text-xs focus:border-primary focus:ring-0" placeholder="Digite uma mensagem..." type="text"/>
+</div>
+</div>
+<!-- Lower Thirds -->
+<div class="glass-panel rounded-xl p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<span class="text-[10px] font-bold text-primary uppercase tracking-wider">Lower Thirds</span>
+<div class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-7 h-4 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-primary"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-2">
+<input class="w-full bg-black/20 border border-white/10 rounded py-1.5 px-3 text-xs focus:border-primary focus:ring-0" placeholder="Nome" type="text" value="Alex Reed"/>
+<input class="w-full bg-black/20 border border-white/10 rounded py-1.5 px-3 text-xs focus:border-primary focus:ring-0" placeholder="Função" type="text" value="Chief Strategy Officer"/>
+</div>
+<button class="w-full bg-primary/20 hover:bg-primary/40 text-primary text-[10px] font-bold py-2 rounded-lg uppercase tracking-widest transition-all">
+                        Aplicar GC
+                    </button>
+</div>
+<!-- Media Drop -->
+<div class="glass-panel rounded-xl p-4 border-2 border-dashed border-primary/30 flex flex-col items-center justify-center gap-2 py-6">
+<span class="material-symbols-outlined text-primary/60 text-3xl">cloud_upload</span>
+<p class="text-[10px] font-medium text-slate-400 text-center">Arraste arquivos aqui<br/>ou clique para enviar</p>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col gap-2 mt-auto">
+<button class="w-full bg-slate-700/50 hover:bg-slate-700 text-slate-100 font-bold py-3 rounded-lg flex items-center justify-center gap-2 transition-colors">
+<span class="material-symbols-outlined text-lg">mic_off</span>
+                        Mutar Todos
+                    </button>
+<button class="w-full bg-red-600/20 hover:bg-red-600 text-red-500 hover:text-white font-bold py-3 rounded-lg border border-red-600/30 flex items-center justify-center gap-2 transition-all">
+<span class="material-symbols-outlined text-lg">logout</span>
+                        Encerrar Sessão
+                    </button>
+</div>
+</aside>
+</main>
+<!-- Bottom Tab bar style spacer for mobile -->
+<div class="h-16 lg:hidden"></div>
+</div>
+</body></html>
