@@ -900,25 +900,24 @@ async function setupWebSocket() {
                     if (navigator.vibrate) navigator.vibrate(50);
                 }
                 break;
+            case 'host-disconnected':
+                showSessionBanner('O host desconectou. Aguardando reconexão...', 'warning');
+                break;
+
+            case 'session-ended':
+                wsIntentionalClose = true;
+                if (localStream) localStream.getTracks().forEach(t => t.stop());
+                if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) {} }); rtcClient.peers.clear(); }
+                if (speakerDetectionInterval) { clearInterval(speakerDetectionInterval); speakerDetectionInterval = null; }
+                showSessionEndedScreen('O host encerrou a sessão.');
+                break;
+
             case 'kicked':
                 wsIntentionalClose = true;
-                // Parar tracks locais
-                if (localStream) {
-                    localStream.getTracks().forEach(t => t.stop());
-                }
-                // Fechar conexões RTC
-                if (rtcClient) {
-                    rtcClient.peers.forEach((pc, id) => { try { pc.close(); } catch (e) { } });
-                    rtcClient.peers.clear();
-                }
-                // Parar speaker detection
-                if (speakerDetectionInterval) {
-                    clearInterval(speakerDetectionInterval);
-                    speakerDetectionInterval = null;
-                }
-                // Mostrar mensagem e redirecionar
-                alert('Você foi removido da sala pelo produtor.');
-                window.location.href = 'index.html';
+                if (localStream) localStream.getTracks().forEach(t => t.stop());
+                if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) {} }); rtcClient.peers.clear(); }
+                if (speakerDetectionInterval) { clearInterval(speakerDetectionInterval); speakerDetectionInterval = null; }
+                showSessionEndedScreen('Você foi removido da sala pelo produtor.');
                 break;
             case 'error':
                 console.error('SERVER ERROR:', data.message);
@@ -1281,6 +1280,47 @@ if (window.location.protocol !== 'https:' && window.location.hostname !== 'local
     if (accessMsg) {
         accessMsg.innerHTML = '<b class="text-red-500">⚠️ iPhone detectado via IP:</b> A câmera do iOS só funciona via HTTPS. <br>Use o modo Túnel ou HTTPS para habilitar a câmera.';
     }
+}
+
+// Banner temporário de aviso no topo da tela (host desconectou mas ainda no grace period)
+function showSessionBanner(message, type = 'warning') {
+    const existing = document.getElementById('session-banner');
+    if (existing) existing.remove();
+
+    const banner = document.createElement('div');
+    banner.id = 'session-banner';
+    banner.className = `fixed top-0 inset-x-0 z-[300] flex items-center justify-center gap-3 py-3 px-6 text-sm font-bold ${
+        type === 'warning' ? 'bg-yellow-600/90 text-white' : 'bg-red-600/90 text-white'
+    } backdrop-blur-sm shadow-xl`;
+    banner.innerHTML = `<i class="ph ph-warning text-lg"></i><span>${message}</span>`;
+    document.body.appendChild(banner);
+}
+
+// Tela de encerramento de sessão (host encerrou ou usuário foi removido)
+function showSessionEndedScreen(reason) {
+    // Remove banner de aviso se existir
+    const banner = document.getElementById('session-banner');
+    if (banner) banner.remove();
+
+    // Oculta tela de chamada
+    const callScreen = document.getElementById('call-screen');
+    if (callScreen) callScreen.classList.add('hidden');
+
+    // Cria overlay de encerramento
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 z-[400] bg-win-bg flex flex-col items-center justify-center gap-6 p-8 text-center';
+    overlay.innerHTML = `
+        <div class="w-20 h-20 rounded-full bg-red-600/20 border border-red-500/30 flex items-center justify-center mb-2">
+            <i class="ph ph-phone-disconnect text-4xl text-red-400"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-white tracking-tight">Sessão Encerrada</h2>
+        <p class="text-sm text-gray-400 max-w-xs">${reason}</p>
+        <button onclick="window.location.href='index.html'"
+            class="mt-4 bg-win-accent hover:bg-win-accent/80 text-white font-bold px-8 py-3 rounded-win text-sm uppercase tracking-widest transition-all active:scale-95">
+            Voltar ao Início
+        </button>
+    `;
+    document.body.appendChild(overlay);
 }
 
 function showToast(message, type = "info") {

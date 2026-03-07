@@ -8,8 +8,11 @@ const MAX_CONNECTIONS_PER_IP = 10;
 const MAX_MESSAGES_PER_SECOND = 30;
 const connectionsByIp = new Map(); // ip -> count
 
+const HOST_GRACE_MS = 30_000; // 30s para o host reconectar antes de encerrar a sessão
+
 function setupSignaling(server) {
     const wss = new WebSocket.Server({ server });
+    const hostGraceTimers = new Map(); // roomId -> setTimeout handle
 
     wss.on('connection', (ws, req) => {
         const ip = req.socket.remoteAddress;
@@ -84,6 +87,13 @@ function setupSignaling(server) {
                                 message: 'Senha incorreta para esta sala.'
                             }));
                             return;
+                        }
+
+                        // Se o host estava no grace period, cancelar o timer de encerramento
+                        if (data.participant && data.participant.role === 'host' && hostGraceTimers.has(normalizedRoomId)) {
+                            clearTimeout(hostGraceTimers.get(normalizedRoomId));
+                            hostGraceTimers.delete(normalizedRoomId);
+                            console.log(`[GRACE] Host reconectou à sala "${normalizedRoomId}". Sessão mantida.`);
                         }
 
                         const participant = roomManager.joinRoom(normalizedRoomId, { ...data.participant, ws });
@@ -299,8 +309,37 @@ function setupSignaling(server) {
             else connectionsByIp.set(ip, remaining);
 
             if (currentRoomId && participantId) {
-                console.log(`Participant ${participantId} left room ${currentRoomId}`);
+                const roomBeforeLeave = roomManager.getRoom(currentRoomId);
+                const wasHost = roomBeforeLeave && roomBeforeLeave.host === participantId;
+
+                console.log(`Participant ${participantId} left room ${currentRoomId}${wasHost ? ' [HOST]' : ''}`);
                 roomManager.leaveRoom(currentRoomId, participantId);
+
+                if (wasHost) {
+                    // Grace period: dá 30s para o host reconectar antes de encerrar a sessão
+                    const timer = setTimeout(() => {
+                        hostGraceTimers.delete(currentRoomId);
+                        const room = roomManager.getRoom(currentRoomId);
+                        const hasGuests = room && room.participants.some(p => p.role !== 'host');
+
+                        if (hasGuests) {
+                            console.log(`[GRACE] Host não reconectou à sala "${currentRoomId}". Encerrando sessão para ${room.participants.length} convidado(s).`);
+                            broadcastToRoom(currentRoomId, { type: 'session-ended' });
+                            // Fechar conexões dos convidados após breve delay para garantir entrega
+                            setTimeout(() => {
+                                roomManager.getParticipants(currentRoomId).forEach(p => {
+                                    if (p.ws) try { p.ws.close(); } catch (_) {}
+                                });
+                            }, 2000);
+                        }
+                    }, HOST_GRACE_MS);
+
+                    hostGraceTimers.set(currentRoomId, timer);
+                    console.log(`[GRACE] Host da sala "${currentRoomId}" desconectou. Grace period de ${HOST_GRACE_MS / 1000}s iniciado.`);
+
+                    // Avisar convidados que o host desconectou (mas a sessão ainda está viva)
+                    broadcastToRoom(currentRoomId, { type: 'host-disconnected', gracePeriodMs: HOST_GRACE_MS });
+                }
 
                 const room = roomManager.getRoom(currentRoomId);
                 if (room) {
