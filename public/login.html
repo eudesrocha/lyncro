@@ -5,15 +5,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyncro - Login do Host</title>
+    <!-- Google Fonts: Inter e Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="js/theme.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
+    <script>tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'win-accent': '#0078d4', 'win-bg': '#1c1c1c'
+                    }
+
+                    ,
+                    fontFamily: {
+                        'logo': ['"Outfit"', 'sans-serif']
+                    }
+                }
+            }
+        }
+
+    </script>
     <style>
         body {
-            background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
             min-height: 100vh;
+            background: #f8fafc;
+        }
+
+        html.dark body {
+            background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
         }
 
         .mica-effect {
@@ -21,13 +47,30 @@
             background: rgba(43, 43, 43, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        html:not(.dark) .mica-effect {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        html:not(.dark) input {
+            background: rgba(255, 255, 255, 0.5) !important;
+            color: #121212 !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+        }
+
+        html:not(.dark) input::placeholder {
+            color: rgba(0, 0, 0, 0.4) !important;
+        }
     </style>
 </head>
 
-<body class="flex items-center justify-center p-6 text-white font-sans">
+<body
+    class="flex items-center justify-center p-6 text-gray-900 dark:text-white font-sans transition-colors duration-300">
     <div class="w-full max-w-md mica-effect p-8 rounded-2xl shadow-2xl animate-reveal">
         <header class="text-center mb-8">
-            <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-2">LYNCRO</h1>
+            <h1 class="text-[2.5rem] font-logo font-[600] italic tracking-tight mb-2 leading-none">Lyncro</h1>
             <p class="text-[10px] font-bold text-win-accent tracking-[0.3em] uppercase">HOST LOGIN</p>
         </header>
 

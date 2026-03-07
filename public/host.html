@@ -5,10 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyncro - Host Monitor</title>
-    <!-- Google Fonts: Inter para fallback premium no iOS -->
+    <!-- Google Fonts: Inter para fallback premium no iOS e Outfit para o Logo -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <!-- Tailwind CSS (usando via CDN para simplificar no MVP, mas configurado localmente se necessário) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -28,6 +30,7 @@
                     fontFamily: {
                         'segoe-black': ['Inter', '"Segoe UI Black"', '"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
                         'segoe': ['Inter', '"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
+                        'logo': ['"Outfit"', 'sans-serif'],
                     }
                 }
             }
@@ -174,15 +177,15 @@
 </head>
 
 <body
-    class="min-h-screen dark:bg-win-bg bg-white dark:text-gray-100 text-gray-900 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
+    class="min-h-screen dark:bg-win-bg bg-[#f8fafc] dark:text-gray-100 text-gray-900 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
 
     <header class="flex justify-between items-center mb-8 border-b border-win-border pb-5">
         <!-- Esquerda: Logo + Controles gerais -->
         <div class="flex items-center gap-6">
             <div class="flex items-baseline gap-2.5">
                 <h1
-                    class="text-3xl font-segoe-black font-[900] italic tracking-[-0.02em] text-white leading-none uppercase">
-                    LYNCRO</h1>
+                    class="text-3xl font-logo font-[600] italic tracking-tight dark:text-white text-gray-900 leading-none">
+                    Lyncro</h1>
                 <span class="text-sm font-bold text-win-accent tracking-[0.2em] uppercase">Host Monitor</span>
             </div>
 
