@@ -128,6 +128,7 @@ function updateOverlay(action, name, title, style) {
         titleEl.textContent = title || '';
 
         overlay.classList.remove('overlay-animated-in', 'overlay-animated-out', 'overlay-in-bottom', 'overlay-out-bottom');
+        void overlay.offsetWidth; // force reflow so animation retriggers
         overlay.classList.add(animIn);
         overlay.style.opacity = '1';
     } else {

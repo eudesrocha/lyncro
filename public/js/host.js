@@ -431,7 +431,7 @@ function updateUI(participants) {
             updateParticipantStatus(p);
         }
 
-        if (!rtcClient.peers.has(p.id) && p.role !== 'observer' && myId && myId < p.id) {
+        if (!rtcClient.peers.has(p.id) && p.role !== 'observer' && myId) {
             initiateConnection(p.id);
         }
     });
