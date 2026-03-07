@@ -11,35 +11,15 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/css/tailwind.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <script src="js/theme.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
-    <script>tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'win-accent': '#0078d4', 'win-bg': '#1c1c1c'
-                    }
-
-                    ,
-                    fontFamily: {
-                        'logo': ['"Outfit"', 'sans-serif']
-                    }
-                }
-            }
-        }
-
-    </script>
     <style>
         body {
             min-height: 100vh;
-            background: #f8fafc;
-        }
-
-        html.dark body {
             background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
+            color: #fff;
         }
 
         .mica-effect {
@@ -48,41 +28,39 @@
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        html:not(.dark) .mica-effect {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        input {
+            background: rgba(0, 0, 0, 0.4) !important;
+            color: #fff !important;
+            border-color: rgba(255, 255, 255, 0.1) !important;
         }
 
-        html:not(.dark) input {
-            background: rgba(255, 255, 255, 0.5) !important;
-            color: #121212 !important;
-            border-color: rgba(0, 0, 0, 0.1) !important;
+        input:focus {
+            border-color: #0078d4 !important;
         }
 
-        html:not(.dark) input::placeholder {
-            color: rgba(0, 0, 0, 0.4) !important;
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.3) !important;
         }
     </style>
 </head>
 
-<body
-    class="flex items-center justify-center p-6 text-gray-900 dark:text-white font-sans transition-colors duration-300">
+<body class="flex items-center justify-center p-6 text-white font-sans transition-colors duration-300">
     <div class="w-full max-w-md mica-effect p-8 rounded-2xl shadow-2xl animate-reveal">
         <header class="text-center mb-8">
-            <h1 class="text-[2.5rem] font-logo font-[600] italic tracking-tight mb-2 leading-none">Lyncro</h1>
+            <h1 class="text-[2.5rem] font-logo font-[600] italic tracking-tight mb-2 leading-none text-white">Lyncro
+            </h1>
             <p class="text-[10px] font-bold text-win-accent tracking-[0.3em] uppercase">HOST LOGIN</p>
         </header>
 
         <div id="login-form" class="space-y-6">
             <div class="space-y-2">
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">E-mail</label>
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">E-mail</label>
                 <input type="email" id="email" placeholder="seu@email.com"
                     class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
             </div>
 
             <div class="space-y-2">
-                <label class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Senha <span
+                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Senha <span
                         class="text-[8px] opacity-50 lowercase">(Opcional para Link Mágico)</span></label>
                 <input type="password" id="password" placeholder="••••••••"
                     class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
@@ -103,7 +81,7 @@
             <div class="relative flex items-center justify-center py-2">
                 <div class="w-full border-t border-white/10"></div>
                 <span
-                    class="absolute bg-[#1c1c1c] px-4 text-[10px] text-gray-500 font-bold uppercase tracking-widest">ou</span>
+                    class="absolute bg-[#121212] px-4 text-[10px] text-gray-400 font-bold uppercase tracking-widest">ou</span>
             </div>
 
             <button onclick="window.LYNCRO_AUTH.loginWithGoogle()"

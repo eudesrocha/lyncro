@@ -18,29 +18,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'win-bg': '#1c1c1c',
-                        'win-card': '#2b2b2b',
-                        'win-surface': '#323232',
-                        'win-accent': '#0078d4',
-                        'win-border': '#2a2a2a',
-                    },
-                    borderRadius: { 'win': '4px' },
-                    fontFamily: {
-                        'segoe-black': ['"Segoe UI Black"', 'Inter', '"Segoe UI"', 'sans-serif'],
-                        'segoe': ['"Segoe UI"', 'Inter', 'sans-serif'],
-                        'logo': ['"Outfit"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <script src="js/theme.js"></script>
+    <link rel="stylesheet" href="/css/tailwind.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
         /* Custom Dropdown Styles */
@@ -106,11 +84,8 @@
         html {
             height: 100%;
             overflow: hidden;
-            /* bg controlado por classes do tailwind na variavel dark: e classes padrao */
-        }
-
-        html.dark body {
             background-color: #1c1c1c;
+            color: #fff;
         }
 
         .tally-program {
@@ -242,11 +217,11 @@
     </style>
 </head>
 
-<body class="text-gray-900 dark:text-gray-100 font-sans dark:bg-win-bg bg-[#f8fafc] transition-colors duration-300">
+<body class="text-gray-100 font-sans bg-win-bg transition-colors duration-300">
 
     <!-- Pré-chamada / Lobby Local -->
     <div id="precall-screen"
-        class="fixed inset-0 z-[100] dark:bg-win-bg bg-[#f8fafc] flex flex-col items-center overflow-y-auto p-6 pb-[env(safe-area-inset-bottom)]">
+        class="fixed inset-0 z-[100] bg-win-bg flex flex-col items-center overflow-y-auto p-6 pb-[env(safe-area-inset-bottom)]">
         <div class="w-full max-w-sm flex flex-col items-center py-8">
             <div class="flex w-full items-center gap-3 mb-6">
                 <div class="w-10 h-10 bg-win-accent rounded-win flex items-center justify-center shadow-md shrink-0">
@@ -254,7 +229,7 @@
                 </div>
                 <div class="flex flex-col text-left">
                     <h1 class="text-[18px] font-bold leading-tight">Configure sua Entrada</h1>
-                    <p class="text-[9px] text-gray-500 uppercase tracking-widest mt-0.5">Teste sua câmera e microfone
+                    <p class="text-[9px] text-gray-400 uppercase tracking-widest mt-0.5">Teste sua câmera e microfone
                     </p>
                 </div>
             </div>
@@ -274,13 +249,13 @@
                     <!-- Camera Select -->
                     <div class="relative">
                         <label
-                            class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1 block ml-1">Câmera</label>
+                            class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Câmera</label>
                         <div id="cam-select-trigger" class="custom-select-trigger !py-2.5">
                             <div class="flex items-center gap-2 truncate">
                                 <i class="ph ph-video-camera text-win-accent shrink-0"></i>
                                 <span id="cam-display-name" class="truncate text-[11px]">Câmera...</span>
                             </div>
-                            <i class="ph ph-caret-down text-gray-500 text-[10px] shrink-0"></i>
+                            <i class="ph ph-caret-down text-gray-400 text-[10px] shrink-0"></i>
                         </div>
                         <div id="cam-select-menu" class="custom-select-menu">
                             <!-- Populated by JS -->
@@ -290,13 +265,13 @@
                     <!-- Mic Select -->
                     <div class="relative">
                         <label
-                            class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1 block ml-1">Microfone</label>
+                            class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Microfone</label>
                         <div id="mic-select-trigger" class="custom-select-trigger !py-2.5">
                             <div class="flex items-center gap-2 truncate">
                                 <i class="ph ph-microphone text-win-accent shrink-0"></i>
                                 <span id="mic-display-name" class="truncate text-[11px]">Micro...</span>
                             </div>
-                            <i class="ph ph-caret-down text-gray-500 text-[10px] shrink-0"></i>
+                            <i class="ph ph-caret-down text-gray-400 text-[10px] shrink-0"></i>
                         </div>
                         <div id="mic-select-menu" class="custom-select-menu">
                             <!-- Populated by JS -->
@@ -307,14 +282,14 @@
                 <!-- Quality Select -->
                 <div class="relative">
                     <label
-                        class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-1 block ml-1">Qualidade
+                        class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1 block ml-1">Qualidade
                         Video</label>
                     <div id="quality-select-trigger" class="custom-select-trigger !py-2.5">
                         <div class="flex items-center gap-2">
                             <i class="ph ph-broadcast text-win-accent shrink-0"></i>
                             <span id="quality-display-name" class="text-[11px]">720p HD</span>
                         </div>
-                        <i class="ph ph-caret-down text-gray-500 text-[10px]"></i>
+                        <i class="ph ph-caret-down text-gray-400 text-[10px]"></i>
                     </div>
                     <div id="quality-select-menu" class="custom-select-menu">
                         <div class="custom-select-option" onclick="selectQuality('720', 'Alta Definição (720p)')">
@@ -343,7 +318,7 @@
             <!-- Virtual Background Selector -->
             <div class="w-full mb-6">
                 <label
-                    class="text-[9px] text-gray-500 uppercase tracking-widest font-bold mb-2 block ml-1 flex items-center gap-1">
+                    class="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-2 block ml-1 flex items-center gap-1">
                     <i class="ph ph-sparkle text-win-accent"></i> Fundo Virtual
                 </label>
 
@@ -458,7 +433,7 @@
             </div>
             <div class="flex flex-col">
                 <span class="text-[10px] font-bold text-win-accent uppercase tracking-widest">Compartilhando</span>
-                <span class="text-[9px] text-gray-500 uppercase tracking-tighter">Sua tela está visível</span>
+                <span class="text-[9px] text-gray-400 uppercase tracking-tighter">Sua tela está visível</span>
             </div>
         </div>
 
@@ -756,7 +731,8 @@
     <!-- Script de Fundo Virtual Inteligente (MediaPipe) -->
     <script src="js/virtual-background.js?v=3"></script>
     <script src="js/webrtc.js?v=3"></script>
-    <script src="js/guest.js?v=4"></script>
+    <script src="js/guest.js?v=5"></script>
+    <script src="js/guest-chat.js"></script>
     <script>
         // Forçar atualização do Service Worker (resolve cache travado no mobile)
         if ('serviceWorker' in navigator) {

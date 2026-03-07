@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const persistentStore = require('./store');
 
 class RoomManager {
     constructor() {
@@ -7,18 +8,29 @@ class RoomManager {
 
     createRoom(roomId = uuidv4(), password = null) {
         if (!this.rooms.has(roomId)) {
+            // Recuperar metadados persistidos (password, hostUserId) se existirem
+            const saved = persistentStore.getRoom(roomId);
             this.rooms.set(roomId, {
                 participants: new Map(),
                 host: null,
-                hostUserId: null, // Supabase user ID do dono da sala
-                password: password ? String(password).trim() : null
+                hostUserId: saved ? saved.hostUserId : null,
+                password: saved ? saved.password : (password ? String(password).trim() : null)
             });
+
+            // Persistir metadados se for uma sala nova
+            if (!saved) {
+                persistentStore.setRoom(roomId, {
+                    password: password ? String(password).trim() : null,
+                    hostUserId: null
+                });
+            }
         }
         return roomId;
     }
 
     joinRoom(roomId, participantData) {
         if (!this.rooms.has(roomId)) {
+            // createRoom já carrega metadados persistidos se existirem
             this.createRoom(roomId);
         }
 
@@ -49,9 +61,13 @@ class RoomManager {
                 return { rejected: true, reason: 'Esta sala já pertence a outro usuário.' };
             }
 
-            // Registrar ou manter o dono
+            // Registrar ou manter o dono (e persistir para sobreviver a restarts)
             if (!room.hostUserId && incomingUserId) {
                 room.hostUserId = incomingUserId;
+                persistentStore.setRoom(roomId, {
+                    password: room.password,
+                    hostUserId: incomingUserId
+                });
             }
 
             // Se já existia um host antigo (ex: aba duplicada do MESMO usuário), removemos ele
@@ -86,7 +102,9 @@ class RoomManager {
         }
 
         if (room.participants.size === 0) {
-            this.rooms.delete(roomId); // Limpa tudo incluindo hostUserId
+            // Remove da memória mas mantém metadados no store (password, hostUserId)
+            // para que o host possa reconectar com as mesmas credenciais
+            this.rooms.delete(roomId);
         }
 
         return participant;

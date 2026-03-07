@@ -11,7 +11,21 @@ const server = http.createServer(app);
 // Configuração para Nuvem (Heroku, Railway, etc.)
 app.set('trust proxy', 1);
 
-app.use(cors());
+// CORS: em produção, restringir ao domínio configurado via ALLOWED_ORIGIN.
+// Em desenvolvimento (localhost), aceita qualquer origem.
+const allowedOrigin = process.env.ALLOWED_ORIGIN || null;
+app.use(cors({
+    origin: (origin, callback) => {
+        // Requisições sem origin (ex: mobile apps, curl) sempre passam
+        if (!origin) return callback(null, true);
+        // Em dev (sem ALLOWED_ORIGIN), aceita tudo
+        if (!allowedOrigin) return callback(null, true);
+        // Em produção, valida contra o domínio configurado
+        if (origin === allowedOrigin) return callback(null, true);
+        callback(new Error(`CORS bloqueado: origem não permitida (${origin})`));
+    },
+    credentials: true
+}));
 app.use(express.json());
 
 // Anti-cache para arquivos estáticos (resolve cache agressivo em mobile Safari/Chrome)
@@ -26,6 +40,13 @@ app.use(express.static(path.join(__dirname, '../public'), {
 }));
 
 // API Endpoints
+
+// Injeta configuração no front-end (SIGNALING_URL pode ser definido via env var)
+app.get('/api/config', (_req, res) => {
+    const signalingUrl = process.env.SIGNALING_URL || null;
+    res.json({ signalingUrl });
+});
+
 app.get('/api/rooms', (req, res) => {
     const rooms = Array.from(roomManager.rooms.keys()).map(id => roomManager.getRoom(id));
     res.json(rooms);

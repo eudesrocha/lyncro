@@ -41,6 +41,8 @@ let returnAudioStream = null; // Áudio de Loopback do Mix-Minus
 let rtcClient;
 let ws;
 let myId;
+let wsReconnectDelay = 2000;      // Backoff exponencial (inicia em 2s, max 30s)
+let wsIntentionalClose = false;   // Evita reconexão ao fechar propositalmente
 let processedStream = null; // Stream pós-IA (se ativo)
 let currentVbMode = 'none';
 let currentVbImage = null;
@@ -245,7 +247,10 @@ function injectReturnAudioToPeers() {
     }
 }
 
-function setupWebSocket() {
+async function setupWebSocket() {
+    // Aguardar config estar pronta antes de ler SIGNALING_URL (evita race condition)
+    if (window.LYNCRO_CONFIG_READY) await window.LYNCRO_CONFIG_READY;
+
     let wsUrl;
     if (window.LYNCRO_CONFIG && window.LYNCRO_CONFIG.SIGNALING_URL) {
         wsUrl = window.LYNCRO_CONFIG.SIGNALING_URL;
@@ -256,17 +261,22 @@ function setupWebSocket() {
     }
 
     ws = new WebSocket(wsUrl);
-    const storedPassword = localStorage.getItem(`room_pwd_${roomName}`);
+    const storedPassword = sessionStorage.getItem(`room_pwd_${roomName}`);
 
     ws.onopen = async () => {
+        wsReconnectDelay = 2000; // Reset do backoff após conexão bem-sucedida
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, initiateConnection, null, handleDataMessage);
         rtcClient.setLocalStream(processedStream || localStream);
 
-        // Obter userId do Supabase para proteção de ownership
+        // Obter sessão Supabase para ownership e autenticação
         let userId = null;
+        let accessToken = null;
         try {
             const session = await window.LYNCRO_AUTH.getSession();
-            if (session && session.user) userId = session.user.id;
+            if (session && session.user) {
+                userId = session.user.id;
+                accessToken = session.access_token;
+            }
         } catch (e) {
             console.warn('Sem sessão Supabase para ownership:', e);
         }
@@ -277,7 +287,8 @@ function setupWebSocket() {
             participant: {
                 name: userName,
                 role: 'host',
-                userId: userId
+                userId: userId,
+                token: accessToken  // JWT para validação no servidor
             }
         };
 
@@ -312,7 +323,30 @@ function setupWebSocket() {
             case 'chat-typing':
                 handleTypingIndicator(data.name, data.isTyping);
                 break;
+            case 'error':
+                console.error('[Server Error]', data.message);
+                if (data.message && data.message.includes('host negado')) {
+                    wsIntentionalClose = true;
+                    alert('Sessão expirada. Faça login novamente.');
+                    window.location.href = 'login.html';
+                } else {
+                    showToast(data.message || 'Erro no servidor.', 'error');
+                }
+                break;
         }
+    };
+
+    ws.onerror = (err) => {
+        console.error('[WS] Erro na conexão do Host:', err);
+    };
+
+    ws.onclose = () => {
+        if (wsIntentionalClose) return;
+        const delay = wsReconnectDelay;
+        wsReconnectDelay = Math.min(wsReconnectDelay * 2, 30000);
+        console.warn(`[WS] Conexão perdida. Reconectando em ${delay / 1000}s...`);
+        showToast(`Conexão perdida. Reconectando em ${delay / 1000}s...`, 'info');
+        setTimeout(setupWebSocket, delay);
     };
 }
 
@@ -1013,7 +1047,7 @@ window.copyCleanFeed = (pId, type = 'camera') => {
     });
 };
 
-// === TOGGLE PAINÉIS E DROPDOWNS ===
+// === TOGGLE PAINÉIS ===
 window.toggleCardPanel = (panelId) => {
     const panel = document.getElementById(panelId);
     if (!panel) return;
@@ -1027,28 +1061,7 @@ window.toggleCardPanel = (panelId) => {
     panel.classList.toggle('hidden');
 };
 
-window.toggleCardDropdown = (dropdownId) => {
-    const dropdown = document.getElementById(dropdownId);
-    if (!dropdown) return;
-    // Fechar todos os outros dropdowns primeiro
-    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(dd => {
-        if (dd.id !== dropdownId) dd.classList.add('hidden');
-    });
-    dropdown.classList.toggle('hidden');
-};
-
-function closeAllCardDropdowns() {
-    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(dd => {
-        dd.classList.add('hidden');
-    });
-}
-
-// Fechar dropdowns ao clicar fora
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('[id^="mic-dropdown-"]') && !e.target.closest('[id^="cam-dropdown-"]') && !e.target.closest('[onclick*="toggleCardDropdown"]')) {
-        closeAllCardDropdowns();
-    }
-});
+// toggleCardDropdown definido abaixo com lógica completa de enumeração de dispositivos
 
 window.copyInviteLink = async () => {
     let baseUrl = window.location.origin;
@@ -1072,73 +1085,7 @@ function showToast(message, type = "info") {
     setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
 }
 
-const chatInput = document.getElementById('chat-input');
-const chatMessages = document.getElementById('chat-messages');
-const sendChatBtn = document.getElementById('send-chat');
-
-function sendChatMessage() {
-    const text = chatInput.value.trim();
-    if (text && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'chat', roomId: roomName, name: 'Produção (Host)', text: text, timestamp: Date.now() }));
-        chatInput.value = '';
-    }
-}
-
-if (sendChatBtn) sendChatBtn.onclick = sendChatMessage;
-if (chatInput) chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendChatMessage(); };
-
-// --- Typing Indicator ---
-let typingTimeout = null;
-const typingIndicatorEl = document.getElementById('typing-indicator');
-const typingUsers = new Set();
-
-if (chatInput) {
-    chatInput.addEventListener('input', () => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: 'Produção (Host)', isTyping: true }));
-        }
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: 'Produção (Host)', isTyping: false }));
-            }
-        }, 1500);
-    });
-}
-
-function handleTypingIndicator(name, isTyping) {
-    if (name === 'Produção (Host)') return; // Ignore own typing
-    if (isTyping) {
-        typingUsers.add(name);
-    } else {
-        typingUsers.delete(name);
-    }
-    if (typingIndicatorEl) {
-        if (typingUsers.size > 0) {
-            const names = Array.from(typingUsers).join(', ');
-            typingIndicatorEl.textContent = `${names} está digitando...`;
-            typingIndicatorEl.classList.remove('hidden');
-        } else {
-            typingIndicatorEl.classList.add('hidden');
-        }
-    }
-}
-
-function appendChatMessage(name, text, time) {
-    if (!chatMessages) return;
-    const msg = document.createElement('div');
-    const isMe = name === 'Produção (Host)';
-    msg.className = `flex flex-col max-w-[90%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
-    const timeStr = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    msg.innerHTML = `
-        <span class="text-[9px] text-gray-500 mb-1 px-1 font-bold uppercase tracking-tighter">${name} • ${timeStr}</span>
-        <div class="px-4 py-2 rounded-win shadow-lg ${isMe ? 'bg-win-accent text-white border-none' : 'bg-black/40 border border-win-border/60 text-gray-200'} text-sm leading-relaxed">
-            ${text}
-        </div>
-    `;
-    chatMessages.appendChild(msg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+// Chat e Typing Indicator movidos para host-chat.js
 
 // Funcao exposta pro HTML para selecionar Fundo (Host)
 window.setVirtualBackground = async (mode, imageUrl = null, btnId = null) => {
@@ -1404,9 +1351,3 @@ window.switchHostDevice = async (deviceId, kind) => {
     }
 };
 
-// Global click event para desmarcar os popups se clicar fora
-document.addEventListener('click', (e) => {
-    if (!e.target.closest('[id^="mic-dropdown-"]') && !e.target.closest('[id^="cam-dropdown-"]') && !e.target.closest('.ph-caret-down') && !e.target.closest('button[onclick^="toggleCardDropdown"]')) {
-        document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(el => el.classList.add('hidden'));
-    }
-});

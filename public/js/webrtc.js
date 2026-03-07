@@ -336,18 +336,18 @@ class WebRTCClient {
     }
 
     addExtraTrack(track, stream) {
-        this.peers.forEach((peer, id) => {
-            peer.pc.addTrack(track, stream);
+        this.peers.forEach((pc, id) => {
+            pc.addTrack(track, stream);
             this.createOffer(id);
         });
     }
 
     removeExtraTrack(track) {
-        this.peers.forEach((peer, id) => {
-            const senders = peer.pc.getSenders();
+        this.peers.forEach((pc, id) => {
+            const senders = pc.getSenders();
             const sender = senders.find(s => s.track === track);
             if (sender) {
-                peer.pc.removeTrack(sender);
+                pc.removeTrack(sender);
                 this.createOffer(id);
             }
         });

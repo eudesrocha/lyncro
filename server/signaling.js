@@ -1,14 +1,34 @@
 const WebSocket = require('ws');
 const roomManager = require('./rooms');
 const { getIceServers } = require('./ice');
+const { verifySupabaseToken } = require('./auth');
+
+// Rate limiting simples por IP: máx de conexões simultâneas e mensagens por segundo
+const MAX_CONNECTIONS_PER_IP = 10;
+const MAX_MESSAGES_PER_SECOND = 30;
+const connectionsByIp = new Map(); // ip -> count
 
 function setupSignaling(server) {
     const wss = new WebSocket.Server({ server });
 
     wss.on('connection', (ws, req) => {
         const ip = req.socket.remoteAddress;
-        console.log(`\n[WS] >>> TENTATIVA DE CONEXÃO RECEBIDA DE: ${ip}`);
+
+        // Limitar conexões simultâneas por IP
+        const ipCount = (connectionsByIp.get(ip) || 0) + 1;
+        if (ipCount > MAX_CONNECTIONS_PER_IP) {
+            console.warn(`[Rate Limit] IP ${ip} excedeu limite de conexões (${MAX_CONNECTIONS_PER_IP}). Rejeitando.`);
+            ws.close(1008, 'Muitas conexões do mesmo IP.');
+            return;
+        }
+        connectionsByIp.set(ip, ipCount);
+
+        console.log(`\n[WS] Conexão de: ${ip} (${ipCount}/${MAX_CONNECTIONS_PER_IP})`);
         console.log(`[WS] User-Agent: ${req.headers['user-agent']}`);
+
+        // Contador de mensagens por segundo
+        let msgCount = 0;
+        const msgReset = setInterval(() => { msgCount = 0; }, 1000);
 
         let currentRoomId = null;
         let participantId = null;
@@ -16,6 +36,13 @@ function setupSignaling(server) {
         ws.on('error', (err) => console.error(`[WS Error] ${ip}:`, err));
 
         ws.on('message', async (message) => {
+            // Rate limit: rejeitar se exceder mensagens por segundo
+            msgCount++;
+            if (msgCount > MAX_MESSAGES_PER_SECOND) {
+                console.warn(`[Rate Limit] IP ${ip} excedeu ${MAX_MESSAGES_PER_SECOND} msg/s. Ignorando.`);
+                return;
+            }
+
             try {
                 const data = JSON.parse(message);
                 const rawRoomId = data.roomId;
@@ -26,6 +53,23 @@ function setupSignaling(server) {
                     case 'join':
                         currentRoomId = normalizedRoomId;
                         const room_join = roomManager.rooms.get(normalizedRoomId);
+
+                        // Validar identidade do host via JWT do Supabase
+                        if (data.participant && data.participant.role === 'host') {
+                            const token = data.participant.token;
+                            const supabaseUser = await verifySupabaseToken(token);
+                            if (!supabaseUser) {
+                                console.log(`[JOIN REJECTED] Room: "${normalizedRoomId}" | Motivo: Token de host inválido`);
+                                ws.send(JSON.stringify({
+                                    type: 'error',
+                                    message: 'Acesso de host negado. Faça login novamente.'
+                                }));
+                                ws.close();
+                                return;
+                            }
+                            // Garantir que o userId usado para ownership seja o do Supabase
+                            data.participant.userId = supabaseUser.id;
+                        }
 
                         // Validar senha se a sala possuir uma
                         if (room_join && room_join.password && data.password !== room_join.password) {
@@ -244,6 +288,11 @@ function setupSignaling(server) {
         });
 
         ws.on('close', () => {
+            clearInterval(msgReset);
+            const remaining = (connectionsByIp.get(ip) || 1) - 1;
+            if (remaining <= 0) connectionsByIp.delete(ip);
+            else connectionsByIp.set(ip, remaining);
+
             if (currentRoomId && participantId) {
                 console.log(`Participant ${participantId} left room ${currentRoomId}`);
                 roomManager.leaveRoom(currentRoomId, participantId);

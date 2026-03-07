@@ -11,31 +11,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&family=Outfit:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
-    <!-- Tailwind CSS (usando via CDN para simplificar no MVP, mas configurado localmente se necessário) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'win-bg': '#1c1c1c',      // Fundo principal
-                        'win-card': '#2b2b2b',    // Cards de vídeo
-                        'win-surface': '#323232', // Botões e inputs
-                        'win-accent': '#0078d4',  // Azul padrão Windows
-                        'win-border': '#2a2a2a',
-                    },
-                    borderRadius: {
-                        'win': '4px', // O segredo para não ficar "arredondado demais"
-                    },
-                    fontFamily: {
-                        'segoe-black': ['Inter', '"Segoe UI Black"', '"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
-                        'segoe': ['Inter', '"Segoe UI"', 'system-ui', '-apple-system', 'sans-serif'],
-                        'logo': ['"Outfit"', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="/css/tailwind.css">
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -177,14 +153,13 @@
 </head>
 
 <body
-    class="min-h-screen dark:bg-win-bg bg-[#f8fafc] dark:text-gray-100 text-gray-900 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
+    class="min-h-screen bg-win-bg text-gray-100 font-sans p-6 selection:bg-win-accent flex flex-col transition-colors duration-300">
 
     <header class="flex justify-between items-center mb-8 border-b border-win-border pb-5">
         <!-- Esquerda: Logo + Controles gerais -->
         <div class="flex items-center gap-6">
             <div class="flex items-baseline gap-2.5">
-                <h1
-                    class="text-3xl font-logo font-[600] italic tracking-tight dark:text-white text-gray-900 leading-none">
+                <h1 class="text-3xl font-logo font-[600] italic tracking-tight text-white leading-none">
                     Lyncro</h1>
                 <span class="text-sm font-bold text-win-accent tracking-[0.2em] uppercase">Host Monitor</span>
             </div>
@@ -227,7 +202,7 @@
                 class="text-[11px] text-win-accent font-black uppercase tracking-[0.15em] bg-win-accent/10 px-3 py-2 rounded-win border border-win-accent/20 shadow-inner">
             </div>
 
-            <button onclick="window.location.href='index.html'"
+            <button onclick="wsIntentionalClose = true; window.location.href='index.html'"
                 class="bg-red-600/10 border border-red-500/30 text-red-500 px-6 py-2 rounded-win hover:bg-red-600 hover:text-white transition-all text-[11px] font-black uppercase tracking-[0.2em] shadow-lg shadow-red-900/10">
                 Encerrar
             </button>
@@ -313,6 +288,7 @@
     <script src="js/virtual-background.js"></script>
     <script src="js/webrtc.js"></script>
     <script src="js/host.js"></script>
+    <script src="js/host-chat.js"></script>
 </body>
 
 </html>

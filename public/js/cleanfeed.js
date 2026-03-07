@@ -15,7 +15,10 @@ function init() {
     setupWebSocket();
 }
 
-function setupWebSocket() {
+async function setupWebSocket() {
+    // Aguardar config estar pronta antes de ler SIGNALING_URL (evita race condition)
+    if (window.LYNCRO_CONFIG_READY) await window.LYNCRO_CONFIG_READY;
+
     console.log('Clean Feed: Connecting to signal server...');
     let wsUrl;
 

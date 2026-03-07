@@ -9,6 +9,8 @@ let ws;
 let myId;
 let isMicOn = companionOf ? false : true; // Companion começa sempre mudo
 let isVideoOn = true;
+let wsReconnectDelay = 2000;     // Backoff exponencial (inicia em 2s, max 30s)
+let wsIntentionalClose = false;  // Evita reconexão em saídas propositais (kick, reject)
 let isHostMuted = false;
 let audioContext;
 let analyser;
@@ -746,7 +748,10 @@ function updateOverlay(action, name, title) {
     }
 }
 
-function setupWebSocket() {
+async function setupWebSocket() {
+    // Aguardar config estar pronta antes de ler SIGNALING_URL (evita race condition)
+    if (window.LYNCRO_CONFIG_READY) await window.LYNCRO_CONFIG_READY;
+
     let wsUrl;
 
     // Priorizar configuração global se disponível e preenchida
@@ -762,6 +767,7 @@ function setupWebSocket() {
     ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
+        wsReconnectDelay = 2000; // Reset do backoff após conexão bem-sucedida
         console.log('Conectado ao servidor de sinalização');
 
         // Feedback visual na tela de espera
@@ -848,6 +854,7 @@ function setupWebSocket() {
                     }
                     console.log('Fui aceito! Renderizando Call Screen e liberando Ice Candidates.');
                 } else if (data.status === 'rejected') {
+                    wsIntentionalClose = true;
                     alert('Sua entrada não foi aprovada pelo Produtor.');
                     window.location.reload();
                 }
@@ -894,6 +901,7 @@ function setupWebSocket() {
                 }
                 break;
             case 'kicked':
+                wsIntentionalClose = true;
                 // Parar tracks locais
                 if (localStream) {
                     localStream.getTracks().forEach(t => t.stop());
@@ -927,16 +935,18 @@ function setupWebSocket() {
     };
 
     ws.onerror = (err) => {
-        console.error('Erro no WebSocket:', err);
-        const waitTitle = document.querySelector('#waiting-screen h2');
-        if (waitTitle) waitTitle.innerHTML = '<span class="text-red-500">Erro de Conexão</span> <br><span class="text-xs font-normal text-gray-400">O celular não conseguiu falar com o servidor. Verifique o Firewall do PC.</span>';
+        console.error('[WS] Erro na conexão:', err);
+        // onclose será chamado logo em seguida — a reconexão acontece lá
     };
 
     ws.onclose = () => {
-        console.warn('Conexão perdida. Tentando reconectar em 3s...');
+        if (wsIntentionalClose) return;
+        const delay = wsReconnectDelay;
+        wsReconnectDelay = Math.min(wsReconnectDelay * 2, 30000);
+        console.warn(`[WS] Conexão perdida. Reconectando em ${delay / 1000}s...`);
         const waitTitle = document.querySelector('#waiting-screen h2');
-        if (waitTitle) waitTitle.innerHTML = '<span class="text-red-500">Conexão Perdida</span> <br><span class="text-sm font-normal text-gray-400">Tentando reconectar...</span>';
-        setTimeout(setupWebSocket, 3000);
+        if (waitTitle) waitTitle.innerHTML = `<span class="text-red-500">Conexão Perdida</span> <br><span class="text-sm font-normal text-gray-400">Reconectando em ${delay / 1000}s...</span>`;
+        setTimeout(setupWebSocket, delay);
     };
 }
 
@@ -967,12 +977,6 @@ function updateTally(tallyState) {
 async function initiateConnection(targetId) {
     const offer = await rtcClient.createOffer(targetId);
     ws.send(JSON.stringify({ type: 'offer', roomId: roomName, to: targetId, offer }));
-}
-
-// handleRemoteTrack já está definida na linha 287 — recebe tracks remotas (vídeo PiP + áudio)
-
-function handleIceCandidate(targetId, candidate) {
-    ws.send(JSON.stringify({ type: 'ice-candidate', roomId: roomName, to: targetId, candidate }));
 }
 
 // 3. Controles de Mídia
@@ -1279,6 +1283,16 @@ if (window.location.protocol !== 'https:' && window.location.hostname !== 'local
     }
 }
 
+function showToast(message, type = "info") {
+    const toast = document.createElement('div');
+    toast.className = `fixed bottom-6 right-6 px-4 py-2 rounded-win shadow-2xl border border-win-border text-xs z-50 transition-all font-semibold`;
+    const colors = { success: 'bg-green-600/90 text-white', error: 'bg-red-600/90 text-white', info: 'bg-win-accent/90 text-white' };
+    toast.classList.add(...(colors[type] || colors.info).split(' '));
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 3000);
+}
+
 // Inicialização
 setupCustomDropdowns();
 startPreCall().then(() => {
@@ -1293,124 +1307,7 @@ startPreCall().then(() => {
     }
 });
 
-// 5. Chat Privado (Convidado)
-const chatPanel = document.getElementById('chat-panel');
-const toggleChatBtn = document.getElementById('toggleChat');
-const closeChatBtn = document.getElementById('closeChat');
-const chatBadge = document.getElementById('chat-badge');
-const chatInput = document.getElementById('chat-input');
-const chatMessages = document.getElementById('chat-messages');
-const sendChatBtn = document.getElementById('send-chat');
-
-if (toggleChatBtn) {
-    toggleChatBtn.onclick = () => {
-        chatPanel.classList.toggle('hidden');
-        if (chatBadge) chatBadge.classList.add('hidden');
-    };
-}
-if (closeChatBtn) {
-    closeChatBtn.onclick = () => chatPanel.classList.add('hidden');
-}
-
-function sendChatMessage() {
-    const text = chatInput.value.trim();
-    if (text && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({
-            type: 'chat',
-            roomId: roomName,
-            name: userName,
-            text: text,
-            timestamp: Date.now()
-        }));
-        chatInput.value = '';
-    }
-}
-
-if (sendChatBtn) sendChatBtn.onclick = sendChatMessage;
-if (chatInput) chatInput.onkeypress = (e) => { if (e.key === 'Enter') sendChatMessage(); };
-
-// --- Typing Indicator (Guest) ---
-let typingTimeout = null;
-const typingIndicatorEl = document.getElementById('typing-indicator');
-const typingUsers = new Set();
-
-if (chatInput) {
-    chatInput.addEventListener('input', () => {
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: userName, isTyping: true }));
-        }
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-            if (ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'chat-typing', roomId: roomName, name: userName, isTyping: false }));
-            }
-        }, 1500);
-    });
-}
-
-function handleTypingIndicator(name, isTyping) {
-    if (name === userName) return; // Ignore own typing
-    if (isTyping) {
-        typingUsers.add(name);
-    } else {
-        typingUsers.delete(name);
-    }
-    if (typingIndicatorEl) {
-        if (typingUsers.size > 0) {
-            const names = Array.from(typingUsers).join(', ');
-            typingIndicatorEl.textContent = `${names} está digitando...`;
-            typingIndicatorEl.classList.remove('hidden');
-        } else {
-            typingIndicatorEl.classList.add('hidden');
-        }
-    }
-}
-
-// --- Room Status (Contagem de participantes + Host Offline) ---
-let hadHostBefore = false;
-function updateRoomStatus(participants) {
-    const countEl = document.getElementById('room-count');
-    const badgeEl = document.getElementById('room-status-badge');
-    const visibleParticipants = participants.filter(p => p.role !== 'observer');
-
-    if (countEl) countEl.textContent = visibleParticipants.length;
-
-    const hostPresent = visibleParticipants.some(p => p.role === 'host');
-
-    if (badgeEl) {
-        if (hostPresent) {
-            badgeEl.classList.remove('text-red-400');
-            badgeEl.classList.add('text-gray-300');
-            badgeEl.title = 'Participantes na sala';
-            hadHostBefore = true;
-        } else {
-            badgeEl.classList.remove('text-gray-300');
-            badgeEl.classList.add('text-red-400');
-            badgeEl.title = 'Produtor offline';
-
-            if (hadHostBefore) {
-                appendChatMessage('Sistema', '⚠️ O Produtor saiu da sala.', Date.now());
-            }
-        }
-    }
-}
-
-function appendChatMessage(name, text, time) {
-    if (!chatMessages) return;
-    const msg = document.createElement('div');
-    const isMe = name === userName;
-    msg.className = `flex flex-col max-w-[85%] ${isMe ? 'self-end items-end' : 'self-start items-start'}`;
-
-    const timeStr = new Date(time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    msg.innerHTML = `
-        <span class="text-[10px] text-gray-400 mb-0.5 px-1">${name} • ${timeStr}</span>
-        <div class="px-3 py-1.5 rounded-lg shadow-md ${isMe ? 'bg-win-accent text-white rounded-br-none' : 'bg-win-surface border border-win-border text-gray-200 rounded-bl-none'} text-sm">
-            ${text}
-        </div>
-    `;
-    chatMessages.appendChild(msg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-}
+// Chat, Typing Indicator e Room Status movidos para guest-chat.js
 
 // --- Câmera Secundária (QR Code Companion) ---
 const openMobileBtn = document.getElementById('openMobileCam');
