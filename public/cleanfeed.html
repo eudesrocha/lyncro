@@ -35,50 +35,186 @@
         }
 
         /* Overlay / Lower Third Animations */
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+
         @keyframes overlay-in {
-            from {
-                transform: translateX(-50px) scale(0.95);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0) scale(1);
-                opacity: 1;
-            }
+            from { transform: translateX(-50px) scale(0.95); opacity: 0; }
+            to   { transform: translateX(0) scale(1); opacity: 1; }
         }
-
+        @keyframes overlay-in-bottom {
+            from { transform: translateY(30px); opacity: 0; }
+            to   { transform: translateY(0); opacity: 1; }
+        }
         @keyframes overlay-out {
-            from {
-                transform: translateX(0) scale(1);
-                opacity: 1;
-            }
-
-            to {
-                transform: translateX(-30px) scale(0.95);
-                opacity: 0;
-            }
+            from { transform: translateX(0) scale(1); opacity: 1; }
+            to   { transform: translateX(-30px) scale(0.95); opacity: 0; }
+        }
+        @keyframes overlay-out-bottom {
+            from { transform: translateY(0); opacity: 1; }
+            to   { transform: translateY(30px); opacity: 0; }
+        }
+        @keyframes neon-pulse {
+            0%, 100% { box-shadow: 0 0 30px rgba(0,240,255,0.25), -4px 0 20px rgba(0,240,255,0.4); }
+            50%       { box-shadow: 0 0 50px rgba(0,240,255,0.45), -4px 0 30px rgba(0,240,255,0.6); }
+        }
+        @keyframes retro-flicker {
+            0%, 100% { opacity: 1; }
+            92% { opacity: 1; }
+            93% { opacity: 0.85; }
+            94% { opacity: 1; }
+            97% { opacity: 0.9; }
+            98% { opacity: 1; }
         }
 
-        .overlay-animated-in {
-            animation: overlay-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        .overlay-animated-in  { animation: overlay-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .overlay-animated-out { animation: overlay-out 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .overlay-in-bottom    { animation: overlay-in-bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .overlay-out-bottom   { animation: overlay-out-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
 
-        .overlay-animated-out {
-            animation: overlay-out 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        .glass-overlay {
-            background: linear-gradient(135deg, rgba(0, 120, 212, 0.95) 0%, rgba(0, 80, 150, 0.95) 100%);
-            backdrop-filter: blur(12px);
-            border-left: 8px solid #fff;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-            padding: 1.5rem 2.5rem;
+        /* ── Base box structure ── */
+        #lt-box {
             display: flex;
             flex-direction: column;
-            min-width: 400px;
+            min-width: 380px;
+            max-width: 680px;
+        }
+        #ov-display-name {
+            font-size: 2.6rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+        #lt-divider { height: 2px; width: 3.5rem; margin: 0.65rem 0; }
+        #ov-display-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.35em;
+        }
+
+        /* ── 1. Classic (Blue gradient) ── */
+        #lt-box.lt-classic {
+            background: linear-gradient(135deg, rgba(0,120,212,0.95) 0%, rgba(0,80,150,0.95) 100%);
+            backdrop-filter: blur(12px);
+            border-left: 8px solid #fff;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            padding: 1.4rem 2.5rem;
             color: white;
             border-radius: 0 4px 4px 0;
         }
+        #lt-box.lt-classic #lt-divider { background: rgba(255,255,255,0.4); }
+        #lt-box.lt-classic #ov-display-title { color: rgba(255,255,255,0.85); }
+
+        /* ── 2. Minimal ── */
+        #lt-box.lt-minimal {
+            background: rgba(0,0,0,0.78);
+            border-left: 3px solid rgba(255,255,255,0.85);
+            padding: 1rem 2rem;
+            color: white;
+            backdrop-filter: blur(8px);
+        }
+        #lt-box.lt-minimal #lt-divider { background: rgba(255,255,255,0.25); }
+        #lt-box.lt-minimal #ov-display-name { font-size: 2.2rem; }
+        #lt-box.lt-minimal #ov-display-title { color: rgba(255,255,255,0.6); letter-spacing: 0.3em; }
+
+        /* ── 3. Neon ── */
+        #lt-box.lt-neon {
+            background: rgba(0,5,15,0.93);
+            border-left: 4px solid #00f0ff;
+            padding: 1.2rem 2.5rem;
+            color: white;
+            animation: neon-pulse 2.5s ease-in-out infinite;
+        }
+        #lt-box.lt-neon #ov-display-name { color: #00f0ff; text-shadow: 0 0 20px rgba(0,240,255,0.7); }
+        #lt-box.lt-neon #lt-divider { background: rgba(0,240,255,0.3); }
+        #lt-box.lt-neon #ov-display-title { color: rgba(180,245,255,0.7); letter-spacing: 0.4em; }
+
+        /* ── 4. Broadcast (TV News red) ── */
+        #lt-box.lt-broadcast {
+            background: linear-gradient(135deg, #b22222 0%, #8b0000 100%);
+            border-top: 4px solid #ff5555;
+            padding: 1rem 2.5rem;
+            color: white;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 -4px 20px rgba(180,0,0,0.35), 0 10px 30px rgba(0,0,0,0.5);
+        }
+        #lt-box.lt-broadcast #ov-display-name { font-size: 2.4rem; letter-spacing: 0.01em; }
+        #lt-box.lt-broadcast #lt-divider { background: rgba(255,255,255,0.35); }
+        #lt-box.lt-broadcast #ov-display-title { color: rgba(255,200,200,0.9); letter-spacing: 0.4em; }
+
+        /* ── 5. Gold Luxury ── */
+        #lt-box.lt-gold {
+            background: linear-gradient(135deg, rgba(10,8,30,0.97), rgba(35,22,5,0.97));
+            border-left: 5px solid #d4a017;
+            padding: 1.2rem 2.5rem;
+            color: white;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7), -5px 0 20px rgba(212,160,23,0.15);
+        }
+        #lt-box.lt-gold #ov-display-name { color: #f5c842; }
+        #lt-box.lt-gold #lt-divider { background: rgba(212,160,23,0.4); }
+        #lt-box.lt-gold #ov-display-title { color: rgba(245,200,66,0.65); letter-spacing: 0.4em; }
+
+        /* ── 6. Frosted Glass ── */
+        #lt-box.lt-glass {
+            background: rgba(255,255,255,0.09);
+            backdrop-filter: blur(24px) saturate(160%);
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 12px;
+            padding: 1.4rem 2.5rem;
+            color: white;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.12);
+        }
+        #lt-box.lt-glass #lt-divider { background: rgba(255,255,255,0.3); }
+        #lt-box.lt-glass #ov-display-title { color: rgba(255,255,255,0.7); }
+
+        /* ── 7. Gradient Purple ── */
+        #lt-box.lt-gradient {
+            background: linear-gradient(135deg, rgba(88,28,218,0.96), rgba(168,20,90,0.96));
+            padding: 1.2rem 2.5rem;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 15px 50px rgba(88,28,218,0.45);
+        }
+        #lt-box.lt-gradient #lt-divider { background: rgba(255,255,255,0.35); }
+        #lt-box.lt-gradient #ov-display-title { color: rgba(255,210,240,0.85); }
+
+        /* ── 8. Retro Terminal ── */
+        #lt-box.lt-retro {
+            background: rgba(0,10,0,0.96);
+            border: 1.5px solid rgba(0,255,65,0.55);
+            padding: 1.2rem 2.5rem;
+            color: #00ff41;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            box-shadow: 0 0 30px rgba(0,255,65,0.12), inset 0 0 50px rgba(0,255,65,0.04);
+            animation: retro-flicker 6s infinite;
+        }
+        #lt-box.lt-retro #ov-display-name { color: #00ff41; text-shadow: 0 0 10px rgba(0,255,65,0.6); font-size: 2.2rem; text-transform: none; }
+        #lt-box.lt-retro #lt-divider { background: rgba(0,255,65,0.3); }
+        #lt-box.lt-retro #ov-display-title { color: rgba(0,255,65,0.65); letter-spacing: 0.3em; }
+
+        /* ── 9. Dark Fade ── */
+        #lt-box.lt-fade {
+            background: linear-gradient(90deg, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0) 100%);
+            border-bottom: 2px solid rgba(255,255,255,0.22);
+            padding: 1.4rem 5rem 1.4rem 0;
+            color: white;
+            min-width: 520px;
+        }
+        #lt-box.lt-fade #lt-divider { background: rgba(255,255,255,0.2); }
+        #lt-box.lt-fade #ov-display-title { color: rgba(255,255,255,0.6); }
+
+        /* ── 10. Corporate ── */
+        #lt-box.lt-corporate {
+            background: rgba(5,10,20,0.96);
+            border-top: 3px solid #0078d4;
+            padding: 1rem 2.5rem;
+            color: white;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.6), 0 -3px 15px rgba(0,120,212,0.15);
+        }
+        #lt-box.lt-corporate #ov-display-name { font-size: 2.3rem; }
+        #lt-box.lt-corporate #lt-divider { background: rgba(0,120,212,0.5); }
+        #lt-box.lt-corporate #ov-display-title { color: rgba(100,180,255,0.8); }
     </style>
 </head>
 
@@ -87,16 +223,12 @@
         <video id="remoteVideo" autoplay playsinline muted></video>
 
         <!-- Lower Third Overlay (Animated) -->
-        <div id="lower-third" class="opacity-0 pointer-events-none"
+        <div id="lower-third" class="pointer-events-none"
             style="position: absolute; bottom: 4rem; left: 4rem; z-index: 40; opacity: 0;">
-            <div class="glass-overlay">
-                <span id="ov-display-name"
-                    style="font-size: 2.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; line-height: 1.1;">NOME
-                    DO CONVIDADO</span>
-                <div style="height: 2px; width: 4rem; background: rgba(255,255,255,0.4); margin: 0.75rem 0;"></div>
-                <span id="ov-display-title"
-                    style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.35em; color: rgba(255,255,255,0.85);">CARGO
-                    / TAGLINE</span>
+            <div id="lt-box" class="lt-classic">
+                <span id="ov-display-name">NOME DO CONVIDADO</span>
+                <div id="lt-divider"></div>
+                <span id="ov-display-title">CARGO / TAGLINE</span>
             </div>
         </div>
 

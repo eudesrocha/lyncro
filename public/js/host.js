@@ -525,6 +525,11 @@ function renderParticipantCard(participant, isLocal = false) {
           title="Banir Convidado">
           <i class="ph ph-x-circle text-sm"></i>
         </button>
+        <button onclick="event.stopPropagation(); copyCleanFeed('${participant.id}')"
+          class="absolute bottom-2.5 right-2.5 w-7 h-7 rounded bg-black/60 backdrop-blur-sm border border-white/10 text-gray-500 hover:bg-win-accent hover:text-white hover:border-win-accent transition-all flex items-center justify-center opacity-0 group-hover:opacity-100 z-20"
+          title="Copiar link OBS (Clean Feed para Câmera)">
+          <i class="ph ph-broadcast text-xs"></i>
+        </button>
         `}
       </div>
 
@@ -917,6 +922,10 @@ window.handleTallyChange = (pId, state, name) => {
     }
 };
 
+function getLTStyle() {
+    return localStorage.getItem('lyncro_lt_style') || 'classic';
+}
+
 window.toggleOverlay = (pId) => {
     const p = currentParticipants.find(part => part.id === pId) || (pId === 'local' ? { id: 'local', overlayActive: false } : null);
     if (!p) return;
@@ -931,7 +940,8 @@ window.toggleOverlay = (pId) => {
         targetId: pId,
         action: action,
         name: nameInput ? nameInput.value : p.name,
-        title: titleInput ? titleInput.value : ''
+        title: titleInput ? titleInput.value : '',
+        style: getLTStyle()
     }));
 
     // Atualização otimista
@@ -1397,6 +1407,47 @@ window.switchHostDevice = async (deviceId, kind) => {
         alert('Mídia bloqueada ou ocupada. Tente novamente.');
     }
 };
+
+// ===== SETTINGS MODAL =====
+window.openSettingsModal = () => {
+    const modal = document.getElementById('settings-modal');
+    if (!modal) return;
+    modal.classList.remove('hidden');
+
+    // Highlight active LT style
+    const current = getLTStyle();
+    document.querySelectorAll('.lt-preview-btn').forEach(btn => {
+        const isActive = btn.dataset.lt === current;
+        btn.querySelector('div').style.borderColor = isActive ? 'var(--color-win-accent, #0078d4)' : 'transparent';
+        btn.querySelector('span').style.color = isActive ? '#e5e7eb' : '';
+    });
+};
+
+window.closeSettingsModal = () => {
+    const modal = document.getElementById('settings-modal');
+    if (modal) modal.classList.add('hidden');
+};
+
+window.selectLTStyle = (style, btn) => {
+    localStorage.setItem('lyncro_lt_style', style);
+
+    // Update visual selection
+    document.querySelectorAll('.lt-preview-btn').forEach(b => {
+        b.querySelector('div').style.borderColor = 'transparent';
+        b.querySelector('span').style.color = '';
+    });
+    if (btn) {
+        btn.querySelector('div').style.borderColor = 'var(--color-win-accent, #0078d4)';
+        btn.querySelector('span').style.color = '#e5e7eb';
+    }
+    showToast(`Estilo "${style}" selecionado`, 'success');
+};
+
+// Close settings modal on backdrop click
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('settings-modal');
+    if (modal && e.target === modal) modal.classList.add('hidden');
+});
 
 window.changeHostQuality = async (qualityKey) => {
     localStorage.setItem('lyncro_host_quality', qualityKey);

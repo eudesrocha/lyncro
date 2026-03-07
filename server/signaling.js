@@ -286,7 +286,8 @@ function setupSignaling(server) {
                                 targetId: data.targetId,
                                 action: data.action, // 'show' ou 'hide'
                                 name: data.name,
-                                title: data.title
+                                title: data.title,
+                                style: data.style || 'classic'
                             });
 
                             // Também avisar a todos sobre a atualização de estado (para quem entrar depois)

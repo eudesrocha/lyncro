@@ -81,8 +81,16 @@ let speakerAnalyzers = new Map(); // targetId -> { analyser, dataArray, source }
 let speakerDetectionInterval = null;
 let speakerAudioCtx = null;
 let currentFullscreenId = null; // ID de quem está sendo exibido em fullscreen (pin ou auto)
-const SPEAKER_THRESHOLD = 15; // Limiar mínimo de volume para considerar como "falando"
-const SPEAKER_SWITCH_DELAY = 800; // ms para trocar speaker (evita flicker)
+
+// ── Noise-tolerant speaker detection parameters ──────────────────────────────
+// Requires sustained speech before switching; ignores brief spikes and background noise.
+const SPEAK_THRESHOLD      = 18;  // Raw avg level (0-255) above noise floor to count as speaking
+const SPEAK_CONFIRM_FRAMES = 6;   // Must speak for 6 × 200ms = ~1.2s before switching
+const SILENCE_CONFIRM_FRAMES = 25; // Must be silent for 25 × 200ms = ~5s before switching back
+const SPEAKER_SWITCH_COOLDOWN = 3000; // Minimum ms between auto-switches
+const SMOOTH_WINDOW = 5;          // Frames averaged for level smoothing
+const NOISE_FLOOR_WINDOW = 40;    // Rolling history length for noise floor calculation
+// ─────────────────────────────────────────────────────────────────────────────
 let lastSpeakerSwitch = 0;
 
 const preVideo = document.getElementById('pre-localVideo');
@@ -625,7 +633,12 @@ function setupSpeakerAnalyzer(targetId, stream) {
         // NÃO conectar ao destination para evitar eco
 
         const dataArray = new Uint8Array(analyser.frequencyBinCount);
-        speakerAnalyzers.set(targetId, { analyser, dataArray, source });
+        speakerAnalyzers.set(targetId, {
+            analyser, dataArray, source,
+            speakFrames: 0,      // consecutive frames above threshold
+            silenceFrames: 0,    // consecutive frames below threshold
+            levelHistory: []     // rolling buffer for smoothing + noise floor
+        });
     } catch (e) {
         console.error('Erro ao criar speaker analyzer:', e);
     }
@@ -635,41 +648,71 @@ function startSpeakerDetection() {
     if (speakerDetectionInterval) return;
 
     speakerDetectionInterval = setInterval(() => {
-        let maxLevel = 0;
-        let maxId = null;
+        let loudestId = null;
+        let loudestEffectiveLevel = 0;
 
         speakerAnalyzers.forEach((data, targetId) => {
             data.analyser.getByteFrequencyData(data.dataArray);
-            let sum = 0;
-            for (let i = 0; i < data.dataArray.length; i++) {
-                sum += data.dataArray[i];
-            }
-            const avg = sum / data.dataArray.length;
 
-            if (avg > SPEAKER_THRESHOLD && avg > maxLevel) {
-                maxLevel = avg;
-                maxId = targetId;
+            // Raw average across frequency bins
+            let sum = 0;
+            for (let i = 0; i < data.dataArray.length; i++) sum += data.dataArray[i];
+            const rawLevel = sum / data.dataArray.length;
+
+            // Rolling history for smoothing and noise floor
+            data.levelHistory.push(rawLevel);
+            if (data.levelHistory.length > NOISE_FLOOR_WINDOW) data.levelHistory.shift();
+
+            // Smoothed level: average of last SMOOTH_WINDOW frames
+            const smoothWindow = data.levelHistory.slice(-SMOOTH_WINDOW);
+            const smoothLevel = smoothWindow.reduce((a, b) => a + b, 0) / smoothWindow.length;
+
+            // Dynamic noise floor: average of the quietest 30% of recent history
+            const sorted = [...data.levelHistory].sort((a, b) => a - b);
+            const floorCount = Math.max(1, Math.floor(sorted.length * 0.3));
+            const noiseFloor = sorted.slice(0, floorCount).reduce((a, b) => a + b, 0) / floorCount;
+
+            // Effective level: how far above the noise floor this person is
+            const effectiveLevel = Math.max(0, smoothLevel - noiseFloor * 1.25);
+
+            if (effectiveLevel > SPEAK_THRESHOLD) {
+                data.speakFrames++;
+                data.silenceFrames = 0;
+            } else {
+                data.silenceFrames++;
+                // Decay speak frames gradually so brief pauses don't reset the counter
+                data.speakFrames = Math.max(0, data.speakFrames - 1);
+            }
+
+            // Only qualify as confirmed speaker
+            if (data.speakFrames >= SPEAK_CONFIRM_FRAMES && effectiveLevel > loudestEffectiveLevel) {
+                loudestEffectiveLevel = effectiveLevel;
+                loudestId = targetId;
             }
         });
 
         const now = Date.now();
-        if (maxId && maxId !== activeSpeakerId && (now - lastSpeakerSwitch) > SPEAKER_SWITCH_DELAY) {
-            activeSpeakerId = maxId;
+
+        if (loudestId && loudestId !== activeSpeakerId && (now - lastSpeakerSwitch) > SPEAKER_SWITCH_COOLDOWN) {
+            // New confirmed speaker detected
+            activeSpeakerId = loudestId;
             lastSpeakerSwitch = now;
+            // Reset silence counter for the new speaker so they hold the slot
+            const d = speakerAnalyzers.get(loudestId);
+            if (d) d.silenceFrames = 0;
             updatePipHighlights();
-
-            // Auto-switch para o speaker se não tem pin manual e há mais de 1 remoto
             if (!pinnedParticipantId && remoteStreams.size > 1) {
-                autoSwitchToSpeaker(maxId);
+                autoSwitchToSpeaker(loudestId);
             }
-        } else if (!maxId && activeSpeakerId) {
-            // Ninguém falando
-            activeSpeakerId = null;
-            updatePipHighlights();
-
-            // Se tinha auto-switch ativo, voltar ao local
-            if (!pinnedParticipantId && remoteStreams.size > 1) {
-                autoSwitchBack();
+        } else if (!loudestId && activeSpeakerId) {
+            // Current speaker may be going silent — only release after confirmed silence
+            const d = speakerAnalyzers.get(activeSpeakerId);
+            if (d && d.silenceFrames >= SILENCE_CONFIRM_FRAMES) {
+                activeSpeakerId = null;
+                updatePipHighlights();
+                if (!pinnedParticipantId && remoteStreams.size > 1) {
+                    autoSwitchBack();
+                }
             }
         }
     }, 200);

@@ -98,30 +98,43 @@ async function setupWebSocket() {
                 break;
             case 'overlay-control':
                 console.log('[CleanFeed] Overlay control received:', data);
-                updateOverlay(data.action, data.name, data.title);
+                updateOverlay(data.action, data.name, data.title, data.style);
                 break;
         }
     };
 }
 
-function updateOverlay(action, name, title) {
+// Styles that animate from bottom instead of left
+const BOTTOM_ANIM_STYLES = new Set(['broadcast', 'corporate', 'fade']);
+
+function updateOverlay(action, name, title, style) {
     const overlay = document.getElementById('lower-third');
+    const box = document.getElementById('lt-box');
     const nameEl = document.getElementById('ov-display-name');
     const titleEl = document.getElementById('ov-display-title');
 
     if (!overlay || !nameEl || !titleEl) return;
 
+    const useBottomAnim = BOTTOM_ANIM_STYLES.has(style);
+    const animIn  = useBottomAnim ? 'overlay-in-bottom'  : 'overlay-animated-in';
+    const animOut = useBottomAnim ? 'overlay-out-bottom' : 'overlay-animated-out';
+
     if (action === 'show') {
-        nameEl.textContent = name;
-        titleEl.textContent = title;
-        overlay.classList.remove('overlay-animated-out');
-        overlay.classList.add('overlay-animated-in');
+        // Apply style class to box
+        if (box && style) {
+            box.className = `lt-${style}`;
+        }
+        nameEl.textContent = name || '';
+        titleEl.textContent = title || '';
+
+        overlay.classList.remove('overlay-animated-in', 'overlay-animated-out', 'overlay-in-bottom', 'overlay-out-bottom');
+        overlay.classList.add(animIn);
         overlay.style.opacity = '1';
     } else {
-        overlay.classList.remove('overlay-animated-in');
-        overlay.classList.add('overlay-animated-out');
+        overlay.classList.remove('overlay-animated-in', 'overlay-animated-out', 'overlay-in-bottom', 'overlay-out-bottom');
+        overlay.classList.add(animOut);
         setTimeout(() => {
-            if (overlay.classList.contains('overlay-animated-out')) {
+            if (overlay.classList.contains(animOut)) {
                 overlay.style.opacity = '0';
             }
         }, 400);
