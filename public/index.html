@@ -147,90 +147,91 @@
 <body
     class="font-segoe selection:bg-win-accent selection:text-white transition-colors duration-300 dark:bg-[#121212] bg-white dark:text-white text-gray-900">
 
-    /* Ajustes para modo claro/escuro */
-    body {
-    min-height: 100vh;
-    overflow-x: hidden;
-    }
+    <style>
+        /* Ajustes para modo claro/escuro */
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-    html.dark body {
-    background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
-    }
+        html.dark body {
+            background: radial-gradient(circle at center, #1c1c1c 0%, #121212 100%);
+        }
 
-    .mica-effect {
-    backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%);
-    background: rgba(43, 43, 43, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+        .mica-effect {
+            backdrop-filter: blur(40px) saturate(150%);
+            -webkit-backdrop-filter: blur(40px) saturate(150%);
+            background: rgba(43, 43, 43, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    .dark .mica-effect {
-    background: rgba(43, 43, 43, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+        .dark .mica-effect {
+            background: rgba(43, 43, 43, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    html:not(.dark) .mica-effect {
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
-    }
+        html:not(.dark) .mica-effect {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
 
-    html:not(.dark) .win-input {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-bottom: 2px solid rgba(0, 0, 0, 0.2);
-    color: #121212;
-    }
+        html:not(.dark) .win-input {
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.2);
+            color: #121212;
+        }
 
-    html:not(.dark) .win-input::placeholder {
-    color: rgba(0, 0, 0, 0.4);
-    }
+        html:not(.dark) .win-input::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+        }
 
-    html:not(.dark) .text-gray-400 {
-    color: #4a4a4a;
-    }
+        html:not(.dark) .text-gray-400 {
+            color: #4a4a4a;
+        }
 
-    html:not(.dark) .text-gray-500 {
-    color: #666666;
-    }
+        html:not(.dark) .text-gray-500 {
+            color: #666666;
+        }
 
-    html:not(.dark) .text-gray-700 {
-    color: #888888;
-    }
+        html:not(.dark) .text-gray-700 {
+            color: #888888;
+        }
 
-    /* Cápsula de Tema */
-    .theme-capsule {
-    display: flex;
-    background: rgba(128, 128, 128, 0.1);
-    border-radius: 999px;
-    padding: 4px;
-    gap: 2px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    }
+        /* Cápsula de Tema */
+        .theme-capsule {
+            display: flex;
+            background: rgba(128, 128, 128, 0.1);
+            border-radius: 999px;
+            padding: 4px;
+            gap: 2px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    .theme-btn {
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    transition: all 0.2s;
-    color: inherit;
-    opacity: 0.5;
-    }
+        .theme-btn {
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            transition: all 0.2s;
+            color: inherit;
+            opacity: 0.5;
+        }
 
-    .theme-btn.active {
-    background: var(--win-accent, #0078d4);
-    color: white;
-    opacity: 1;
-    }
+        .theme-btn.active {
+            background: var(--win-accent, #0078d4);
+            color: white;
+            opacity: 1;
+        }
 
-    html:not(.dark) .theme-capsule {
-    background: rgba(0, 0, 0, 0.05);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    }
+        html:not(.dark) .theme-capsule {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
     </style>
 
     <!-- Header / Logo -->
