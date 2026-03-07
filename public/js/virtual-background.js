@@ -193,22 +193,35 @@ class VirtualBackground {
         this.ctx.globalCompositeOperation = 'destination-over';
 
         if (this.mode === 'blur') {
-            // Criar um canvas offscreen se não existir (corrige bug iOS Canvas Filter + destination-over)
-            if (!this.offscreenCanvas) {
-                this.offscreenCanvas = document.createElement('canvas');
-                this.offscreenCtx = this.offscreenCanvas.getContext('2d');
-            }
-            if (this.offscreenCanvas.width !== this.canvas.width || this.offscreenCanvas.height !== this.canvas.height) {
-                this.offscreenCanvas.width = this.canvas.width;
-                this.offscreenCanvas.height = this.canvas.height;
+            // Técnica de downscale/upscale: funciona em TODOS os browsers (incluindo Safari iOS)
+            // ctx.filter não é suportado no Safari iOS, então usamos escala reduzida + imageSmoothingQuality
+            if (!this.blurCanvas) {
+                this.blurCanvas = document.createElement('canvas');
+                this.blurCtx = this.blurCanvas.getContext('2d');
             }
 
-            // Aplicar desfoque ao vídeo original no canvas offscreen
-            this.offscreenCtx.filter = 'blur(8px) saturate(1.2)';
-            this.offscreenCtx.drawImage(results.image, 0, 0, this.canvas.width, this.canvas.height);
+            const scale = 0.125; // Reduzir 8x para criar o blur
+            const bw = Math.max(1, Math.floor(this.canvas.width * scale));
+            const bh = Math.max(1, Math.floor(this.canvas.height * scale));
 
-            // Desenhar o resultado do offscreen no canvas principal
-            this.ctx.drawImage(this.offscreenCanvas, 0, 0, this.canvas.width, this.canvas.height);
+            if (this.blurCanvas.width !== bw || this.blurCanvas.height !== bh) {
+                this.blurCanvas.width = bw;
+                this.blurCanvas.height = bh;
+            }
+
+            // 1. Desenhar imagem reduzida (perde detalhes = blur)
+            this.blurCtx.drawImage(results.image, 0, 0, bw, bh);
+
+            // 2. Ampliar de volta para o tamanho original (bilinear filtering = smooth blur)
+            this.ctx.imageSmoothingEnabled = true;
+            this.ctx.imageSmoothingQuality = 'high';
+            this.ctx.drawImage(this.blurCanvas, 0, 0, bw, bh, 0, 0, this.canvas.width, this.canvas.height);
+
+            // 3. Aplicar leve saturação via overlay de cor (opcional, compensa perda de cor)
+            this.ctx.globalCompositeOperation = 'overlay';
+            this.ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
+            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            this.ctx.globalCompositeOperation = 'destination-over';
         } else if (this.mode === 'image' && this.backgroundImage && this.backgroundImage.complete) {
             // Desenhar imagem de fundo
 
@@ -221,35 +234,99 @@ class VirtualBackground {
 
             this.ctx.drawImage(this.backgroundImage, 0, 0, this.backgroundImage.width, this.backgroundImage.height,
                 centerShift_x, centerShift_y, this.backgroundImage.width * ratio, this.backgroundImage.height * ratio);
-        } else if (this.mode === 'anim-window' && this.backgroundImage && this.backgroundImage.complete) {
+        } else if (this.mode === 'anim-window') {
             const time = performance.now() * 0.001;
+            const w = this.canvas.width;
+            const h = this.canvas.height;
 
-            // 1. Um pequeno brilho solar que se move (Frente - desenhado primeiro com destination-over)
-            const gradient = this.ctx.createRadialGradient(
-                this.canvas.width * 0.8 + Math.sin(time * 0.5) * 50,
-                this.canvas.height * 0.2 + Math.cos(time * 0.3) * 30,
-                10,
-                this.canvas.width * 0.8,
-                this.canvas.height * 0.2,
-                300
-            );
-            gradient.addColorStop(0, 'rgba(255, 255, 230, 0.15)');
-            gradient.addColorStop(1, 'rgba(255, 255, 230, 0)');
-            this.ctx.fillStyle = gradient;
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            // === FUNDO: Céu azul suave ===
+            const skyGrad = this.ctx.createLinearGradient(0, 0, 0, h);
+            skyGrad.addColorStop(0, '#87CEEB');
+            skyGrad.addColorStop(0.5, '#B0E0F6');
+            skyGrad.addColorStop(1, '#d4eaf7');
+            this.ctx.fillStyle = skyGrad;
+            this.ctx.fillRect(0, 0, w, h);
 
-            // 2. Adicionar animação sutil (Brisa de vento / sombras oscilantes) (Meio)
-            this.ctx.fillStyle = `rgba(10, 30, 15, ${0.05 + Math.sin(time) * 0.02})`;
-            this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+            // === RAIO DE SOL movendo-se ===
+            const sunX = w * 0.75 + Math.sin(time * 0.3) * 40;
+            const sunY = h * 0.15 + Math.cos(time * 0.2) * 20;
+            const sunGrad = this.ctx.createRadialGradient(sunX, sunY, 5, sunX, sunY, w * 0.5);
+            sunGrad.addColorStop(0, 'rgba(255, 255, 220, 0.35)');
+            sunGrad.addColorStop(0.3, 'rgba(255, 255, 200, 0.1)');
+            sunGrad.addColorStop(1, 'rgba(255, 255, 200, 0)');
+            this.ctx.fillStyle = sunGrad;
+            this.ctx.fillRect(0, 0, w, h);
 
-            // 3. Desenhar imagem base da janela (Fundo - desenhado por último)
-            const hRatio = this.canvas.width / this.backgroundImage.width;
-            const vRatio = this.canvas.height / this.backgroundImage.height;
-            const ratio = Math.max(hRatio, vRatio);
-            const centerShift_x = (this.canvas.width - this.backgroundImage.width * ratio) / 2;
-            const centerShift_y = (this.canvas.height - this.backgroundImage.height * ratio) / 2;
-            this.ctx.drawImage(this.backgroundImage, 0, 0, this.backgroundImage.width, this.backgroundImage.height,
-                centerShift_x, centerShift_y, this.backgroundImage.width * ratio, this.backgroundImage.height * ratio);
+            // === COPA DA ÁRVORE (folhas balançando) ===
+            this.ctx.fillStyle = '#2d5a1e';
+            for (let i = 0; i < 18; i++) {
+                const baseX = w * (0.1 + (i % 6) * 0.16);
+                const baseY = h * (0.05 + Math.floor(i / 6) * 0.12);
+                const sway = Math.sin(time * 1.2 + i * 0.7) * (8 + i * 1.5);
+                const swayY = Math.cos(time * 0.8 + i * 1.1) * 4;
+                const size = 30 + (i % 5) * 12;
+
+                // Folha escura
+                this.ctx.beginPath();
+                this.ctx.ellipse(baseX + sway, baseY + swayY, size, size * 0.7, Math.sin(time + i) * 0.3, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+            // Folhas mais claras por cima
+            this.ctx.fillStyle = '#3d7a2e';
+            for (let i = 0; i < 12; i++) {
+                const baseX = w * (0.15 + (i % 5) * 0.18);
+                const baseY = h * (0.08 + Math.floor(i / 5) * 0.1);
+                const sway = Math.sin(time * 1.5 + i * 1.3) * (10 + i * 2);
+                const swayY = Math.cos(time * 1.0 + i * 0.9) * 5;
+                const size = 20 + (i % 4) * 10;
+                this.ctx.beginPath();
+                this.ctx.ellipse(baseX + sway, baseY + swayY, size, size * 0.6, Math.cos(time * 0.5 + i) * 0.4, 0, Math.PI * 2);
+                this.ctx.fill();
+            }
+
+            // === MOLDURA DA JANELA ===
+            this.ctx.fillStyle = '#f5f0e8';
+            // Moldura esquerda
+            this.ctx.fillRect(0, 0, w * 0.04, h);
+            // Moldura direita
+            this.ctx.fillRect(w * 0.96, 0, w * 0.04, h);
+            // Moldura superior
+            this.ctx.fillRect(0, 0, w, h * 0.04);
+            // Moldura inferior (peitoril)
+            this.ctx.fillRect(0, h * 0.88, w, h * 0.12);
+            // Divisória central vertical
+            this.ctx.fillRect(w * 0.49, 0, w * 0.02, h * 0.88);
+
+            // Sombra no peitoril
+            const shelfGrad = this.ctx.createLinearGradient(0, h * 0.88, 0, h * 0.92);
+            shelfGrad.addColorStop(0, 'rgba(0,0,0,0.15)');
+            shelfGrad.addColorStop(1, 'rgba(0,0,0,0)');
+            this.ctx.fillStyle = shelfGrad;
+            this.ctx.fillRect(0, h * 0.88, w, h * 0.04);
+
+            // === CORTINA ondulando com brisa ===
+            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+            // Cortina esquerda
+            this.ctx.beginPath();
+            this.ctx.moveTo(w * 0.04, 0);
+            for (let y = 0; y < h * 0.88; y += 5) {
+                const wave = Math.sin(time * 2.0 + y * 0.015) * (15 + Math.sin(time * 0.5) * 8);
+                this.ctx.lineTo(w * 0.04 + w * 0.08 + wave, y);
+            }
+            this.ctx.lineTo(w * 0.04, h * 0.88);
+            this.ctx.closePath();
+            this.ctx.fill();
+
+            // Cortina direita
+            this.ctx.beginPath();
+            this.ctx.moveTo(w * 0.96, 0);
+            for (let y = 0; y < h * 0.88; y += 5) {
+                const wave = Math.sin(time * 2.0 + y * 0.015 + 1.5) * (15 + Math.sin(time * 0.5 + 1) * 8);
+                this.ctx.lineTo(w * 0.96 - w * 0.08 - wave, y);
+            }
+            this.ctx.lineTo(w * 0.96, h * 0.88);
+            this.ctx.closePath();
+            this.ctx.fill();
 
         } else if (this.mode === 'anim-studio') {
             // Fundo animado Studio Pulse (cinemático, escuro com pulsação de luz)

@@ -601,13 +601,13 @@ function renderParticipantCard(participant, isLocal = false) {
                         </button>
 
                         <!-- Animated -->
-                        <button onclick="setVirtualBackground('anim-window', 'img/bg-window-tree.png', this.id)"
+                        <button onclick="setVirtualBackground('anim-window', null, this.id)"
                             id="vb-btn-anim-window"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16">
-                            <img src="img/bg-window-tree.png" alt="Window" class="w-full h-full object-cover">
-                            <div class="absolute inset-0 bg-black/40 group-hover:bg-transparent transition-all"></div>
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-sky-400 to-green-700">
+                            <i class="ph ph-window text-white/60 text-lg absolute top-2"></i>
                             <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
                                     class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span class="mt-4 text-[8px] font-bold text-white uppercase tracking-widest">Janela</span>
                         </button>
                         <button onclick="setVirtualBackground('anim-studio', null, this.id)" id="vb-btn-anim-studio"
                             class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-br from-blue-900 to-black relative">
