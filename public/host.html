@@ -209,6 +209,16 @@
                 class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none w-32 cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
                 <option value="">Sem Retorno</option>
             </select>
+
+            <select id="host-quality-select" onchange="changeHostQuality(this.value)"
+                title="Qualidade do vídeo da câmera"
+                class="bg-transparent border-none text-[11px] font-bold text-gray-400 outline-none cursor-pointer uppercase tracking-tight focus:text-win-accent transition-colors">
+                <option value="1080_60">1080p 60fps</option>
+                <option value="1080_30">1080p 30fps</option>
+                <option value="720" selected>720p HD</option>
+                <option value="480">480p SD</option>
+                <option value="360">360p LQ</option>
+            </select>
         </div>
 
         <!-- Direita: Convidar + Sala + Tema + Encerrar -->

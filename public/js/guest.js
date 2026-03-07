@@ -1,3 +1,54 @@
+// ── Presets de Qualidade de Vídeo ────────────────────────────────────────────
+const VIDEO_QUALITY_PRESETS = {
+    '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
+    '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
+    '720':     { label: '720p HD',     width: 1280, height: 720,  frameRate: 30 },
+    '480':     { label: '480p SD',     width: 854,  height: 480,  frameRate: 30 },
+    '360':     { label: '360p LQ',     width: 640,  height: 360,  frameRate: 30 },
+};
+
+function buildVideoConstraints(qualityKey, extras = {}) {
+    const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
+    return {
+        width:     { ideal: p.width },
+        height:    { ideal: p.height },
+        frameRate: { ideal: p.frameRate, max: p.frameRate },
+        ...extras
+    };
+}
+
+function detectAndSuggestQuality() {
+    const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    if (!conn) return; // Safari e outros sem Network Information API — mantém padrão 720p
+
+    const downlink = conn.downlink || 0; // Mbps estimados
+    const eff = conn.effectiveType || '4g';
+
+    let suggested = '720';
+    if (downlink >= 15) {
+        suggested = '1080_30';
+    } else if (downlink >= 4 && eff === '4g') {
+        suggested = '720'; // padrão, sem notificação
+    } else if (eff === '3g' || (downlink > 0 && downlink < 3)) {
+        suggested = '480';
+    } else if (eff === '2g' || eff === 'slow-2g') {
+        suggested = '360';
+    }
+
+    if (suggested === '720') return; // padrão, não precisa notificar
+
+    const el = document.getElementById('video-quality');
+    if (el) {
+        el.value = suggested;
+        el.dispatchEvent(new Event('change'));
+    }
+    // Toast aparece depois que a UI está pronta
+    setTimeout(() => {
+        const preset = VIDEO_QUALITY_PRESETS[suggested];
+        showToast(`Qualidade ajustada para ${preset.label} baseada na sua conexão`, 'info');
+    }, 1500);
+}
+
 const urlParams = new URLSearchParams(window.location.search);
 const roomName = urlParams.get('room') || 'default';
 const userName = urlParams.get('name') || 'Convidado';
@@ -52,13 +103,15 @@ async function startPreCall() {
     try {
         const qualitySelect = document.getElementById('video-quality');
         const savedQuality = localStorage.getItem('lyncro_video_quality');
-        if (savedQuality && qualitySelect) qualitySelect.value = savedQuality;
+        if (savedQuality && qualitySelect) {
+            qualitySelect.value = savedQuality;
+        } else {
+            detectAndSuggestQuality();
+        }
 
-        const heightQoS = qualitySelect ? parseInt(qualitySelect.value) : 720;
-        const widthQoS = Math.round(heightQoS * (16 / 9));
-
+        const qualityKey = qualitySelect ? qualitySelect.value : '720';
         localStream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: widthQoS }, height: { ideal: heightQoS }, facingMode: companionOf ? "environment" : "user" },
+            video: buildVideoConstraints(qualityKey, { facingMode: companionOf ? 'environment' : 'user' }),
             audio: {
                 echoCancellation: true,
                 noiseSuppression: true,
@@ -104,9 +157,9 @@ if (qualitySelectEl) {
     qualitySelectEl.addEventListener('change', () => {
         const val = qualitySelectEl.value;
         localStorage.setItem('lyncro_video_quality', val);
-        const label = val === '720' ? '720p HD' : val === '480' ? '480p SD' : '360p LQ';
+        const preset = VIDEO_QUALITY_PRESETS[val] || VIDEO_QUALITY_PRESETS['720'];
         const display = document.getElementById('quality-display-name');
-        if (display) display.innerText = label;
+        if (display) display.innerText = preset.label;
 
         if (localStream) {
             localStream.getTracks().forEach(t => t.stop());
@@ -1234,9 +1287,10 @@ window.switchDevice = async (deviceId, kind) => {
     camMenu.classList.add('hidden');
 
     try {
+        const currentQuality = localStorage.getItem('lyncro_video_quality') || '720';
         const constraints = {
             audio: kind === 'audio' ? { deviceId: { exact: deviceId } } : false,
-            video: kind === 'video' ? { deviceId: { exact: deviceId } } : false
+            video: kind === 'video' ? buildVideoConstraints(currentQuality, { deviceId: { exact: deviceId } }) : false
         };
 
         const newStream = await navigator.mediaDevices.getUserMedia(constraints);

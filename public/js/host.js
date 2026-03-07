@@ -32,6 +32,29 @@ async function handleNDIToggle(participantId, name) {
     }
 }
 
+// ── Presets de Qualidade de Vídeo ────────────────────────────────────────────
+const VIDEO_QUALITY_PRESETS = {
+    '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
+    '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
+    '720':     { label: '720p HD',     width: 1280, height: 720,  frameRate: 30 },
+    '480':     { label: '480p SD',     width: 854,  height: 480,  frameRate: 30 },
+    '360':     { label: '360p LQ',     width: 640,  height: 360,  frameRate: 30 },
+};
+
+function buildVideoConstraints(qualityKey, extras = {}) {
+    const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
+    return {
+        width:     { ideal: p.width },
+        height:    { ideal: p.height },
+        frameRate: { ideal: p.frameRate, max: p.frameRate },
+        ...extras
+    };
+}
+
+function getHostQuality() {
+    return localStorage.getItem('lyncro_host_quality') || '720';
+}
+
 const urlParams = new URLSearchParams(window.location.search);
 const roomName = urlParams.get('room') || 'default';
 const userName = urlParams.get('name') || 'Host';
@@ -67,7 +90,10 @@ async function init() {
 
     // 3. Solicitar mídias em background
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: buildVideoConstraints(getHostQuality()),
+            audio: true
+        });
 
         // Aplicar processamento de Fundo Virtual (se ativo)
         if (currentVbMode !== 'none') {
@@ -1301,7 +1327,7 @@ window.switchHostDevice = async (deviceId, kind) => {
     try {
         const constraints = {
             audio: kind === 'audio' ? { deviceId: { exact: deviceId } } : false,
-            video: kind === 'video' ? { deviceId: { exact: deviceId } } : false
+            video: kind === 'video' ? buildVideoConstraints(getHostQuality(), { deviceId: { exact: deviceId } }) : false
         };
 
         const newStream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -1345,6 +1371,46 @@ window.switchHostDevice = async (deviceId, kind) => {
     } catch (e) {
         console.error(`Erro ao trocar de ${kind} no Host:`, e);
         alert('Mídia bloqueada ou ocupada. Tente novamente.');
+    }
+};
+
+window.changeHostQuality = async (qualityKey) => {
+    localStorage.setItem('lyncro_host_quality', qualityKey);
+    const preset = VIDEO_QUALITY_PRESETS[qualityKey];
+    if (!preset) return;
+
+    // Reaplica a track de vídeo atual com as novas constraints
+    const currentVideoTrack = localStream && localStream.getVideoTracks()[0];
+    const currentDeviceId = currentVideoTrack && currentVideoTrack.getSettings().deviceId;
+
+    try {
+        const newStream = await navigator.mediaDevices.getUserMedia({
+            video: buildVideoConstraints(qualityKey, currentDeviceId ? { deviceId: { exact: currentDeviceId } } : {}),
+            audio: false
+        });
+        const newTrack = newStream.getVideoTracks()[0];
+        newTrack.enabled = !isHostCamMuted;
+
+        if (currentVideoTrack) {
+            localStream.removeTrack(currentVideoTrack);
+            currentVideoTrack.stop();
+        }
+        localStream.addTrack(newTrack);
+
+        if (rtcClient) await rtcClient.replaceTrack(newTrack);
+
+        // Atualiza preview do card local
+        const vid = document.querySelector('#video-card-local video');
+        if (vid) vid.srcObject = localStream;
+
+        showToast(`Qualidade alterada para ${preset.label}`, 'success');
+    } catch (e) {
+        console.error('[Quality] Falha ao alterar qualidade:', e);
+        showToast(`Câmera não suporta ${preset.label}`, 'error');
+        // Reverter seletor para o valor anterior
+        const sel = document.getElementById('host-quality-select');
+        if (sel) sel.value = getHostQuality();
+        localStorage.setItem('lyncro_host_quality', getHostQuality());
     }
 };
 
