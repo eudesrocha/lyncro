@@ -55,20 +55,25 @@ function setupSignaling(server) {
                         const room_join = roomManager.rooms.get(normalizedRoomId);
 
                         // Validar identidade do host via JWT do Supabase
+                        // Só aplica se SUPABASE_URL e SUPABASE_ANON_KEY estiverem configurados.
+                        // Sem essas variáveis (ex: dev local), a validação é pulada com aviso.
                         if (data.participant && data.participant.role === 'host') {
-                            const token = data.participant.token;
-                            const supabaseUser = await verifySupabaseToken(token);
-                            if (!supabaseUser) {
-                                console.log(`[JOIN REJECTED] Room: "${normalizedRoomId}" | Motivo: Token de host inválido`);
-                                ws.send(JSON.stringify({
-                                    type: 'error',
-                                    message: 'Acesso de host negado. Faça login novamente.'
-                                }));
-                                ws.close();
-                                return;
+                            if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+                                const supabaseUser = await verifySupabaseToken(data.participant.token);
+                                if (!supabaseUser) {
+                                    console.log(`[JOIN REJECTED] Room: "${normalizedRoomId}" | Motivo: Token de host inválido`);
+                                    ws.send(JSON.stringify({
+                                        type: 'error',
+                                        message: 'Acesso de host negado. Faça login novamente.'
+                                    }));
+                                    ws.close();
+                                    return;
+                                }
+                                // Garantir que o userId usado para ownership seja o do Supabase
+                                data.participant.userId = supabaseUser.id;
+                            } else {
+                                console.warn('[Auth] SUPABASE_URL/ANON_KEY não configurados. Pulando validação JWT do host.');
                             }
-                            // Garantir que o userId usado para ownership seja o do Supabase
-                            data.participant.userId = supabaseUser.id;
                         }
 
                         // Validar senha se a sala possuir uma
