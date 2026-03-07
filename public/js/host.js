@@ -536,12 +536,9 @@ function renderParticipantCard(participant, isLocal = false) {
             <i class="ph ${participant.audioMuted ? 'ph-microphone-slash' : 'ph-microphone'} text-sm"></i>
           </button>
           ${isLocal ? `
-          <button onclick="toggleCardDropdown('mic-dropdown-${participant.id}')" class="p-1.5 border border-l-0 border-win-border rounded-r-win text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+          <button onclick="toggleCardDropdown('mic-dropdown-${participant.id}', this)" class="p-1.5 border border-l-0 border-win-border rounded-r-win text-gray-500 hover:text-white hover:bg-white/5 transition-all">
             <i class="ph ph-caret-down text-[10px]"></i>
           </button>
-          <div id="mic-dropdown-${participant.id}" class="hidden absolute top-full left-0 mt-1 bg-win-surface border border-win-border rounded shadow-2xl z-50 min-w-[180px] max-h-40 overflow-y-auto">
-            <div id="mic-dropdown-list-${participant.id}" class="flex flex-col p-1"></div>
-          </div>
           ` : ''}
         </div>
 
@@ -551,12 +548,9 @@ function renderParticipantCard(participant, isLocal = false) {
             <i class="ph ${participant.videoMuted ? 'ph-video-camera-slash' : 'ph-video-camera'} text-sm"></i>
           </button>
           ${isLocal ? `
-          <button onclick="toggleCardDropdown('cam-dropdown-${participant.id}')" class="p-1.5 border border-l-0 border-win-border rounded-r-win text-gray-500 hover:text-white hover:bg-white/5 transition-all">
+          <button onclick="toggleCardDropdown('cam-dropdown-${participant.id}', this)" class="p-1.5 border border-l-0 border-win-border rounded-r-win text-gray-500 hover:text-white hover:bg-white/5 transition-all">
             <i class="ph ph-caret-down text-[10px]"></i>
           </button>
-          <div id="cam-dropdown-${participant.id}" class="hidden absolute top-full left-0 mt-1 bg-win-surface border border-win-border rounded shadow-2xl z-50 min-w-[180px] max-h-40 overflow-y-auto">
-            <div id="cam-dropdown-list-${participant.id}" class="flex flex-col p-1"></div>
-          </div>
           ` : ''}
         </div>
 
@@ -1265,64 +1259,94 @@ window.toggleScreenShare = async () => {
 
 // ==========================================
 // Seleção de Câmera/Microfone (Host)
+// Dropdown flutuante fixado ao body (z-[9999]) para escapar de qualquer overflow pai
 // ==========================================
-window.toggleCardDropdown = async (dropdownId) => {
-    // Esconder outros dropdowns abertos
-    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(el => {
-        if (el.id !== dropdownId) el.classList.add('hidden');
-    });
+function getFloatingDropdown() {
+    let el = document.getElementById('floating-device-dropdown');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'floating-device-dropdown';
+        el.className = 'fixed z-[9999] bg-win-surface border border-win-border rounded-win shadow-2xl min-w-[200px] max-h-48 overflow-y-auto';
+        el.style.display = 'none';
+        document.body.appendChild(el);
 
-    const dropdown = document.getElementById(dropdownId);
-    if (!dropdown) return;
-
-    dropdown.classList.toggle('hidden');
-
-    // Se o dropdown foi aberto, enumerar os dispositivos e carregar a lista
-    if (!dropdown.classList.contains('hidden')) {
-        try {
-            const devices = await navigator.mediaDevices.enumerateDevices();
-            const listId = dropdownId.replace('-dropdown-', '-dropdown-list-');
-            const listEl = document.getElementById(listId);
-            if (!listEl) return;
-
-            listEl.innerHTML = '';
-
-            let currentAudioId = '';
-            let currentVideoId = '';
-            if (localStream) {
-                const audioTracks = localStream.getAudioTracks();
-                if (audioTracks.length > 0) currentAudioId = audioTracks[0].getSettings().deviceId;
-                const videoTracks = localStream.getVideoTracks();
-                if (videoTracks.length > 0) currentVideoId = videoTracks[0].getSettings().deviceId;
+        // Fechar ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!el.contains(e.target) && !e.target.closest('[data-dropdown-trigger]')) {
+                el.style.display = 'none';
+                el.dataset.currentId = '';
             }
+        }, true);
+    }
+    return el;
+}
 
-            const isMic = dropdownId.startsWith('mic-');
-            const kind = isMic ? 'audioinput' : 'videoinput';
-            const filteredDevices = devices.filter(d => d.kind === kind);
+window.toggleCardDropdown = async (dropdownId, triggerBtn) => {
+    const floating = getFloatingDropdown();
 
-            if (filteredDevices.length === 0) {
-                listEl.innerHTML = '<div class="text-[10px] text-gray-500 p-2 text-center pointer-events-none">Nenhum dispositivo detectado</div>';
-                return;
-            }
+    // Fechar se o mesmo dropdown já está aberto
+    if (floating.dataset.currentId === dropdownId && floating.style.display !== 'none') {
+        floating.style.display = 'none';
+        floating.dataset.currentId = '';
+        return;
+    }
 
-            filteredDevices.forEach((device, index) => {
-                const isSelected = device.deviceId === (isMic ? currentAudioId : currentVideoId);
-                const label = device.label || `${isMic ? 'Microfone' : 'Câmera'} ${index + 1}`;
-                listEl.innerHTML += `
-                    <button onclick="switchHostDevice('${device.deviceId}', '${isMic ? 'audio' : 'video'}')" class="text-left w-full px-3 py-2 hover:bg-win-accent rounded transition-colors truncate text-[11px] ${isSelected ? 'text-win-accent font-bold bg-white/5' : 'text-gray-300'}">
-                        ${label}
-                    </button>
-                `;
-            });
-        } catch (e) {
-            console.error('Erro ao enumerar dispositivos para o dropdown:', e);
+    // Posicionar abaixo do botão trigger
+    const rect = triggerBtn.getBoundingClientRect();
+    floating.style.left = `${rect.left}px`;
+    floating.style.top = `${rect.bottom + 4}px`;
+    floating.style.display = 'block';
+    floating.dataset.currentId = dropdownId;
+    floating.innerHTML = '<div class="p-3 text-[10px] text-gray-500 text-center">Carregando...</div>';
+
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+
+        let currentAudioId = '';
+        let currentVideoId = '';
+        if (localStream) {
+            const at = localStream.getAudioTracks();
+            if (at.length > 0) currentAudioId = at[0].getSettings().deviceId;
+            const vt = localStream.getVideoTracks();
+            if (vt.length > 0) currentVideoId = vt[0].getSettings().deviceId;
         }
+
+        const isMic = dropdownId.startsWith('mic-');
+        const kind = isMic ? 'audioinput' : 'videoinput';
+        const filtered = devices.filter(d => d.kind === kind);
+
+        if (filtered.length === 0) {
+            floating.innerHTML = '<div class="p-3 text-[10px] text-gray-500 text-center">Nenhum dispositivo detectado</div>';
+            return;
+        }
+
+        const list = document.createElement('div');
+        list.className = 'flex flex-col p-1';
+        filtered.forEach((device, idx) => {
+            const isSelected = device.deviceId === (isMic ? currentAudioId : currentVideoId);
+            const label = device.label || `${isMic ? 'Microfone' : 'Câmera'} ${idx + 1}`;
+            const btn = document.createElement('button');
+            btn.className = `text-left w-full px-3 py-2 hover:bg-win-accent hover:text-white rounded transition-colors truncate text-[11px] ${isSelected ? 'text-win-accent font-bold bg-white/5' : 'text-gray-300'}`;
+            btn.textContent = label;
+            btn.onclick = () => switchHostDevice(device.deviceId, isMic ? 'audio' : 'video');
+            list.appendChild(btn);
+        });
+        floating.innerHTML = '';
+        floating.appendChild(list);
+
+        // Ajustar se sair da tela
+        const fr = floating.getBoundingClientRect();
+        if (fr.right > window.innerWidth) floating.style.left = `${window.innerWidth - fr.width - 8}px`;
+        if (fr.bottom > window.innerHeight) floating.style.top = `${rect.top - fr.height - 4}px`;
+    } catch (e) {
+        floating.innerHTML = '<div class="p-3 text-[10px] text-gray-500 text-center">Erro ao listar dispositivos</div>';
     }
 };
 
 window.switchHostDevice = async (deviceId, kind) => {
-    // Fechar dropdowns
-    document.querySelectorAll('[id^="mic-dropdown-"], [id^="cam-dropdown-"]').forEach(el => el.classList.add('hidden'));
+    // Fechar floating dropdown
+    const fd = document.getElementById('floating-device-dropdown');
+    if (fd) { fd.style.display = 'none'; fd.dataset.currentId = ''; }
 
     try {
         const constraints = {
