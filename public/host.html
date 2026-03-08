@@ -368,6 +368,41 @@
                         class="flex-1 bg-gradient-to-r from-purple-900/40 to-win-accent/30 text-purple-300 border border-purple-500/30 hover:from-purple-800 hover:to-win-accent hover:text-white rounded-lg py-2 text-[10px] uppercase font-bold tracking-widest transition-all drop-shadow-lg flex items-center justify-center gap-1.5">
                         <i class="ph ph-grid-four text-sm"></i> View Dashboard
                     </button>
+
+                    <!-- Layout Picker Dropdown -->
+                    <div class="relative shrink-0" id="layout-picker-wrap">
+                        <button onclick="toggleLayoutPicker()" id="btn-layout-picker"
+                            class="w-9 h-9 bg-white/5 text-gray-300 border border-white/10 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/50 rounded-lg flex items-center justify-center transition-all"
+                            title="Layouts de Cena">
+                            <i class="ph ph-squares-four text-sm"></i>
+                        </button>
+                        <div id="layout-picker-menu"
+                            class="hidden absolute bottom-full right-0 mb-2 w-44 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-50">
+                            <div class="p-1.5 flex flex-col gap-0.5">
+                                <button onclick="changeLayout('auto-grid'); closeLayoutPicker()" id="layout-auto-grid"
+                                    class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
+                                    <i class="ph ph-squares-four text-sm shrink-0"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Auto Grid</span>
+                                </button>
+                                <button onclick="changeLayout('cnn-split'); closeLayoutPicker()" id="layout-cnn-split"
+                                    class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
+                                    <i class="ph ph-layout text-sm shrink-0"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">CNN Split</span>
+                                </button>
+                                <button onclick="changeLayout('cnn-vertical'); closeLayoutPicker()" id="layout-cnn-vertical"
+                                    class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
+                                    <i class="ph ph-rows text-sm shrink-0"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">CNN Vertical</span>
+                                </button>
+                                <button onclick="changeLayout('speaker-highlight'); closeLayoutPicker()" id="layout-speaker-highlight"
+                                    class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
+                                    <i class="ph ph-presentation-chart text-sm shrink-0"></i>
+                                    <span class="text-[10px] font-bold uppercase tracking-wider">Highlight</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <button onclick="copyMasterGridLink()" id="btn-copy-grid"
                         class="w-9 h-9 bg-white/5 text-gray-300 border border-white/10 hover:bg-win-accent hover:text-white hover:border-win-accent rounded-lg flex items-center justify-center transition-all shrink-0"
                         title="Copiar Link Limpo pro OBS">
@@ -461,50 +496,6 @@
                                 class="w-full accent-win-accent h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
-            </section>
-
-            <!-- Layouts Section -->
-            <section id="layouts-section" class="glass-panel rounded-2xl flex flex-col shrink-0 overflow-hidden">
-                <header class="px-5 py-3 border-b border-white/5 bg-white/5">
-                    <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
-                        <i class="ph ph-squares-four text-win-accent text-sm"></i> Layouts de Cena
-                    </h2>
-                </header>
-                <div class="p-3 grid grid-cols-2 lg:grid-cols-4 gap-2">
-                    <button onclick="changeLayout('auto-grid')" id="layout-auto-grid"
-                        class="layout-btn flex flex-col items-center justify-center p-3 rounded-lg border border-white/10 bg-black/20 hover:bg-win-accent/20 hover:border-win-accent/50 transition-all gap-2 relative overflow-hidden group active">
-                        <i
-                            class="ph ph-squares-four text-xl text-gray-400 group-hover:text-win-accent transition-colors"></i>
-                        <span
-                            class="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-200">Auto
-                            Grid</span>
-                    </button>
-
-                    <button onclick="changeLayout('cnn-split')" id="layout-cnn-split"
-                        class="layout-btn flex flex-col items-center justify-center p-3 rounded-lg border border-white/10 bg-black/20 hover:bg-win-accent/20 hover:border-win-accent/50 transition-all gap-2 relative overflow-hidden group">
-                        <i class="ph ph-layout text-xl text-gray-400 group-hover:text-win-accent transition-colors"></i>
-                        <span
-                            class="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-200">CNN
-                            Split</span>
-                    </button>
-
-                    <button onclick="changeLayout('speaker-highlight')" id="layout-speaker-highlight"
-                        class="layout-btn flex flex-col items-center justify-center p-3 rounded-lg border border-white/10 bg-black/20 hover:bg-win-accent/20 hover:border-win-accent/50 transition-all gap-2 relative overflow-hidden group">
-                        <i
-                            class="ph ph-chalkboard-teacher text-xl text-gray-400 group-hover:text-win-accent transition-colors"></i>
-                        <span
-                            class="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-200">Highlight</span>
-                    </button>
-
-                    <button onclick="changeLayout('cinema-219')" id="layout-cinema-219"
-                        class="layout-btn flex flex-col items-center justify-center p-3 rounded-lg border border-white/10 bg-black/20 hover:bg-win-accent/20 hover:border-win-accent/50 transition-all gap-2 relative overflow-hidden group">
-                        <i
-                            class="ph ph-film-strip text-xl text-gray-400 group-hover:text-win-accent transition-colors"></i>
-                        <span
-                            class="text-[9px] font-bold uppercase tracking-widest text-gray-500 group-hover:text-gray-200">21:9
-                            Cinema</span>
-                    </button>
-                </div>
             </section>
 
             <!-- Chat Section -->

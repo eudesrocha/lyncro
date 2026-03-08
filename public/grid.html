@@ -205,7 +205,7 @@
             transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* CNN Split: 50/50 Side by Side com corte de preenchimento */
+        /* CNN Split: 50/50 Side by Side */
         #grid-container.layout-cnn-split {
             gap: 2px;
             padding: 0;
@@ -226,36 +226,61 @@
             object-fit: cover !important;
         }
 
-        /* Speaker Highlight: O primeiro ganha destaque total */
+        /* CNN Vertical: enquadramento portrait lado a lado (até 5/linha, depois reorganiza) */
+        #grid-container.layout-cnn-vertical {
+            gap: 2px;
+            padding: 0;
+            background: #000;
+            align-items: stretch;
+            justify-content: center;
+        }
+
+        #grid-container.layout-cnn-vertical .grid-cell {
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            aspect-ratio: unset;
+            /* flex-basis e height calculados via JS conforme contagem */
+        }
+
+        #grid-container.layout-cnn-vertical .grid-cell video {
+            object-fit: cover !important;
+        }
+
+        /* Speaker Highlight: destaque principal + tira de miniaturas abaixo */
         #grid-container.layout-speaker-highlight {
-            align-content: center;
-            padding: 40px;
+            padding: 0;
+            gap: 2px;
+            background: #000;
+            align-content: flex-start;
         }
 
         #grid-container.layout-speaker-highlight .grid-cell:first-child {
-            flex: 0 1 100% !important;
-            max-width: 1200px !important;
-            max-height: 75vh !important;
-            border: 2px solid rgba(0, 120, 212, 0.3);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+            height: 72vh !important;
+            max-height: 72vh !important;
+            aspect-ratio: unset;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            opacity: 1;
         }
 
         #grid-container.layout-speaker-highlight .grid-cell:not(:first-child) {
-            flex: 0 1 180px !important;
-            max-width: 220px !important;
-            max-height: 120px !important;
-            opacity: 0.6;
+            flex: 1 1 auto !important;
+            max-width: 340px !important;
+            height: calc(28vh - 2px) !important;
+            max-height: calc(28vh - 2px) !important;
+            aspect-ratio: unset;
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            opacity: 0.9;
         }
 
-        /* Cinema 21:9: Proporção ultra-panorâmica */
-        #grid-container.layout-cinema-219 .grid-cell {
-            aspect-ratio: 21 / 9 !important;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.4);
-        }
-
-        #grid-container.layout-cinema-219 .grid-cell video {
-            object-fit: contain !important;
+        #grid-container.layout-speaker-highlight .grid-cell video {
+            object-fit: cover !important;
         }
     </style>
 </head>

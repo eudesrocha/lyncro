@@ -451,18 +451,9 @@ function updateUI(participants) {
     const emptyQueueMsg = document.getElementById('empty-queue-msg');
     const queueCountBadge = document.getElementById('queue-count');
 
-    // Atualiza Visual do Layout Atual
+    // Atualiza destaque do layout ativo no picker
     if (window.currentRoomSettings && window.currentRoomSettings.layout) {
-        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active', 'border-win-accent', 'bg-win-accent/10'));
-        const activeBtn = document.getElementById(`layout-${window.currentRoomSettings.layout}`);
-        if (activeBtn) activeBtn.classList.add('active', 'border-win-accent', 'bg-win-accent/10');
-    }
-
-    // Atualiza Visual do Layout Atual
-    if (window.currentRoomSettings && window.currentRoomSettings.layout) {
-        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active', 'border-win-accent', 'bg-win-accent/10'));
-        const activeBtn = document.getElementById(`layout-${window.currentRoomSettings.layout}`);
-        if (activeBtn) activeBtn.classList.add('active', 'border-win-accent', 'bg-win-accent/10');
+        applyLayoutPickerActive(window.currentRoomSettings.layout);
     }
 
     const currentParticipantIds = participants.filter(p => p.status === 'accepted' || p.role === 'host').map(p => p.id);
@@ -1712,14 +1703,40 @@ window.changeLayout = function (layoutId) {
         // Feedback Otimista na UI
         if (!window.currentRoomSettings) window.currentRoomSettings = {};
         window.currentRoomSettings.layout = layoutId;
+        applyLayoutPickerActive(layoutId);
 
-        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active', 'border-win-accent', 'bg-win-accent/10'));
-        const activeBtn = document.getElementById(`layout-${layoutId}`);
-        if (activeBtn) activeBtn.classList.add('active', 'border-win-accent', 'bg-win-accent/10');
-
-        showToast(`Layout alterado para ${layoutId.replace('-', ' ').toUpperCase()}`, 'success');
+        const labels = { 'auto-grid': 'Auto Grid', 'cnn-split': 'CNN Split', 'cnn-vertical': 'CNN Vertical', 'speaker-highlight': 'Highlight' };
+        showToast(`Layout: ${labels[layoutId] || layoutId}`, 'success');
     }
 };
+
+function applyLayoutPickerActive(layoutId) {
+    document.querySelectorAll('.layout-btn').forEach(btn => {
+        btn.classList.remove('text-win-accent', 'bg-win-accent/10');
+        btn.classList.add('text-gray-400');
+    });
+    const activeBtn = document.getElementById(`layout-${layoutId}`);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-gray-400');
+        activeBtn.classList.add('text-win-accent', 'bg-win-accent/10');
+    }
+}
+
+window.toggleLayoutPicker = function () {
+    const menu = document.getElementById('layout-picker-menu');
+    if (menu) menu.classList.toggle('hidden');
+};
+
+window.closeLayoutPicker = function () {
+    const menu = document.getElementById('layout-picker-menu');
+    if (menu) menu.classList.add('hidden');
+};
+
+// Fechar ao clicar fora
+document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('layout-picker-wrap');
+    if (wrap && !wrap.contains(e.target)) closeLayoutPicker();
+});
 
 let prompterState = {
     targetId: 'all',

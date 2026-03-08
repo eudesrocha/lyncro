@@ -34,12 +34,34 @@ function calculateGrid() {
         }
     }
 
-    // Se houver um layout especial, o CSS cuida do cálculo
+    // CNN Vertical: JS calcula colunas e altura com base na contagem
+    if (currentLayout === 'cnn-vertical') {
+        const c = count || 1;
+        let cols, rows;
+        if (c <= 5)      { cols = c; rows = 1; }
+        else if (c <= 6) { cols = 3; rows = 2; }
+        else if (c <= 8) { cols = 4; rows = 2; }
+        else if (c <= 9) { cols = 3; rows = 3; }
+        else             { cols = 5; rows = Math.ceil(c / 5); }
+
+        const h = `calc(${100 / rows}vh - ${rows > 1 ? 1 : 0}px)`;
+        const cells = document.querySelectorAll('.grid-cell');
+        cells.forEach(cell => {
+            const basis = `calc(${100 / cols}% - ${cols > 1 ? 1 : 0}px)`;
+            cell.style.flex = `0 1 ${basis}`;
+            cell.style.maxWidth = basis;
+            cell.style.height = h;
+        });
+        return;
+    }
+
+    // Demais layouts especiais: CSS cuida do visual, limpar inline styles
     if (currentLayout !== 'auto-grid') {
         const cells = document.querySelectorAll('.grid-cell');
         cells.forEach(cell => {
             cell.style.flex = '';
             cell.style.maxWidth = '';
+            cell.style.height = '';
         });
         return;
     }
@@ -63,7 +85,7 @@ function applyLayout(layoutId) {
     if (!container) return;
 
     // Remover classes antigas
-    container.classList.remove('layout-auto-grid', 'layout-cnn-split', 'layout-speaker-highlight', 'layout-cinema-219');
+    container.classList.remove('layout-auto-grid', 'layout-cnn-split', 'layout-cnn-vertical', 'layout-speaker-highlight');
 
     // Adicionar nova
     container.classList.add(`layout-${layoutId}`);
