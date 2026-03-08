@@ -29,10 +29,8 @@
         }
 
         /* 
-           O grid container se estica até os limites (com alguma margem se quisermos, 
-           mas para OBS fullscreen é melhor 0 ou minima). 
-           Usaremos Flexbox com wrap, calculando o widht/height base dinamicamente no JS, 
-           ou apenas o CSS magic dependendo de quantos videos existam.
+           O grid container se estica até os limites. Usando Flexbox
+           com content center, centralizamos automaticamente filas ímpares.
         */
         #grid-container {
             width: 100%;
@@ -41,27 +39,34 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
+            /* centraliza vertical no eixo secundario */
+            align-content: center;
+            /* centraliza o bloco flex todo no meio */
             justify-content: center;
+            /* alinha horizontamente (centraliza os sobressalentes ímpares) */
             gap: 16px;
             /* modern gap */
             box-sizing: border-box;
             transition: all 0.3s ease;
         }
 
-        /* Cada célula de vídeo */
+        /* Cada célula de vídeo (com proporção FORÇADA para não quebrar a tela) */
         .grid-cell {
             position: relative;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 16px;
             overflow: hidden;
-            /* Flex calculos geridos por script */
             display: flex;
             align-items: center;
             justify-content: center;
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            /* glassmorphism light border */
+            /* Proteções Críticas de Proporção: */
+            aspect-ratio: 16 / 9;
+            /* Garante Paisagem Independente da Transmissão do Celular */
+            max-height: calc(100vh - 32px);
+            /* Proíbe estouro vertical (rolagem de tela acidental) */
         }
 
         .grid-cell video {

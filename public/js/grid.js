@@ -33,20 +33,18 @@ function calculateGrid() {
         }
     }
 
-    // Usaremos CSS Grid dinâmico em vez de flex complexo
-    let cols = 1;
-    let rows = 1;
+    // Usamos regras flexíveis baseadas na contagem de pessoas
+    let basis = '100%';
+    if (count === 1) basis = '100%';
+    else if (count >= 2 && count <= 4) basis = 'calc(50% - 8px)'; // (gap de 16px dividido)
+    else if (count >= 5 && count <= 9) basis = 'calc(33.333% - 11px)';
+    else if (count >= 10) basis = 'calc(25% - 12px)';
 
-    if (count === 1) { cols = 1; rows = 1; }
-    else if (count === 2) { cols = 2; rows = 1; }
-    else if (count === 3 || count === 4) { cols = 2; rows = 2; }
-    else if (count === 5 || count === 6) { cols = 3; rows = 2; }
-    else if (count >= 7 && count <= 9) { cols = 3; rows = 3; }
-    else if (count >= 10) { cols = 4; rows = 3; }
-
-    container.style.display = 'grid';
-    container.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
-    container.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+    const cells = document.querySelectorAll('.grid-cell');
+    cells.forEach(cell => {
+        cell.style.flex = `0 1 ${basis}`;
+        cell.style.maxWidth = basis;
+    });
 }
 
 function updateCellInfo(id) {
@@ -159,18 +157,27 @@ async function setupWebSocket() {
                 if (rtcClient) rtcClient.updateConfig(data.iceServers);
                 break;
             case 'participant-update':
-                // Atualizar cache de nomes
+                // Atualizar cache de nomes (IGNORAR waiting - só accepted)
                 data.participants.forEach(p => {
-                    participantsData.set(p.id, p);
-                    updateCellInfo(p.id);
+                    if (p.role !== 'observer' && p.status === 'accepted') {
+                        participantsData.set(p.id, p);
+                        updateCellInfo(p.id);
+                    }
                 });
 
-                // Ligar para todo mundo que não for observer
+                // Ligar para todo mundo que não for observer E que esteja ACCEPTED
                 data.participants.forEach(p => {
-                    if (p.role !== 'observer' && p.status !== 'disconnected') {
-                        if (!rtcClient.peers.has(p.id)) {
-                            console.log(`[Grid] Solicitando vídeo de: ${p.id} (${p.name})`);
-                            initiateConnection(p.id);
+                    if (p.role !== 'observer') {
+                        if (p.status === 'accepted') {
+                            if (!rtcClient.peers.has(p.id)) {
+                                console.log(`[Grid] Solicitando vídeo de: ${p.id} (${p.name})`);
+                                initiateConnection(p.id);
+                            }
+                        } else if (rtcClient.peers.has(p.id)) {
+                            // Se alguem perdeu status de aceite (foi kickado ou posto em espera de novo) e ele tava ativo na tela
+                            console.log(`[Grid] Participante perdeu aprovação: ${p.id}. Removendo do Dashboard.`);
+                            rtcClient.removePeer(p.id);
+                            removeVideoCell(p.id);
                         }
                     }
                 });
