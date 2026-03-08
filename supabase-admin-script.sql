@@ -2,8 +2,20 @@
 create table if not exists public.profiles (
   id uuid references auth.users not null primary key,
   email text,
-  role text default 'user' -- Papel padrão é 'user'
+  role text default 'user', -- Papel padrão é 'user'
+  -- Assinatura / Plano
+  plan text default 'free',                    -- 'free' | 'pro'
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  plan_expires_at timestamptz
 );
+
+-- 1b. Adiciona colunas de assinatura caso a tabela já exista
+alter table public.profiles
+  add column if not exists plan text default 'free',
+  add column if not exists stripe_customer_id text,
+  add column if not exists stripe_subscription_id text,
+  add column if not exists plan_expires_at timestamptz;
 
 -- 2. Ativa o Row Level Security (RLS), o que significa que o acesso externo aos dados será bloqueado por padrão
 alter table public.profiles enable row level security;
@@ -19,15 +31,16 @@ create policy "Admins podem ver todos os perfis" on profiles for select
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email, role)
+  insert into public.profiles (id, email, role, plan)
   values (
     new.id,
     new.email,
     -- Se o e-mail for o seu e-mail do Google, define como 'admin', senão define como 'user'
     case
-      when new.email = 'eudesrocha1@yahoo.com.br' then 'admin' 
+      when new.email = 'eudesrocha1@yahoo.com.br' then 'admin'
       else 'user'
-    end
+    end,
+    'free' -- plano padrão para novos usuários
   );
   return new;
 end;

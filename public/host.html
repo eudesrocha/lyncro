@@ -295,8 +295,9 @@
             <div class="flex items-center justify-center bg-win-accent/10 rounded-xl p-2 border border-win-accent/20">
                 <i class="ph ph-broadcast text-win-accent text-2xl font-bold"></i>
             </div>
-            <h1 class="text-2xl font-logo font-black italic tracking-tight text-white leading-none hidden sm:block">
+            <h1 class="text-2xl font-logo font-black italic tracking-tight text-white leading-none hidden sm:block flex items-center gap-2">
                 Lyncro
+                <span id="plan-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-gray-400 tracking-widest">FREE</span>
             </h1>
 
             <div class="w-px h-6 bg-white/10 mx-2 hidden md:block"></div>
@@ -314,6 +315,7 @@
                 </button>
                 <div class="w-px h-4 bg-white/10 mx-1"></div>
                 <button id="btn-record"
+                    data-pro-feature="Gravação"
                     class="flex items-center justify-center px-3 h-8 rounded-lg border border-transparent hover:bg-red-600/20 hover:text-red-400 hover:border-red-500/30 transition-all text-[10px] font-bold uppercase tracking-widest text-gray-400 group gap-1.5">
                     <i class="ph ph-record text-sm"></i>
                     <span class="rec-label pb-px hidden md:inline">Gravar</span>
@@ -472,15 +474,19 @@
                                     <i class="ph ph-squares-four text-sm shrink-0"></i>
                                     <span class="text-[10px] font-bold uppercase tracking-wider">Auto Grid</span>
                                 </button>
-                                <button onclick="changeLayout('cnn-split'); closeLayoutPicker()" id="layout-cnn-split"
+                                <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('CNN Split')) return; changeLayout('cnn-split'); closeLayoutPicker()" id="layout-cnn-split"
+                                    data-pro-feature="CNN Split"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-layout text-sm shrink-0"></i>
                                     <span class="text-[10px] font-bold uppercase tracking-wider">CNN Split</span>
+                                    <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
-                                <button onclick="changeLayout('cnn-vertical'); closeLayoutPicker()" id="layout-cnn-vertical"
+                                <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('CNN Vertical')) return; changeLayout('cnn-vertical'); closeLayoutPicker()" id="layout-cnn-vertical"
+                                    data-pro-feature="CNN Vertical"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-rows text-sm shrink-0"></i>
                                     <span class="text-[10px] font-bold uppercase tracking-wider">CNN Vertical</span>
+                                    <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
                                 <button onclick="changeLayout('portrait-cards'); closeLayoutPicker()" id="layout-portrait-cards"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
@@ -938,6 +944,20 @@
     <script src="js/host-chat.js"></script>
     <script src="js/host-recorder.js"></script>
     <script src="js/theme.js"></script>
+    <script src="js/plan.js"></script>
+    <script>
+        // Gate do botão Gravar — intercepta o clique se usuário for FREE
+        document.addEventListener('DOMContentLoaded', function () {
+            var btnRecord = document.getElementById('btn-record');
+            if (!btnRecord) return;
+            btnRecord.addEventListener('click', function (e) {
+                if (window.LYNCRO_PLAN && LYNCRO_PLAN.isFree()) {
+                    e.stopImmediatePropagation();
+                    LYNCRO_PLAN.showUpgradeModal('Gravação');
+                }
+            }, true); // capture=true para interceptar antes do handler existente
+        });
+    </script>
 </body>
 
 </html>

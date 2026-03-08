@@ -4,6 +4,7 @@ const path = require('path');
 const cors = require('cors');
 const setupSignaling = require('./signaling');
 const roomManager = require('./rooms');
+const billingRouter = require('./billing');
 
 const app = express();
 const server = http.createServer(app);
@@ -26,6 +27,9 @@ app.use(cors({
     },
     credentials: true
 }));
+// Billing router MUST come before express.json() so the webhook gets the raw body
+app.use(billingRouter);
+
 app.use(express.json());
 
 // Anti-cache para arquivos estáticos (resolve cache agressivo em mobile Safari/Chrome)

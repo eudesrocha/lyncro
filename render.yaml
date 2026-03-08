@@ -19,4 +19,31 @@ services:
         sync: false
       - key: ALLOWED_ORIGIN
         sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # Price IDs — BRL
+      - key: STRIPE_PRICE_PRO_BRL_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_PRO_BRL_SEMIANNUAL
+        sync: false
+      - key: STRIPE_PRICE_PRO_BRL_ANNUAL
+        sync: false
+      # Price IDs — USD
+      - key: STRIPE_PRICE_PRO_USD_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_PRO_USD_SEMIANNUAL
+        sync: false
+      - key: STRIPE_PRICE_PRO_USD_ANNUAL
+        sync: false
+      # Price IDs — EUR
+      - key: STRIPE_PRICE_PRO_EUR_MONTHLY
+        sync: false
+      - key: STRIPE_PRICE_PRO_EUR_SEMIANNUAL
+        sync: false
+      - key: STRIPE_PRICE_PRO_EUR_ANNUAL
+        sync: false
     healthCheckPath: /api/rooms
