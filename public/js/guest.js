@@ -1739,7 +1739,7 @@ function updatePrompterState(state) {
             container.classList.remove('hidden');
             container.classList.remove('guest-closed');
             const controls = document.getElementById('prompter-local-controls');
-            if (controls) controls.classList.remove('hidden');
+            if (controls) controls.style.display = 'flex';
             container.style.opacity = '1';
             prompterActive = true;
             if (!prompterAnimId) {
@@ -1761,7 +1761,7 @@ function updatePrompterState(state) {
         container.style.opacity = '1';
         const controls = document.getElementById('prompter-local-controls');
         if (controls) {
-            controls.classList.remove('hidden');
+            controls.style.display = 'flex';
             controls.style.opacity = '1';
         }
         if (!prompterActive) {
@@ -1866,7 +1866,7 @@ window.closeGuestPrompter = () => {
     if (container) {
         container.classList.add('hidden');
         container.classList.add('guest-closed');
-        if (controls) controls.classList.add('hidden');
+        if (controls) controls.style.display = 'none';
 
         prompterActive = false;
         isPrompterPlaying = false;
