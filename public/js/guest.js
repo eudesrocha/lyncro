@@ -1777,8 +1777,12 @@ function updatePrompterState(state) {
     // Mas para manter centrado e legal, dividimos por 2 e aplicamos nas laterais
     textContent.style.padding = `0 ${marginPct}%`;
 
-    // Aplicar Tamanho da Fonte
-    const sizePx = state.size || 60;
+    // Aplicar Tamanho da Fonte dinâmico (PC vs Mobile)
+    let sizePx = state.size || 60;
+    // Se a tela for pequena (celular), aplica a proporção solicitada de 50px base para cada 60px do host
+    if (window.innerWidth <= 768) {
+        sizePx = Math.round(sizePx * (50 / 60));
+    }
     textContent.style.fontSize = `${sizePx}px`;
 }
 

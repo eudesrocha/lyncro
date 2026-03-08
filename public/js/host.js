@@ -1689,8 +1689,8 @@ let prompterState = {
     targetId: 'all',
     text: '',
     isPlaying: false,
-    speed: 5,
-    size: 25,
+    speed: 4,
+    size: 60,
     margin: 5,
     restartToken: 0
 };
