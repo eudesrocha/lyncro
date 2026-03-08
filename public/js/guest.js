@@ -937,7 +937,11 @@ async function setupWebSocket() {
         switch (data.type) {
             case 'init-network':
                 myId = data.yourId;
-                if (rtcClient) rtcClient.updateConfig(data.iceServers);
+                if (rtcClient) {
+                    rtcClient.updateConfig(data.iceServers);
+                    // Wifi ressuscitou: matar lixo P2P do estado velho
+                    Array.from(rtcClient.peers.keys()).forEach(id => rtcClient.removePeer(id));
+                }
                 sessionStorage.setItem(`lyncro_reconnect_id_${roomName}`, myId);
                 console.log('My ID:', myId);
                 break;

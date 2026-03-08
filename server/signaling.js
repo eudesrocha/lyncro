@@ -16,7 +16,23 @@ function setupSignaling(server) {
     const hostGraceTimers = new Map(); // roomId       -> setTimeout handle
     const guestGraceTimers = new Map(); // participantId -> setTimeout handle
 
+    const interval = setInterval(() => {
+        wss.clients.forEach((ws) => {
+            if (ws.isAlive === false) {
+                console.log(`[Heartbeat] Cliente não respondeu ao ping. Derrubando conexão TCP.`);
+                return ws.terminate();
+            }
+            ws.isAlive = false;
+            ws.ping();
+        });
+    }, 5000); // Heartbeat rígido de 5s
+
+    wss.on('close', () => clearInterval(interval));
+
     wss.on('connection', (ws, req) => {
+        ws.isAlive = true;
+        ws.on('pong', () => { ws.isAlive = true; });
+
         const ip = req.socket.remoteAddress;
 
         // Limitar conexões simultâneas por IP
