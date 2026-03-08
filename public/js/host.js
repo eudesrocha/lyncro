@@ -57,6 +57,7 @@ function getHostQuality() {
 const urlParams = new URLSearchParams(window.location.search);
 const roomName = urlParams.get('room') || 'default';
 const userName = urlParams.get('name') || 'Host';
+let displayName = localStorage.getItem('lyncro_host_display_name') || userName;
 
 let localStream;
 let returnAudioStream = null; // Áudio de Loopback do Mix-Minus
@@ -340,7 +341,7 @@ async function setupWebSocket() {
             type: 'join',
             roomId: roomName,
             participant: {
-                name: userName,
+                name: displayName,
                 role: 'host',
                 userId: userId,
                 token: accessToken  // JWT para validação no servidor
@@ -611,8 +612,16 @@ function renderParticipantCard(participant, isLocal = false) {
           <span id="tally-text-${participant.id}" class="text-[9px] font-black tracking-widest uppercase text-white/90">${participant.tallyState === 'program' ? 'No Ar' : participant.tallyState === 'preview' ? 'Preview' : 'Ready'}</span>
         </div>
 
-        <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-bold border border-win-border text-white/70">
-          ${participant.name} ${isLocal ? '(Host)' : ''}
+        <div class="absolute bottom-2.5 left-2.5 bg-black/60 backdrop-blur-md rounded border border-win-border flex items-center overflow-hidden">
+          ${isLocal
+            ? `<input id="host-display-name" type="text" value="${participant.name}"
+                 class="text-[10px] font-bold bg-transparent outline-none text-white/70 hover:text-white focus:text-win-accent px-2 py-0.5 w-28 cursor-pointer transition-colors"
+                 title="Clique para editar o nome exibido no Dashboard"
+                 onblur="updateHostName(this.value)"
+                 onkeydown="if(event.key==='Enter')this.blur()" />
+               <span class="text-[10px] font-bold text-win-accent/60 pr-2">HOST</span>`
+            : `<span class="text-[10px] font-bold text-white/70 px-2 py-0.5">${participant.name}</span>`
+          }
         </div>
 
         ${isLocal ? '' : `
@@ -1721,6 +1730,17 @@ function applyLayoutPickerActive(layoutId) {
         activeBtn.classList.add('text-win-accent', 'bg-win-accent/10');
     }
 }
+
+window.updateHostName = function (newName) {
+    newName = (newName || '').trim() || userName;
+    displayName = newName;
+    localStorage.setItem('lyncro_host_display_name', displayName);
+    const input = document.getElementById('host-display-name');
+    if (input && input.value !== displayName) input.value = displayName;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'update-participant', roomId: roomName, updates: { name: displayName } }));
+    }
+};
 
 window.toggleLayoutPicker = function () {
     const menu = document.getElementById('layout-picker-menu');
