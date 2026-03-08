@@ -39,7 +39,7 @@
         #splash-screen {
             position: fixed;
             inset: 0;
-            background: #060b10;
+            background: var(--bg, #060b10);
             z-index: 99999;
             display: flex;
             align-items: center;
@@ -63,8 +63,8 @@
             font-style: italic;
             color: transparent;
             /* Efeito de revelar o texto desenhando e depois preenchendo */
-            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
-            background: linear-gradient(to right, #ffffff 50%, transparent 50%);
+            -webkit-text-stroke: 1px var(--text-muted, rgba(255, 255, 255, 0.5));
+            background: linear-gradient(to right, var(--text, #ffffff) 50%, transparent 50%);
             background-size: 200% 100%;
             background-position: 100% 0;
             background-clip: text;
@@ -85,7 +85,7 @@
         @keyframes textReveal {
             0% {
                 background-position: 100% 0;
-                -webkit-text-stroke: 1px rgba(255, 255, 255, 0.5);
+                -webkit-text-stroke: 1px var(--text-muted, rgba(255, 255, 255, 0.5));
                 transform: scale(0.95);
             }
 
@@ -93,7 +93,7 @@
                 background-position: 0 0;
                 -webkit-text-stroke: 1px transparent;
                 transform: scale(1);
-                filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
+                filter: drop-shadow(0 0 10px var(--text-muted, rgba(255, 255, 255, 0.2)));
             }
 
             100% {

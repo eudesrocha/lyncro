@@ -125,18 +125,19 @@ input[class*="bg-white"]::placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     border: 1px solid var(--toggle-border);
     background: var(--toggle-bg);
     color: var(--toggle-icon);
     cursor: pointer;
     transition: all 0.2s ease;
-    font-size: 1.1rem;
+    font-size: 1.25rem;
     flex-shrink: 0;
 }
-.theme-toggle-btn:hover {
+.theme-toggle-btn:hover,
+.theme-toggle-btn:active {
     border-color: #0078d4;
     color: #0078d4;
     background: rgba(0, 120, 212, 0.08);
