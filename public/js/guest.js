@@ -80,6 +80,7 @@ let speakerAnalyzers = new Map(); // targetId -> { analyser, dataArray, source }
 let speakerDetectionInterval = null;
 let speakerAudioCtx = null;
 let currentFullscreenId = null; // ID de quem está sendo exibido em fullscreen (pin ou auto)
+let currentParticipants = []; // array cache de particpantes da sala
 
 // ── Noise-tolerant speaker detection parameters ──────────────────────────────
 // Requires sustained speech before switching; ignores brief spikes and background noise.
@@ -946,6 +947,7 @@ async function setupWebSocket() {
                 console.log('My ID:', myId);
                 break;
             case 'participant-update':
+                currentParticipants = data.participants;
                 const me = data.participants.find(p => p.id === myId);
                 if (me) updateTally(me.tallyState);
 
@@ -986,6 +988,14 @@ async function setupWebSocket() {
                 // Alguém desconectou (ou caiu e voltou): limpar o RTC antigo para forçar nova negotiation
                 if (data.participantId && rtcClient) {
                     rtcClient.removePeer(data.participantId);
+                }
+                break;
+            case 'host-disconnected':
+                // Força descartar a via WebRTC do Host para que possamos aceitar Nova Oferta dele quando voltar.
+                console.warn('[Signal] Host desconectou. Removendo peer morto...');
+                if (rtcClient) {
+                    const hostParticipant = currentParticipants && currentParticipants.find(p => p.role === 'host');
+                    if (hostParticipant) rtcClient.removePeer(hostParticipant.id);
                 }
                 break;
             case 'admission-result':

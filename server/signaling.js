@@ -19,13 +19,18 @@ function setupSignaling(server) {
     const interval = setInterval(() => {
         wss.clients.forEach((ws) => {
             if (ws.isAlive === false) {
-                console.log(`[Heartbeat] Cliente não respondeu ao ping. Derrubando conexão TCP.`);
-                return ws.terminate();
+                ws.missedPings = (ws.missedPings || 0) + 1;
+                if (ws.missedPings >= 3) {
+                    console.log(`[Heartbeat] Cliente não respondeu a 3 pings (15s). Derrubando TCP.`);
+                    return ws.terminate(); // Cai somente após 3 erros (ajuda o 4G oscilante)
+                }
+            } else {
+                ws.missedPings = 0;
             }
             ws.isAlive = false;
             ws.ping();
         });
-    }, 5000); // Heartbeat rígido de 5s
+    }, 5000); // Roda a cada 5s
 
     wss.on('close', () => clearInterval(interval));
 
