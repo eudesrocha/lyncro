@@ -34,8 +34,8 @@ function calculateGrid() {
         }
     }
 
-    // CNN Vertical: células portrait 9:16 lado a lado; JS controla largura e max-height por linha
-    if (currentLayout === 'cnn-vertical') {
+    // CNN Vertical e Portrait Cards: mesma lógica de colunas, gap diferente
+    if (currentLayout === 'cnn-vertical' || currentLayout === 'portrait-cards') {
         const c = count || 1;
         let cols, rows;
         if (c <= 5)      { cols = c; rows = 1; }
@@ -44,8 +44,10 @@ function calculateGrid() {
         else if (c <= 9) { cols = 3; rows = 3; }
         else             { cols = 5; rows = Math.ceil(c / 5); }
 
-        const gapPx = 2;
-        const maxH = `${100 / rows}vh`;
+        const gapPx = currentLayout === 'portrait-cards' ? 16 : 2;
+        const paddingPx = currentLayout === 'portrait-cards' ? 16 : 0;
+        const totalPadding = paddingPx * 2;
+        const maxH = `calc((100vh - ${totalPadding + (rows - 1) * gapPx}px) / ${rows})`;
         const cells = document.querySelectorAll('.grid-cell');
         cells.forEach(cell => {
             const totalGap = (cols - 1) * gapPx;
@@ -89,7 +91,7 @@ function applyLayout(layoutId) {
     if (!container) return;
 
     // Remover classes antigas
-    container.classList.remove('layout-auto-grid', 'layout-cnn-split', 'layout-cnn-vertical', 'layout-speaker-highlight');
+    container.classList.remove('layout-auto-grid', 'layout-cnn-split', 'layout-cnn-vertical', 'layout-portrait-cards', 'layout-speaker-highlight');
 
     // Adicionar nova
     container.classList.add(`layout-${layoutId}`);

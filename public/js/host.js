@@ -1705,7 +1705,7 @@ window.changeLayout = function (layoutId) {
         window.currentRoomSettings.layout = layoutId;
         applyLayoutPickerActive(layoutId);
 
-        const labels = { 'auto-grid': 'Auto Grid', 'cnn-split': 'CNN Split', 'cnn-vertical': 'CNN Vertical', 'speaker-highlight': 'Highlight' };
+        const labels = { 'auto-grid': 'Auto Grid', 'cnn-split': 'CNN Split', 'cnn-vertical': 'CNN Vertical', 'portrait-cards': 'Portrait Cards', 'speaker-highlight': 'Highlight' };
         showToast(`Layout: ${labels[layoutId] || layoutId}`, 'success');
     }
 };

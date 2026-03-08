@@ -250,6 +250,28 @@
             object-fit: cover !important;
         }
 
+        /* Portrait Cards: igual ao CNN Vertical, mas com identidade visual Lyncro */
+        #grid-container.layout-portrait-cards {
+            gap: 16px;
+            padding: 16px;
+            align-items: center;
+            align-content: center;
+            justify-content: center;
+        }
+
+        #grid-container.layout-portrait-cards .grid-cell {
+            aspect-ratio: 9/16 !important;
+            height: auto !important;
+            max-height: calc(100vh - 32px) !important;
+            border-radius: 16px !important;
+            border: 1px solid rgba(0, 120, 212, 0.18) !important;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05) !important;
+        }
+
+        #grid-container.layout-portrait-cards .grid-cell video {
+            object-fit: cover !important;
+        }
+
         /* Speaker Highlight: destaque principal + tira de miniaturas abaixo */
         #grid-container.layout-speaker-highlight {
             padding: 0;
