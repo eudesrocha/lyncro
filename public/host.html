@@ -46,6 +46,49 @@
             box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.1);
         }
 
+        /* Dropdown menus — solid, theme-adaptive */
+        #settings-picker-menu,
+        #layout-picker-menu {
+            background-color: #0e0e1c !important;
+            border-color: rgba(255, 255, 255, 0.12) !important;
+        }
+
+        [data-theme="light"] #settings-picker-menu,
+        [data-theme="light"] #layout-picker-menu {
+            background-color: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        [data-theme="light"] #settings-picker-menu button,
+        [data-theme="light"] #layout-picker-menu button {
+            color: #374151;
+        }
+
+        [data-theme="light"] #settings-picker-menu button:hover,
+        [data-theme="light"] #layout-picker-menu button:hover {
+            background-color: rgba(0, 120, 212, 0.08);
+            color: #0078d4;
+        }
+
+        [data-theme="light"] #settings-picker-menu span,
+        [data-theme="light"] #settings-picker-menu .text-gray-300,
+        [data-theme="light"] #settings-picker-menu .text-gray-400,
+        [data-theme="light"] #settings-picker-menu .text-gray-500 {
+            color: #374151 !important;
+        }
+
+        [data-theme="light"] #layout-picker-menu .text-gray-400 {
+            color: #374151 !important;
+        }
+
+        /* VIEW DASHBOARD — legível no tema claro */
+        [data-theme="light"] button[onclick="openMasterGrid()"] {
+            color: #5b21b6 !important;
+            background-image: linear-gradient(to right, rgba(109,40,217,0.15), rgba(0,120,212,0.12)) !important;
+            border-color: rgba(109,40,217,0.3) !important;
+        }
+
         .bg-glow {
             position: relative;
         }
@@ -104,8 +147,14 @@
 
         select,
         select option {
-            background-color: #1a1a1a !important;
-            color: #efefef !important;
+            background-color: #1a1a1a;
+            color: #efefef;
+        }
+
+        [data-theme="light"] select,
+        [data-theme="light"] select option {
+            background-color: #f0f1f4;
+            color: #111114;
         }
 
         .device-select-compact {
@@ -318,6 +367,12 @@
                 <div id="settings-picker-menu"
                     class="hidden absolute top-full right-0 mt-2 w-56 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl z-[999]">
                     <div class="p-1.5 flex flex-col gap-0.5">
+                        <button onclick="openSettingsModal(); closeSettingsPicker()"
+                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-left">
+                            <i class="ph ph-text-aa text-sm text-win-accent"></i>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Letreiros & Lower Thirds</span>
+                        </button>
+                        <div class="my-0.5 border-t border-white/5"></div>
                         <div class="px-3 pt-2 pb-1.5">
                             <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500">Produção</span>
                         </div>
@@ -384,7 +439,7 @@
 
             <!-- Invite Block -->
             <div class="glass-panel rounded-2xl p-4 flex flex-col gap-2 shrink-0 relative z-10">
-                <label class="text-[10px] font-black text-win-accent uppercase tracking-[0.2em]">Ponte de
+                <label class="text-[10px] font-black text-win-accent uppercase tracking-[0.2em]">Link de
                     Convite</label>
                 <div class="flex items-center gap-2 bg-black/30 rounded-xl p-2 border border-white/10 shadow-inner">
                     <input id="invite-link-input"
@@ -504,34 +559,31 @@
                         </button>
 
                         <div class="flex-1 flex flex-col gap-1.5 mt-1">
-                            <div
-                                class="flex justify-between text-[9px] font-bold text-gray-500 uppercase tracking-widest">
-                                <span>Velocidade</span> <span id="lbl-prompter-speed">4x</span>
+                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Velocidade</span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="adjustPrompter('speed',-1)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">−</button>
+                                <span id="lbl-prompter-speed" class="flex-1 text-center text-[11px] font-bold text-gray-200">4x</span>
+                                <button onclick="adjustPrompter('speed',1)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">+</button>
                             </div>
-                            <input type="range" id="prompter-speed" min="1" max="10" value="4"
-                                class="w-full accent-win-accent h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
 
                     <div class="flex items-center gap-5 mt-1">
                         <div class="flex-1 flex flex-col gap-1.5">
-                            <div
-                                class="flex justify-between text-[9px] font-bold text-gray-500 uppercase tracking-widest">
-                                <span title="Tamanho da Fonte no PC do Convidado"><i class="ph ph-text-t"></i>
-                                    Tamanho</span> <span id="lbl-prompter-size">60px</span>
+                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest" title="Tamanho da Fonte no PC do Convidado"><i class="ph ph-text-t"></i> Tamanho</span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="adjustPrompter('size',-5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">−</button>
+                                <span id="lbl-prompter-size" class="flex-1 text-center text-[11px] font-bold text-gray-200">60px</span>
+                                <button onclick="adjustPrompter('size',5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">+</button>
                             </div>
-                            <input type="range" id="prompter-size" min="30" max="120" value="60"
-                                class="w-full accent-win-accent h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer">
                         </div>
                         <div class="flex-1 flex flex-col gap-1.5">
-                            <div
-                                class="flex justify-between text-[9px] font-bold text-gray-500 uppercase tracking-widest">
-                                <span title="Distância Horizontal do Texto"><i
-                                        class="ph ph-arrows-in-line-horizontal"></i> Margem</span> <span
-                                    id="lbl-prompter-margin">5%</span>
+                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest" title="Distância Horizontal do Texto"><i class="ph ph-arrows-in-line-horizontal"></i> Margem</span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="adjustPrompter('margin',-5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">−</button>
+                                <span id="lbl-prompter-margin" class="flex-1 text-center text-[11px] font-bold text-gray-200">5%</span>
+                                <button onclick="adjustPrompter('margin',5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">+</button>
                             </div>
-                            <input type="range" id="prompter-margin" min="0" max="40" value="5"
-                                class="w-full accent-win-accent h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer">
                         </div>
                     </div>
             </section>

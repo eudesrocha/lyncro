@@ -57,7 +57,10 @@ function getHostQuality() {
 const urlParams = new URLSearchParams(window.location.search);
 const roomName = urlParams.get('room') || 'default';
 const userName = urlParams.get('name') || 'Host';
-let displayName = localStorage.getItem('lyncro_host_display_name') || userName;
+// URL param name takes priority (used at room creation); fall back to saved name
+const _urlName = urlParams.get('name');
+let displayName = _urlName || localStorage.getItem('lyncro_host_display_name') || 'Host';
+if (_urlName) localStorage.setItem('lyncro_host_display_name', _urlName);
 
 let localStream;
 let returnAudioStream = null; // Áudio de Loopback do Mix-Minus
@@ -1870,13 +1873,25 @@ function broadcastPrompterState() {
     }
 }
 
+// Ajusta parâmetros do teleprompter via botões +/−
+window.adjustPrompter = (field, delta) => {
+    const config = {
+        speed:  { min: 1,  max: 10,  step: 1,  label: 'lbl-prompter-speed',  suffix: 'x' },
+        size:   { min: 30, max: 120, step: 5,  label: 'lbl-prompter-size',   suffix: 'px' },
+        margin: { min: 0,  max: 40,  step: 5,  label: 'lbl-prompter-margin', suffix: '%' },
+    };
+    const c = config[field];
+    if (!c) return;
+    prompterState[field] = Math.max(c.min, Math.min(c.max, prompterState[field] + delta));
+    const lbl = document.getElementById(c.label);
+    if (lbl) lbl.innerText = prompterState[field] + c.suffix;
+    broadcastPrompterState();
+};
+
 // Hook inputs após o carregamento
 document.addEventListener('DOMContentLoaded', () => {
     const pTarget = document.getElementById('prompter-target');
     const pText = document.getElementById('prompter-text');
-    const pSpeed = document.getElementById('prompter-speed');
-    const pSize = document.getElementById('prompter-size');
-    const pMargin = document.getElementById('prompter-margin');
 
     if (pTarget) {
         pTarget.addEventListener('change', (e) => {
@@ -1889,27 +1904,6 @@ document.addEventListener('DOMContentLoaded', () => {
             prompterState.text = e.target.value;
             isPrompterFinished = false;
             updatePrompterPlayButtonUI();
-            broadcastPrompterState();
-        });
-    }
-    if (pSpeed) {
-        pSpeed.addEventListener('input', (e) => {
-            prompterState.speed = parseInt(e.target.value);
-            document.getElementById('lbl-prompter-speed').innerText = prompterState.speed + 'x';
-            broadcastPrompterState();
-        });
-    }
-    if (pSize) {
-        pSize.addEventListener('input', (e) => {
-            prompterState.size = parseInt(e.target.value);
-            document.getElementById('lbl-prompter-size').innerText = prompterState.size + 'px';
-            broadcastPrompterState();
-        });
-    }
-    if (pMargin) {
-        pMargin.addEventListener('input', (e) => {
-            prompterState.margin = parseInt(e.target.value);
-            document.getElementById('lbl-prompter-margin').innerText = prompterState.margin + '%';
             broadcastPrompterState();
         });
     }
