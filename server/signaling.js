@@ -8,11 +8,13 @@ const MAX_CONNECTIONS_PER_IP = 10;
 const MAX_MESSAGES_PER_SECOND = 30;
 const connectionsByIp = new Map(); // ip -> count
 
-const HOST_GRACE_MS = 30_000; // 30s para o host reconectar antes de encerrar a sessão
+const HOST_GRACE_MS  = 30_000; // 30s para o host reconectar antes de encerrar a sessão
+const GUEST_GRACE_MS = 30_000; // 30s para convidado aceito reconectar antes de ser removido
 
 function setupSignaling(server) {
     const wss = new WebSocket.Server({ server });
-    const hostGraceTimers = new Map(); // roomId -> setTimeout handle
+    const hostGraceTimers  = new Map(); // roomId       -> setTimeout handle
+    const guestGraceTimers = new Map(); // participantId -> setTimeout handle
 
     wss.on('connection', (ws, req) => {
         const ip = req.socket.remoteAddress;
@@ -64,6 +66,11 @@ function setupSignaling(server) {
                             if (existingRoom && existingRoom.participants.has(reconnectId)) {
                                 const existing = existingRoom.participants.get(reconnectId);
                                 if (existing.status === 'accepted' && existing.role === 'guest') {
+                                    // Cancelar o grace timer pendente (se houver)
+                                    if (guestGraceTimers.has(reconnectId)) {
+                                        clearTimeout(guestGraceTimers.get(reconnectId));
+                                        guestGraceTimers.delete(reconnectId);
+                                    }
                                     roomManager.updateParticipant(normalizedRoomId, reconnectId, { ws });
                                     participantId = reconnectId;
                                     console.log(`[RECONNECT] "${existing.name}" reconectou à sala "${normalizedRoomId}" (ID: ${reconnectId})`);
@@ -337,9 +344,31 @@ function setupSignaling(server) {
             if (currentRoomId && participantId) {
                 const roomBeforeLeave = roomManager.getRoom(currentRoomId);
                 const wasHost = roomBeforeLeave && roomBeforeLeave.host === participantId;
+                const participantSnap = roomBeforeLeave && roomBeforeLeave.participants.find(p => p.id === participantId);
+                const isAcceptedGuest = !wasHost && participantSnap && participantSnap.status === 'accepted' && participantSnap.role === 'guest';
 
-                console.log(`Participant ${participantId} left room ${currentRoomId}${wasHost ? ' [HOST]' : ''}`);
-                roomManager.leaveRoom(currentRoomId, participantId);
+                console.log(`Participant ${participantId} left room ${currentRoomId}${wasHost ? ' [HOST]' : isAcceptedGuest ? ' [GUEST – grace period]' : ''}`);
+
+                if (isAcceptedGuest) {
+                    // Não remover imediatamente: dar grace period para reconexão transparente
+                    roomManager.updateParticipant(currentRoomId, participantId, { ws: null });
+
+                    const graceTimer = setTimeout(() => {
+                        guestGraceTimers.delete(participantId);
+                        roomManager.leaveRoom(currentRoomId, participantId);
+                        console.log(`[GRACE] Convidado "${participantSnap.name}" não reconectou. Removido da sala "${currentRoomId}".`);
+                        const roomAfter = roomManager.getRoom(currentRoomId);
+                        if (roomAfter) {
+                            broadcastToRoom(currentRoomId, { type: 'participant-update', participants: roomAfter.participants });
+                        }
+                    }, GUEST_GRACE_MS);
+
+                    guestGraceTimers.set(participantId, graceTimer);
+                    console.log(`[GRACE] Convidado "${participantSnap.name}" desconectou. Grace period de ${GUEST_GRACE_MS / 1000}s iniciado.`);
+                    // Não broadcast participant-update aqui — o convidado provavelmente vai reconectar em breve
+                } else {
+                    roomManager.leaveRoom(currentRoomId, participantId);
+                }
 
                 if (wasHost) {
                     // Grace period: dá 30s para o host reconectar antes de encerrar a sessão
@@ -368,7 +397,7 @@ function setupSignaling(server) {
                 }
 
                 const room = roomManager.getRoom(currentRoomId);
-                if (room) {
+                if (room && !isAcceptedGuest) {
                     broadcastToRoom(currentRoomId, {
                         type: 'participant-update',
                         participants: room.participants
