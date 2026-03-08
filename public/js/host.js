@@ -634,11 +634,11 @@ function renderParticipantCard(participant, isLocal = false) {
               </button>
             </div>
           </div>
-          <div class="flex gap-1.5">
+          <div class="flex flex-col gap-1.5">
             <input type="text" id="ov-name-${participant.id}" placeholder="Nome" value="${participant.overlayName || participant.name || ''}"
-              class="flex-1 bg-black/30 border border-win-border/30 rounded px-2.5 py-2 text-[11px] outline-none focus:border-win-accent transition-all placeholder:text-gray-700 text-gray-300">
+              class="w-full bg-black/30 border border-win-border/30 rounded px-2.5 py-2 text-[11px] outline-none focus:border-win-accent transition-all placeholder:text-gray-700 text-gray-300">
             <input type="text" id="ov-title-${participant.id}" placeholder="Tagline / Título" value="${participant.overlayTitle || ''}"
-              class="flex-1 bg-black/30 border border-win-border/30 rounded px-2.5 py-2 text-[11px] outline-none focus:border-win-accent transition-all placeholder:text-gray-700 text-gray-300">
+              class="w-full bg-black/30 border border-win-border/30 rounded px-2.5 py-2 text-[11px] outline-none focus:border-win-accent transition-all placeholder:text-gray-700 text-gray-300">
           </div>
         </div>
       </div>

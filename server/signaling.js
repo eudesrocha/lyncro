@@ -173,13 +173,17 @@ function setupSignaling(server) {
                         const rm = roomManager.getRoom(normalizedRoomId);
                         if (rm && rm.host === participantId) {
                             const targetParticipant = rm.participants.find(p => p.id === data.targetId);
-                            if (targetParticipant && data.mediaType === 'audio') {
-                                if (data.action === 'mute') {
-                                    roomManager.updateParticipant(normalizedRoomId, data.targetId, { hostMuted: true });
-                                } else if (data.action === 'unmute') {
-                                    // if the guest muted themselves, the host cannot unmute them
-                                    // MVP: Permitir que o Produtor (Host) tenha soberania para desmutar
-                                    roomManager.updateParticipant(normalizedRoomId, data.targetId, { hostMuted: false });
+                            if (targetParticipant) {
+                                const isMute = data.action === 'mute';
+                                if (data.mediaType === 'audio') {
+                                    roomManager.updateParticipant(normalizedRoomId, data.targetId, {
+                                        hostMuted: isMute,
+                                        audioMuted: isMute
+                                    });
+                                } else if (data.mediaType === 'video') {
+                                    roomManager.updateParticipant(normalizedRoomId, data.targetId, {
+                                        videoMuted: isMute
+                                    });
                                 }
                             }
 
