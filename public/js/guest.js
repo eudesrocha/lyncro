@@ -892,6 +892,15 @@ async function setupWebSocket() {
         if (waitTitle) waitTitle.innerHTML = 'Conectado! <br><span class="text-sm font-normal text-gray-400">Aguardando aprovação do produtor...</span>';
 
         rtcClient = new WebRTCClient(userName, handleRemoteTrack, handleIceCandidate, null, null, handleDataMessage);
+
+        // Forçar estado do Hardware de acordo com UI para prevenir suspensão do SO na reconexão (ex: 4G->WiFi)
+        if (localStream && localStream.getAudioTracks().length > 0) {
+            localStream.getAudioTracks()[0].enabled = isMicOn;
+        }
+        if (localStream && localStream.getVideoTracks().length > 0) {
+            localStream.getVideoTracks()[0].enabled = isVideoOn;
+        }
+
         // Garantir que a conexão WebRTC envie a câmera processada com o fundo virtual (se as opções estiverem visíveis)
         rtcClient.setLocalStream(processedStream || localStream);
 
@@ -913,6 +922,14 @@ async function setupWebSocket() {
         if (password) joinPayload.password = password;
 
         ws.send(JSON.stringify(joinPayload));
+
+        // Sincronizar o estado de Mudo e Vídeo com o Host ao re-estabelecer o socket
+        ws.send(JSON.stringify({
+            type: 'media-control',
+            roomId: roomName,
+            mediaType: 'audio',
+            action: isMicOn ? 'unmute' : 'mute'
+        }));
     };
 
     ws.onmessage = async (event) => {
@@ -948,6 +965,13 @@ async function setupWebSocket() {
                 break;
             case 'chat-typing':
                 handleTypingIndicator(data.name, data.isTyping);
+                break;
+            case 'peer-reconnected':
+            case 'participant-left':
+                // Alguém desconectou (ou caiu e voltou): limpar o RTC antigo para forçar nova negotiation
+                if (data.participantId && rtcClient) {
+                    rtcClient.removePeer(data.participantId);
+                }
                 break;
             case 'admission-result':
                 console.log('Resultado da admissão recebido:', data.status);

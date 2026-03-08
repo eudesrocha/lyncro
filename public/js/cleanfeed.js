@@ -100,6 +100,20 @@ async function setupWebSocket() {
                 console.log('[CleanFeed] Overlay control received:', data);
                 updateOverlay(data.action, data.name, data.title, data.style);
                 break;
+            case 'peer-reconnected':
+                console.log(`[CleanFeed] Alvo ${data.participantId} reconectou. Resetando WebRTC.`);
+                if (rtcClient) rtcClient.removePeer(data.participantId);
+                if (data.participantId === targetParticipantId) {
+                    participantVideoCount[targetParticipantId] = 0;
+                }
+                break;
+            case 'participant-left':
+                if (data.participantId === targetParticipantId) {
+                    console.log(`[CleanFeed] Alvo ${data.participantId} saiu. Puxando status de espera.`);
+                    if (rtcClient) rtcClient.removePeer(data.participantId);
+                    participantVideoCount[targetParticipantId] = 0;
+                }
+                break;
         }
     };
 }
