@@ -18,10 +18,12 @@
   },
   "type": "commonjs",
   "dependencies": {
+    "@supabase/supabase-js": "^2.98.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "jsdom": "^28.1.0",
     "qrcode": "^1.5.4",
+    "stripe": "^20.4.1",
     "twilio": "^5.12.2",
     "uuid": "^13.0.0",
     "ws": "^8.19.0"
