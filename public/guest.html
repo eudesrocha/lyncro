@@ -196,73 +196,306 @@
         }
 
         @keyframes overlay-in-bottom {
-            from { transform: translateY(30px); opacity: 0; }
-            to   { transform: translateY(0);    opacity: 1; }
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
+
         @keyframes overlay-out-bottom {
-            from { transform: translateY(0);    opacity: 1; }
-            to   { transform: translateY(30px); opacity: 0; }
+            from {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(30px);
+                opacity: 0;
+            }
         }
+
         @keyframes neon-pulse {
-            0%,100% { box-shadow: 0 0 30px rgba(0,240,255,.25),-4px 0 20px rgba(0,240,255,.4); }
-            50%     { box-shadow: 0 0 50px rgba(0,240,255,.45),-4px 0 30px rgba(0,240,255,.6); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 30px rgba(0, 240, 255, .25), -4px 0 20px rgba(0, 240, 255, .4);
+            }
+
+            50% {
+                box-shadow: 0 0 50px rgba(0, 240, 255, .45), -4px 0 30px rgba(0, 240, 255, .6);
+            }
         }
+
         @keyframes retro-flicker {
-            0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:.85} 94%{opacity:1} 97%{opacity:.9} 98%{opacity:1}
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            92% {
+                opacity: 1
+            }
+
+            93% {
+                opacity: .85
+            }
+
+            94% {
+                opacity: 1
+            }
+
+            97% {
+                opacity: .9
+            }
+
+            98% {
+                opacity: 1
+            }
         }
-        .overlay-in-bottom  { animation: overlay-in-bottom  0.5s cubic-bezier(0.16,1,0.3,1) forwards; }
-        .overlay-out-bottom { animation: overlay-out-bottom 0.4s cubic-bezier(0.16,1,0.3,1) forwards; }
+
+        .overlay-in-bottom {
+            animation: overlay-in-bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .overlay-out-bottom {
+            animation: overlay-out-bottom 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
 
         /* ── LT Box base ── */
-        #lt-box { display:flex; flex-direction:column; min-width:280px; max-width:580px; }
-        #lt-divider { height:2px; width:3.5rem; margin:0.65rem 0; }
-        #ov-display-name { font-size:2rem; font-weight:900; text-transform:uppercase; letter-spacing:-0.02em; line-height:1.1; }
-        #ov-display-title { font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.35em; }
+        #lt-box {
+            display: flex;
+            flex-direction: column;
+            min-width: 280px;
+            max-width: 580px;
+        }
+
+        #lt-divider {
+            height: 2px;
+            width: 3.5rem;
+            margin: 0.65rem 0;
+        }
+
+        #ov-display-name {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            line-height: 1.1;
+        }
+
+        #ov-display-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.35em;
+        }
 
         /* 1. Classic */
-        #lt-box.lt-classic { background:linear-gradient(135deg,rgba(0,120,212,.95),rgba(0,80,150,.95)); backdrop-filter:blur(12px); border-left:8px solid #fff; box-shadow:0 15px 40px rgba(0,0,0,.6); padding:1.2rem 2rem; color:white; border-radius:0 4px 4px 0; }
-        #lt-box.lt-classic #lt-divider { background:rgba(255,255,255,.4); }
-        #lt-box.lt-classic #ov-display-title { color:rgba(255,255,255,.85); }
+        #lt-box.lt-classic {
+            background: linear-gradient(135deg, rgba(0, 120, 212, .95), rgba(0, 80, 150, .95));
+            backdrop-filter: blur(12px);
+            border-left: 8px solid #fff;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .6);
+            padding: 1.2rem 2rem;
+            color: white;
+            border-radius: 0 4px 4px 0;
+        }
+
+        #lt-box.lt-classic #lt-divider {
+            background: rgba(255, 255, 255, .4);
+        }
+
+        #lt-box.lt-classic #ov-display-title {
+            color: rgba(255, 255, 255, .85);
+        }
+
         /* 2. Minimal */
-        #lt-box.lt-minimal { background:rgba(0,0,0,.78); border-left:3px solid rgba(255,255,255,.85); padding:1rem 1.8rem; color:white; backdrop-filter:blur(8px); }
-        #lt-box.lt-minimal #lt-divider { background:rgba(255,255,255,.25); }
-        #lt-box.lt-minimal #ov-display-name { font-size:1.8rem; }
-        #lt-box.lt-minimal #ov-display-title { color:rgba(255,255,255,.6); letter-spacing:.3em; }
+        #lt-box.lt-minimal {
+            background: rgba(0, 0, 0, .78);
+            border-left: 3px solid rgba(255, 255, 255, .85);
+            padding: 1rem 1.8rem;
+            color: white;
+            backdrop-filter: blur(8px);
+        }
+
+        #lt-box.lt-minimal #lt-divider {
+            background: rgba(255, 255, 255, .25);
+        }
+
+        #lt-box.lt-minimal #ov-display-name {
+            font-size: 1.8rem;
+        }
+
+        #lt-box.lt-minimal #ov-display-title {
+            color: rgba(255, 255, 255, .6);
+            letter-spacing: .3em;
+        }
+
         /* 3. Neon */
-        #lt-box.lt-neon { background:rgba(0,5,15,.93); border-left:4px solid #00f0ff; padding:1.2rem 2rem; color:white; animation:neon-pulse 2.5s ease-in-out infinite; }
-        #lt-box.lt-neon #ov-display-name { color:#00f0ff; text-shadow:0 0 20px rgba(0,240,255,.7); }
-        #lt-box.lt-neon #lt-divider { background:rgba(0,240,255,.3); }
-        #lt-box.lt-neon #ov-display-title { color:rgba(180,245,255,.7); letter-spacing:.4em; }
+        #lt-box.lt-neon {
+            background: rgba(0, 5, 15, .93);
+            border-left: 4px solid #00f0ff;
+            padding: 1.2rem 2rem;
+            color: white;
+            animation: neon-pulse 2.5s ease-in-out infinite;
+        }
+
+        #lt-box.lt-neon #ov-display-name {
+            color: #00f0ff;
+            text-shadow: 0 0 20px rgba(0, 240, 255, .7);
+        }
+
+        #lt-box.lt-neon #lt-divider {
+            background: rgba(0, 240, 255, .3);
+        }
+
+        #lt-box.lt-neon #ov-display-title {
+            color: rgba(180, 245, 255, .7);
+            letter-spacing: .4em;
+        }
+
         /* 4. Broadcast */
-        #lt-box.lt-broadcast { background:linear-gradient(135deg,#b22222,#8b0000); border-top:4px solid #ff5555; padding:1rem 2rem; color:white; border-radius:0 4px 4px 0; box-shadow:0 -4px 20px rgba(180,0,0,.35),0 10px 30px rgba(0,0,0,.5); }
-        #lt-box.lt-broadcast #lt-divider { background:rgba(255,255,255,.35); }
-        #lt-box.lt-broadcast #ov-display-title { color:rgba(255,200,200,.9); letter-spacing:.4em; }
+        #lt-box.lt-broadcast {
+            background: linear-gradient(135deg, #b22222, #8b0000);
+            border-top: 4px solid #ff5555;
+            padding: 1rem 2rem;
+            color: white;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 -4px 20px rgba(180, 0, 0, .35), 0 10px 30px rgba(0, 0, 0, .5);
+        }
+
+        #lt-box.lt-broadcast #lt-divider {
+            background: rgba(255, 255, 255, .35);
+        }
+
+        #lt-box.lt-broadcast #ov-display-title {
+            color: rgba(255, 200, 200, .9);
+            letter-spacing: .4em;
+        }
+
         /* 5. Gold */
-        #lt-box.lt-gold { background:linear-gradient(135deg,rgba(10,8,30,.97),rgba(35,22,5,.97)); border-left:5px solid #d4a017; padding:1.2rem 2rem; color:white; box-shadow:0 15px 40px rgba(0,0,0,.7); }
-        #lt-box.lt-gold #ov-display-name { color:#f5c842; }
-        #lt-box.lt-gold #lt-divider { background:rgba(212,160,23,.4); }
-        #lt-box.lt-gold #ov-display-title { color:rgba(245,200,66,.65); letter-spacing:.4em; }
+        #lt-box.lt-gold {
+            background: linear-gradient(135deg, rgba(10, 8, 30, .97), rgba(35, 22, 5, .97));
+            border-left: 5px solid #d4a017;
+            padding: 1.2rem 2rem;
+            color: white;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, .7);
+        }
+
+        #lt-box.lt-gold #ov-display-name {
+            color: #f5c842;
+        }
+
+        #lt-box.lt-gold #lt-divider {
+            background: rgba(212, 160, 23, .4);
+        }
+
+        #lt-box.lt-gold #ov-display-title {
+            color: rgba(245, 200, 66, .65);
+            letter-spacing: .4em;
+        }
+
         /* 6. Glass */
-        #lt-box.lt-glass { background:rgba(255,255,255,.09); backdrop-filter:blur(24px) saturate(160%); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:1.2rem 2rem; color:white; box-shadow:0 8px 40px rgba(0,0,0,.45); }
-        #lt-box.lt-glass #lt-divider { background:rgba(255,255,255,.3); }
-        #lt-box.lt-glass #ov-display-title { color:rgba(255,255,255,.7); }
+        #lt-box.lt-glass {
+            background: rgba(255, 255, 255, .09);
+            backdrop-filter: blur(24px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, .18);
+            border-radius: 12px;
+            padding: 1.2rem 2rem;
+            color: white;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, .45);
+        }
+
+        #lt-box.lt-glass #lt-divider {
+            background: rgba(255, 255, 255, .3);
+        }
+
+        #lt-box.lt-glass #ov-display-title {
+            color: rgba(255, 255, 255, .7);
+        }
+
         /* 7. Gradient */
-        #lt-box.lt-gradient { background:linear-gradient(135deg,rgba(88,28,218,.96),rgba(168,20,90,.96)); padding:1.2rem 2rem; color:white; border-radius:4px; box-shadow:0 15px 50px rgba(88,28,218,.45); }
-        #lt-box.lt-gradient #lt-divider { background:rgba(255,255,255,.35); }
-        #lt-box.lt-gradient #ov-display-title { color:rgba(255,210,240,.85); }
+        #lt-box.lt-gradient {
+            background: linear-gradient(135deg, rgba(88, 28, 218, .96), rgba(168, 20, 90, .96));
+            padding: 1.2rem 2rem;
+            color: white;
+            border-radius: 4px;
+            box-shadow: 0 15px 50px rgba(88, 28, 218, .45);
+        }
+
+        #lt-box.lt-gradient #lt-divider {
+            background: rgba(255, 255, 255, .35);
+        }
+
+        #lt-box.lt-gradient #ov-display-title {
+            color: rgba(255, 210, 240, .85);
+        }
+
         /* 8. Retro */
-        #lt-box.lt-retro { background:rgba(0,10,0,.96); border:1.5px solid rgba(0,255,65,.55); padding:1.2rem 2rem; color:#00ff41; font-family:'Courier New',monospace; box-shadow:0 0 30px rgba(0,255,65,.12); animation:retro-flicker 6s infinite; }
-        #lt-box.lt-retro #ov-display-name { color:#00ff41; text-shadow:0 0 10px rgba(0,255,65,.6); text-transform:none; }
-        #lt-box.lt-retro #lt-divider { background:rgba(0,255,65,.3); }
-        #lt-box.lt-retro #ov-display-title { color:rgba(0,255,65,.65); letter-spacing:.3em; }
+        #lt-box.lt-retro {
+            background: rgba(0, 10, 0, .96);
+            border: 1.5px solid rgba(0, 255, 65, .55);
+            padding: 1.2rem 2rem;
+            color: #00ff41;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 0 30px rgba(0, 255, 65, .12);
+            animation: retro-flicker 6s infinite;
+        }
+
+        #lt-box.lt-retro #ov-display-name {
+            color: #00ff41;
+            text-shadow: 0 0 10px rgba(0, 255, 65, .6);
+            text-transform: none;
+        }
+
+        #lt-box.lt-retro #lt-divider {
+            background: rgba(0, 255, 65, .3);
+        }
+
+        #lt-box.lt-retro #ov-display-title {
+            color: rgba(0, 255, 65, .65);
+            letter-spacing: .3em;
+        }
+
         /* 9. Fade */
-        #lt-box.lt-fade { background:linear-gradient(90deg,rgba(0,0,0,.94) 0%,rgba(0,0,0,0) 100%); border-bottom:2px solid rgba(255,255,255,.22); padding:1.2rem 4rem 1.2rem 0; color:white; min-width:420px; }
-        #lt-box.lt-fade #lt-divider { background:rgba(255,255,255,.2); }
-        #lt-box.lt-fade #ov-display-title { color:rgba(255,255,255,.6); }
+        #lt-box.lt-fade {
+            background: linear-gradient(90deg, rgba(0, 0, 0, .94) 0%, rgba(0, 0, 0, 0) 100%);
+            border-bottom: 2px solid rgba(255, 255, 255, .22);
+            padding: 1.2rem 4rem 1.2rem 0;
+            color: white;
+            min-width: 420px;
+        }
+
+        #lt-box.lt-fade #lt-divider {
+            background: rgba(255, 255, 255, .2);
+        }
+
+        #lt-box.lt-fade #ov-display-title {
+            color: rgba(255, 255, 255, .6);
+        }
+
         /* 10. Corporate */
-        #lt-box.lt-corporate { background:rgba(5,10,20,.96); border-top:3px solid #0078d4; padding:1rem 2rem; color:white; box-shadow:0 10px 40px rgba(0,0,0,.6); }
-        #lt-box.lt-corporate #lt-divider { background:rgba(0,120,212,.5); }
-        #lt-box.lt-corporate #ov-display-title { color:rgba(100,180,255,.8); }
+        #lt-box.lt-corporate {
+            background: rgba(5, 10, 20, .96);
+            border-top: 3px solid #0078d4;
+            padding: 1rem 2rem;
+            color: white;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .6);
+        }
+
+        #lt-box.lt-corporate #lt-divider {
+            background: rgba(0, 120, 212, .5);
+        }
+
+        #lt-box.lt-corporate #ov-display-title {
+            color: rgba(100, 180, 255, .8);
+        }
 
         .pip-active-speaker {
             box-shadow: 0 0 0 2px #0078d4, 0 0 16px rgba(0, 120, 212, 0.5) !important;
@@ -604,16 +837,34 @@
                 <label class="text-[10px] text-win-accent uppercase tracking-widest font-bold mb-3 block pl-1">Ajustar
                     Fundo Virtual</label>
                 <!-- O mesmo bloco de fundos virtuais reusado para as configs on-the-fly -->
-                <div class="flex overflow-x-auto gap-3 pb-2 pl-1 pr-1 max-w-full hide-scroll-bar snap-x snap-mandatory">
+                <div
+                    class="flex overflow-x-auto gap-3 pb-4 pl-1 pr-4 max-w-full hide-scroll-bar snap-x snap-mandatory mt-2">
                     <button onclick="setVirtualBackground('none', null, this.id)" id="vb-btn-none"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-white/5 border border-white/10 transition-all hover:border-win-accent w-20 h-16 shadow-lg"><i
-                            class="ph ph-prohibit text-xl text-gray-300 mb-1"></i><span
-                            class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Real</span></button>
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-white/5 border border-white/10 transition-all hover:bg-white/10 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-prohibit text-xl text-gray-300 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-gray-300">Nenhum</span>
+                    </button>
                     <button onclick="setVirtualBackground('blur', null, this.id)" id="vb-btn-blur"
-                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-black/40 border border-white/10 transition-all hover:border-win-accent w-20 h-16 shadow-lg"><i
-                            class="ph ph-drop text-xl text-blue-400 mb-1"></i><span
-                            class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Blur</span></button>
-                    <!-- Somente imagens estáticas no live por performance se preferir, ou copiar o HTML completo aqui. -->
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-black/40 border border-white/10 transition-all hover:bg-white/10 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-drop text-xl text-blue-400 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-blue-400">Desfoque</span>
+                    </button>
+                    <!-- Static Images (3) replicadas da entrada -->
+                    <button onclick="setVirtualBackground('image', 'img/bg-living-room.png', this.id)"
+                        id="vb-btn-living"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
+                        <img src="img/bg-living-room.png" alt="Living" class="w-full h-full object-cover">
+                    </button>
+                    <button onclick="setVirtualBackground('image', 'img/bg-office-premium.png', this.id)"
+                        id="vb-btn-office-premium"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
+                        <img src="img/bg-office-premium.png" alt="Office" class="w-full h-full object-cover">
+                    </button>
+                    <button onclick="setVirtualBackground('image', 'img/bg-studio-pro.png', this.id)"
+                        id="vb-btn-studio-pro"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
+                        <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
+                    </button>
                 </div>
             </div>
         </div>

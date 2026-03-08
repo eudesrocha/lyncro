@@ -204,6 +204,24 @@ function setupSignaling(server) {
                         });
                         break;
 
+                    case 'leave':
+                        // O Cliente explicitamente avisou que está de saída definitiva
+                        if (currentRoomId && participantId) {
+                            console.log(`[LEAVE EXPLICIT] Participant ${participantId} saiu ativamente da sala ${currentRoomId}.`);
+                            if (guestGraceTimers.has(participantId)) {
+                                clearTimeout(guestGraceTimers.get(participantId));
+                                guestGraceTimers.delete(participantId);
+                            }
+                            roomManager.leaveRoom(currentRoomId, participantId);
+                            const roomNow = roomManager.getRoom(currentRoomId);
+                            if (roomNow) {
+                                broadcastToRoom(currentRoomId, { type: 'participant-update', participants: roomNow.participants });
+                                // Sinaliza pra limpar webRTC imediatamente no Grid e Host
+                                broadcastToRoom(currentRoomId, { type: 'participant-left', participantId: participantId });
+                            }
+                        }
+                        break;
+
                     case 'chat-typing':
                         broadcastToRoom(normalizedRoomId, {
                             type: 'chat-typing',

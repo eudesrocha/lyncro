@@ -1248,7 +1248,15 @@ if (switchCamBtn) {
 
 const leaveBtn = document.getElementById('leaveRoom');
 if (leaveBtn) {
-    leaveBtn.onclick = () => window.location.href = 'index.html';
+    leaveBtn.onclick = () => {
+        // Envia recado de morte explícita
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'leave', roomId: roomName }));
+            ws.close();
+            wsIntentionalClose = true;
+        }
+        window.location.href = 'index.html';
+    };
 }
 const unpinBtn = document.getElementById('unpin-btn');
 if (unpinBtn) unpinBtn.onclick = () => unpinParticipant();
