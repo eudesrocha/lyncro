@@ -365,6 +365,9 @@ async function setupWebSocket() {
                 break;
             case 'participant-update':
                 updateUI(data.participants);
+                if (typeof broadcastPrompterState === 'function') {
+                    broadcastPrompterState(); // Garante o sync imediato para quem acabou de entrar ou foi aprovado
+                }
                 break;
             case 'offer':
                 const answer = await rtcClient.handleOffer(data.from, data.offer);
