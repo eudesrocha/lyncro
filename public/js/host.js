@@ -43,8 +43,8 @@ const VIDEO_QUALITY_PRESETS = {
 function buildVideoConstraints(qualityKey, extras = {}) {
     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
     return {
-        width:     { ideal: p.width,  max: p.width  },
-        height:    { ideal: p.height, max: p.height },
+        width: { ideal: p.width },
+        height: { ideal: p.height },
         frameRate: { ideal: p.frameRate },   // sem max — evita rejeição em câmeras com 29.97 fps
         ...extras
     };
