@@ -1685,14 +1685,13 @@ window.copyMasterGridLink = () => {
     }
 };
 
-// ── Teleprompter Logic ───────────────────────────────────────────────────────
 let prompterState = {
     targetId: 'all',
     text: '',
     isPlaying: false,
     speed: 5,
-    size: 60,
-    margin: 20,
+    size: 25,
+    margin: 5,
     restartToken: 0
 };
 
