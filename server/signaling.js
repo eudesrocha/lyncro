@@ -57,6 +57,33 @@ function setupSignaling(server) {
                         currentRoomId = normalizedRoomId;
                         const room_join = roomManager.rooms.get(normalizedRoomId);
 
+                        // Reconexão transparente: convidado já aceito voltando após queda de WS
+                        if (data.participant && data.participant.reconnectId) {
+                            const reconnectId = data.participant.reconnectId;
+                            const existingRoom = roomManager.rooms.get(normalizedRoomId);
+                            if (existingRoom && existingRoom.participants.has(reconnectId)) {
+                                const existing = existingRoom.participants.get(reconnectId);
+                                if (existing.status === 'accepted' && existing.role === 'guest') {
+                                    roomManager.updateParticipant(normalizedRoomId, reconnectId, { ws });
+                                    participantId = reconnectId;
+                                    console.log(`[RECONNECT] "${existing.name}" reconectou à sala "${normalizedRoomId}" (ID: ${reconnectId})`);
+
+                                    const iceServersRecon = await getIceServers();
+                                    ws.send(JSON.stringify({ type: 'init-network', iceServers: iceServersRecon, yourId: reconnectId }));
+                                    ws.send(JSON.stringify({ type: 'admission-result', status: 'accepted' }));
+
+                                    // Avisar todos que este participante reconectou (para limpar peer antigo e re-iniciar)
+                                    broadcastToRoom(normalizedRoomId, { type: 'peer-reconnected', participantId: reconnectId });
+
+                                    broadcastToRoom(normalizedRoomId, {
+                                        type: 'participant-update',
+                                        participants: roomManager.getRoom(normalizedRoomId).participants
+                                    });
+                                    break;
+                                }
+                            }
+                        }
+
                         // Validar identidade do host via JWT do Supabase
                         // Só aplica se SUPABASE_URL e SUPABASE_ANON_KEY estiverem configurados.
                         // Sem essas variáveis (ex: dev local), a validação é pulada com aviso.

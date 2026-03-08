@@ -358,6 +358,10 @@ async function setupWebSocket() {
             case 'chat-typing':
                 handleTypingIndicator(data.name, data.isTyping);
                 break;
+            case 'peer-reconnected':
+                // Convidado reconectou: remover peer antigo para que participant-update re-inicie a conexão
+                if (rtcClient) rtcClient.removePeer(data.participantId);
+                break;
             case 'error':
                 console.error('[Server Error]', data.message);
                 if (data.message && data.message.includes('host negado')) {

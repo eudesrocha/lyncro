@@ -883,10 +883,16 @@ async function setupWebSocket() {
         const passwordEl = document.getElementById('room-password');
         const password = passwordEl ? passwordEl.value.trim() : null;
 
+        const storedReconnectId = sessionStorage.getItem(`lyncro_reconnect_id_${roomName}`);
         const joinPayload = {
             type: 'join',
             roomId: roomName,
-            participant: { name: userName, role: 'guest', companionOf: companionOf }
+            participant: {
+                name: userName,
+                role: 'guest',
+                companionOf: companionOf,
+                ...(storedReconnectId ? { reconnectId: storedReconnectId } : {})
+            }
         };
 
         if (password) joinPayload.password = password;
@@ -900,6 +906,7 @@ async function setupWebSocket() {
             case 'init-network':
                 myId = data.yourId;
                 if (rtcClient) rtcClient.updateConfig(data.iceServers);
+                sessionStorage.setItem(`lyncro_reconnect_id_${roomName}`, myId);
                 console.log('My ID:', myId);
                 break;
             case 'participant-update':
