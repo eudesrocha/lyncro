@@ -34,7 +34,6 @@ async function handleNDIToggle(participantId, name) {
 
 // ── Presets de Qualidade de Vídeo ────────────────────────────────────────────
 const VIDEO_QUALITY_PRESETS = {
-    '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
     '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
     '720': { label: '720p HD', width: 1280, height: 720, frameRate: 30 },
     '480': { label: '480p SD', width: 854, height: 480, frameRate: 30 },
@@ -44,9 +43,9 @@ const VIDEO_QUALITY_PRESETS = {
 function buildVideoConstraints(qualityKey, extras = {}) {
     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
     return {
-        width: { ideal: p.width },
-        height: { ideal: p.height },
-        frameRate: { ideal: p.frameRate, max: p.frameRate },
+        width:     { ideal: p.width,  max: p.width  },
+        height:    { ideal: p.height, max: p.height },
+        frameRate: { ideal: p.frameRate },   // sem max — evita rejeição em câmeras com 29.97 fps
         ...extras
     };
 }
@@ -103,10 +102,25 @@ async function init() {
 
     // 3. Solicitar mídias em background
     try {
-        localStream = await navigator.mediaDevices.getUserMedia({
-            video: buildVideoConstraints(getHostQuality()),
-            audio: true
-        });
+        const hostQuality = getHostQuality();
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: buildVideoConstraints(hostQuality),
+                audio: true
+            });
+        } catch (constraintErr) {
+            // Câmera não suporta a qualidade pedida — fallback automático para 720p
+            console.warn(`[Media] Falha com ${hostQuality}, tentando 720p:`, constraintErr.message);
+            if (hostQuality !== '720') {
+                localStorage.setItem('lyncro_host_quality', '720');
+                const sel = document.getElementById('host-quality-select');
+                if (sel) sel.value = '720';
+            }
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: buildVideoConstraints('720'),
+                audio: true
+            });
+        }
 
         // Aplicar processamento de Fundo Virtual (se ativo)
         if (currentVbMode !== 'none') {

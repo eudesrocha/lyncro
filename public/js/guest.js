@@ -1,6 +1,5 @@
 // ── Presets de Qualidade de Vídeo ────────────────────────────────────────────
 const VIDEO_QUALITY_PRESETS = {
-    '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
     '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
     '720': { label: '720p HD', width: 1280, height: 720, frameRate: 30 },
     '480': { label: '480p SD', width: 854, height: 480, frameRate: 30 },
@@ -10,9 +9,9 @@ const VIDEO_QUALITY_PRESETS = {
 function buildVideoConstraints(qualityKey, extras = {}) {
     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
     return {
-        width: { ideal: p.width },
-        height: { ideal: p.height },
-        frameRate: { ideal: p.frameRate, max: p.frameRate },
+        width:     { ideal: p.width,  max: p.width  },
+        height:    { ideal: p.height, max: p.height },
+        frameRate: { ideal: p.frameRate },   // sem max — evita rejeição em câmeras com 29.97 fps
         ...extras
     };
 }
@@ -118,14 +117,24 @@ async function startPreCall() {
         }
 
         const qualityKey = qualitySelect ? qualitySelect.value : '720';
-        localStream = await navigator.mediaDevices.getUserMedia({
-            video: buildVideoConstraints(qualityKey, { facingMode: companionOf ? 'environment' : 'user' }),
-            audio: {
-                echoCancellation: true,
-                noiseSuppression: true,
-                autoGainControl: true
+        const facingExtras = { facingMode: companionOf ? 'environment' : 'user' };
+        try {
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: buildVideoConstraints(qualityKey, facingExtras),
+                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+            });
+        } catch (constraintErr) {
+            // Se a câmera não suporta a resolução pedida, tentar 720p como fallback
+            console.warn(`[Media] Falha com ${qualityKey}, tentando 720p:`, constraintErr.message);
+            if (qualityKey !== '720') {
+                if (qualitySelect) qualitySelect.value = '720';
+                localStorage.setItem('lyncro_video_quality', '720');
             }
-        });
+            localStream = await navigator.mediaDevices.getUserMedia({
+                video: buildVideoConstraints('720', facingExtras),
+                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+            });
+        }
 
         if (!isMicOn && localStream.getAudioTracks().length > 0) {
             localStream.getAudioTracks()[0].enabled = false;
