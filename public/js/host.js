@@ -1652,3 +1652,87 @@ window.copyMasterGridLink = () => {
         }, 3000);
     }
 };
+
+// ── Teleprompter Logic ───────────────────────────────────────────────────────
+let prompterState = {
+    text: '',
+    isPlaying: false,
+    speed: 5,
+    size: 60,
+    margin: 20
+};
+
+window.togglePrompterUI = () => {
+    const body = document.getElementById('prompter-body');
+    const caret = document.getElementById('prompter-caret');
+    if (body.classList.contains('hidden')) {
+        body.classList.remove('hidden');
+        caret.style.transform = 'rotate(-180deg)';
+    } else {
+        body.classList.add('hidden');
+        caret.style.transform = 'rotate(0deg)';
+    }
+};
+
+window.togglePrompterPlayback = () => {
+    prompterState.isPlaying = !prompterState.isPlaying;
+    const ico = document.getElementById('ico-prompter-play');
+    const btn = document.getElementById('btn-prompter-play');
+
+    if (prompterState.isPlaying) {
+        ico.className = 'ph ph-pause text-lg';
+        btn.classList.add('bg-win-accent', 'text-white');
+        btn.classList.remove('bg-win-accent/20', 'text-win-accent');
+    } else {
+        ico.className = 'ph ph-play text-lg';
+        btn.classList.remove('bg-win-accent', 'text-white');
+        btn.classList.add('bg-win-accent/20', 'text-win-accent');
+    }
+    broadcastPrompterState();
+};
+
+function broadcastPrompterState() {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'prompter-sync',
+            roomId: roomName,
+            payload: prompterState
+        }));
+    }
+}
+
+// Hook inputs após o carregamento
+document.addEventListener('DOMContentLoaded', () => {
+    const pText = document.getElementById('prompter-text');
+    const pSpeed = document.getElementById('prompter-speed');
+    const pSize = document.getElementById('prompter-size');
+    const pMargin = document.getElementById('prompter-margin');
+
+    if (pText) {
+        pText.addEventListener('input', (e) => {
+            prompterState.text = e.target.value;
+            broadcastPrompterState();
+        });
+    }
+    if (pSpeed) {
+        pSpeed.addEventListener('input', (e) => {
+            prompterState.speed = parseInt(e.target.value);
+            document.getElementById('lbl-prompter-speed').innerText = prompterState.speed + 'x';
+            broadcastPrompterState();
+        });
+    }
+    if (pSize) {
+        pSize.addEventListener('input', (e) => {
+            prompterState.size = parseInt(e.target.value);
+            document.getElementById('lbl-prompter-size').innerText = prompterState.size + 'px';
+            broadcastPrompterState();
+        });
+    }
+    if (pMargin) {
+        pMargin.addEventListener('input', (e) => {
+            prompterState.margin = parseInt(e.target.value);
+            document.getElementById('lbl-prompter-margin').innerText = prompterState.margin + '%';
+            broadcastPrompterState();
+        });
+    }
+});

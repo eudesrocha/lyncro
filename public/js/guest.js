@@ -1064,6 +1064,11 @@ async function setupWebSocket() {
                 console.log('Overlay control received:', data);
                 updateOverlay(data.action, data.name, data.title, data.style);
                 break;
+            case 'prompter-sync':
+                if (data.payload) {
+                    updatePrompterState(data.payload);
+                }
+                break;
             case 'chat':
                 appendChatMessage(data.name, data.text, data.timestamp);
                 const cp = document.getElementById('chat-panel');
@@ -1671,3 +1676,78 @@ window.toggleScreenShare = async () => {
         }
     }
 };
+
+// ── Teleprompter (Guest Engine) ──────────────────────────────────────────────
+let prompterActive = false;
+let currentPrompterSpeed = 5; // 1-10
+let isPrompterPlaying = false;
+let prompterScrollY = 0;
+let lastFrameTime = 0;
+
+function updatePrompterState(state) {
+    const container = document.getElementById('prompter-container');
+    const textView = document.getElementById('prompter-scroll-view');
+    const textContent = document.getElementById('prompter-text-content');
+
+    if (!container || !textView || !textContent) return;
+
+    // Se o texto for limpo e o prompter estiver parado, esconder a janela
+    if (!state.text || state.text.trim() === '') {
+        container.classList.add('hidden');
+        prompterActive = false;
+        isPrompterPlaying = false;
+        prompterScrollY = 0;
+        textView.style.transform = `translateY(0px)`;
+        return;
+    } else {
+        if (!prompterActive) {
+            container.classList.remove('hidden');
+            prompterActive = true;
+            // Iniciar anim loop
+            lastFrameTime = performance.now();
+            requestAnimationFrame(prompterAnimationLoop);
+        }
+    }
+
+    // Update text
+    if (textContent.textContent !== state.text) {
+        textContent.textContent = state.text;
+    }
+
+    // Update Speed, Playback Status, Size and Margin
+    currentPrompterSpeed = state.speed || 5;
+    isPrompterPlaying = !!state.isPlaying;
+
+    // Aplicar Margem (padding horizontal do container de rolagem)
+    // Map de 0 a 40 (O slider vai de 0 a 40, representa porcentagem da tela)
+    const marginPct = (state.margin !== undefined ? state.margin : 20);
+    // Mas para manter centrado e legal, dividimos por 2 e aplicamos nas laterais
+    textContent.style.padding = `0 ${marginPct}%`;
+
+    // Aplicar Tamanho da Fonte
+    const sizePx = state.size || 60;
+    textContent.style.fontSize = `${sizePx}px`;
+}
+
+function prompterAnimationLoop(currentTime) {
+    if (!prompterActive) return; // Parar loop se sumiu
+
+    const deltaTime = currentTime - lastFrameTime;
+    lastFrameTime = currentTime;
+
+    if (isPrompterPlaying) {
+        // Velocidade baseada no slider de 1 a 10.
+        // ex: speed=5 move X pixels por segundo.
+        const pixelsPerSecond = currentPrompterSpeed * 15;
+        const deltaY = (pixelsPerSecond * deltaTime) / 1000;
+
+        prompterScrollY -= deltaY;
+
+        const textView = document.getElementById('prompter-scroll-view');
+        if (textView) {
+            textView.style.transform = `translateY(${prompterScrollY}px)`;
+        }
+    }
+
+    requestAnimationFrame(prompterAnimationLoop);
+}

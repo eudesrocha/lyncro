@@ -230,6 +230,14 @@ function setupSignaling(server) {
                         });
                         break;
 
+                    case 'prompter-sync':
+                        // Mirror the teleprompter state (text, speed, playback, etc) verbatim to everyone in the room
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'prompter-sync',
+                            payload: data.payload
+                        });
+                        break;
+
                     case 'tally-change':
                         const room = roomManager.getRoom(normalizedRoomId);
                         if (room.host === participantId) {

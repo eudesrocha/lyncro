@@ -874,6 +874,39 @@
             <video id="localVideo" class="w-full h-full object-cover" autoplay playsinline muted></video>
             <video id="pinnedVideo" class="w-full h-full object-cover hidden" autoplay playsinline></video>
 
+            <!-- TELEPROMPTER OVERLAY -->
+            <div id="prompter-container"
+                class="absolute top-6 left-1/2 -translate-x-1/2 w-[85%] max-w-4xl h-[45vh] z-[70] overflow-hidden rounded-3xl border border-white/10 hidden flex-col shadow-2xl transition-all duration-500"
+                style="background: rgba(0,0,0,0.5); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+                <!-- Cabeçalho Fixo (Brand Lyncro) -->
+                <div
+                    class="absolute top-0 w-full flex items-center justify-center pt-4 pb-12 bg-gradient-to-b from-black/80 to-transparent z-20 pointer-events-none">
+                    <span class="text-win-accent text-[11px] uppercase tracking-[0.4em]"
+                        style="font-family: 'Segoe UI Black', Arial, sans-serif; font-weight: 900; box-shadow: 0 2px 15px rgba(0,120,212,0.6); -webkit-text-stroke: 0.5px black;">LYNCRO</span>
+                </div>
+
+                <!-- Sombra Inferior (Fade effect) -->
+                <div
+                    class="absolute bottom-0 w-full h-32 bg-gradient-to-t from-black/90 to-transparent z-20 pointer-events-none">
+                </div>
+
+                <!-- Central Indicator (Focus Line de leitura) -->
+                <div class="absolute top-1/2 -translate-y-1/2 left-0 w-full flex items-center z-10 pointer-events-none">
+                    <div class="w-6 h-[3px] bg-red-600/90 rounded-r-lg shadow-[0_0_12px_#ef4444]"></div>
+                    <div class="flex-1 h-[1px] bg-red-600/10 mix-blend-screen"></div>
+                    <div class="w-6 h-[3px] bg-red-600/90 rounded-l-lg shadow-[0_0_12px_#ef4444]"></div>
+                </div>
+
+                <!-- The Scrolling Text Wrapper -->
+                <div id="prompter-scroll-view" class="absolute top-0 left-0 w-full px-4 sm:px-12 pointer-events-none"
+                    style="padding-top: 22vh; padding-bottom: 22vh; will-change: transform; text-align: center;">
+                    <span id="prompter-text-content"
+                        class="inline-block whitespace-pre-wrap transition-all duration-300"
+                        style="color: #00FF41; font-family: 'Segoe UI', system-ui, sans-serif; font-weight: 700; font-size: 60px; line-height: 1.35; text-shadow: 0 4px 16px rgba(0,255,65,0.4), 0 0 40px rgba(0,255,65,0.2);">Aguardando
+                        roteiro...</span>
+                </div>
+            </div>
+
             <!-- Nome do participante em destaque -->
             <div id="main-video-name" class="absolute bottom-32 sm:bottom-6 left-4 sm:left-6 z-30 hidden">
                 <div class="glass-panel px-4 py-2 rounded-xl flex items-center gap-3 shadow-xl">
