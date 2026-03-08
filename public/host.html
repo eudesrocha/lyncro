@@ -64,7 +64,9 @@
         }
 
         /* Domínio Dinâmico do Host via CSS Grid */
-        #video-grid { align-items: start; }
+        #video-grid {
+            align-items: start;
+        }
 
         #video-grid>div:first-child {
             grid-column: span 1;
@@ -357,6 +359,18 @@
                     <button onclick="copyInviteLinkGlobal()" id="copy-global-btn"
                         class="w-8 h-8 rounded-lg bg-win-accent/20 text-win-accent hover:bg-win-accent hover:text-white flex items-center justify-center transition-all shrink-0">
                         <i id="copy-global-ico" class="ph ph-copy text-sm"></i>
+                    </button>
+                </div>
+                <!-- Master Dashboard (Grid) Controls -->
+                <div class="flex items-center gap-2 mt-1">
+                    <button onclick="openMasterGrid()"
+                        class="flex-1 bg-gradient-to-r from-purple-900/40 to-win-accent/30 text-purple-300 border border-purple-500/30 hover:from-purple-800 hover:to-win-accent hover:text-white rounded-lg py-2 text-[10px] uppercase font-bold tracking-widest transition-all drop-shadow-lg flex items-center justify-center gap-1.5">
+                        <i class="ph ph-grid-four text-sm"></i> View Dashboard
+                    </button>
+                    <button onclick="copyMasterGridLink()" id="btn-copy-grid"
+                        class="w-9 h-9 bg-white/5 text-gray-300 border border-white/10 hover:bg-win-accent hover:text-white hover:border-win-accent rounded-lg flex items-center justify-center transition-all shrink-0"
+                        title="Copiar Link Limpo pro OBS">
+                        <i id="ico-copy-grid" class="ph ph-copy text-sm"></i>
                     </button>
                 </div>
             </div>

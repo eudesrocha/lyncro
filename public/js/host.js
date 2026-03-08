@@ -1617,3 +1617,38 @@ window.changeHostQuality = async (qualityKey) => {
     }
 };
 
+// ── Master Grid Dashboard ───────────────────────────────────────────────────
+window.openMasterGrid = () => {
+    const url = new URL(window.location.origin + '/grid.html');
+    url.searchParams.set('room', roomName);
+    url.searchParams.set('host', 'true'); // Modo host = mostra barra regencial
+    window.open(url.toString(), '_blank', 'width=1280,height=720');
+};
+
+window.copyMasterGridLink = () => {
+    const url = new URL(window.location.origin + '/grid.html');
+    url.searchParams.set('room', roomName);
+    // Link obs nu sem "?host=true"
+
+    const input = document.createElement('input');
+    input.value = url.toString();
+    document.body.appendChild(input);
+    input.select();
+    document.execCommand('copy');
+    document.body.removeChild(input);
+
+    showToast('🚀 Link do Grid Master copiado para o OBS!', 'success');
+
+    // Anim Feedback
+    const ico = document.getElementById('ico-copy-grid');
+    const btn = document.getElementById('btn-copy-grid');
+    if (ico && btn) {
+        ico.className = 'ph ph-check text-sm text-white';
+        const oldClasses = btn.className;
+        btn.className = 'w-9 h-9 bg-green-600 text-white border border-green-500 rounded-lg flex items-center justify-center transition-all shrink-0 shadow-lg';
+        setTimeout(() => {
+            ico.className = 'ph ph-copy text-sm';
+            btn.className = oldClasses;
+        }, 3000);
+    }
+};

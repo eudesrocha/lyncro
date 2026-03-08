@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyncro - Master Grid</title>
+    <!-- Usa o Tailwind da main -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            /* Permite que o OBS coloque cenários por trás se necessário, ou que uma imagem seja configurada */
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #050505;
+            /* Fallback limpo */
+        }
+
+        /* 
+           O grid container se estica até os limites (com alguma margem se quisermos, 
+           mas para OBS fullscreen é melhor 0 ou minima). 
+           Usaremos Flexbox com wrap, calculando o widht/height base dinamicamente no JS, 
+           ou apenas o CSS magic dependendo de quantos videos existam.
+        */
+        #grid-container {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            /* modern gap */
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        /* Cada célula de vídeo */
+        .grid-cell {
+            position: relative;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            /* Flex calculos geridos por script */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            /* glassmorphism light border */
+        }
+
+        .grid-cell video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* preencher arredondado */
+        }
+
+        /* Crachá moderno cinematográfico */
+        .name-badge {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: badge-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.5s;
+        }
+
+        @keyframes badge-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Status Tally (opcional para gravação?) O OBS gosta limpo, mas talvez seja bom mostrar mudo */
+        .mic-off-icon {
+            color: #f87171;
+            font-size: 16px;
+        }
+
+        /* ── INVISÍVEL AO OBS: Controles Flutuantes apenas para host=true ── */
+        #host-toolbar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(15, 15, 20, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 9999px;
+            display: none;
+            /* Só exibido se url ?host=true */
+            gap: 16px;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .toolbar-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .toolbar-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .loading-glass {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+            font-weight: 600;
+            flex-direction: column;
+            gap: 16px;
+            transition: opacity 0.5s;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #00f0ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Utilitario de áudio (VU escondido no OBS) */
+        .vu-ring {
+            position: absolute;
+            inset: -3px;
+            border-radius: 19px;
+            border: 3px solid #10b981;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.1s;
+        }
+
+        .speaking .vu-ring {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Splash de Conexão -->
+    <div id="loading" class="loading-glass">
+        <div class="spinner"></div>
+        <div class="tracking-widest uppercase text-sm text-gray-400">Sincronizando Mídias...</div>
+    </div>
+
+    <!-- O Quadro (Grid) -->
+    <div id="grid-container">
+        <!-- Javascript vai injetar os .grid-cell aqui -->
+    </div>
+
+    <!-- Barra de Controle do Host (invisível por padrão, revelada via JS se houver ?host=true param) -->
+    <div id="host-toolbar">
+        <div class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mr-2 flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            Modo Regência (Ao Vivo)
+        </div>
+        <!-- Opção de Layout/Fundo (poderia ter controles, por enquanto vamos manter clean) -->
+        <button class="toolbar-btn" title="Alternar Tela Cheia" onclick="document.documentElement.requestFullscreen()">
+            <i class="ph ph-corners-out text-xl"></i>
+        </button>
+        <button class="toolbar-btn text-red-400" title="Fechar Dashboard" onclick="window.close()">
+            <i class="ph ph-x text-xl"></i>
+        </button>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/webrtc.js"></script>
+    <script src="js/grid.js"></script>
+</body>
+
+</html>
