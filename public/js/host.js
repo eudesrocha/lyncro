@@ -385,6 +385,16 @@ async function setupWebSocket() {
             case 'chat-typing':
                 handleTypingIndicator(data.name, data.isTyping);
                 break;
+            case 'prompter-finished':
+                if (prompterState.isPlaying) {
+                    prompterState.isPlaying = false;
+                    isPrompterFinished = true;
+                    if (typeof updatePrompterPlayButtonUI === 'function') {
+                        updatePrompterPlayButtonUI();
+                    }
+                    showToast('O teleprompter chegou ao fim.', 'success');
+                }
+                break;
             case 'peer-reconnected':
                 // Convidado reconectou: remover peer antigo para que participant-update re-inicie a conexão
                 if (rtcClient) rtcClient.removePeer(data.participantId);
@@ -1682,8 +1692,11 @@ let prompterState = {
     isPlaying: false,
     speed: 5,
     size: 60,
-    margin: 20
+    margin: 20,
+    restartToken: 0
 };
+
+let isPrompterFinished = false;
 
 window.togglePrompterUI = () => {
     const body = document.getElementById('prompter-body');
@@ -1698,21 +1711,41 @@ window.togglePrompterUI = () => {
 };
 
 window.togglePrompterPlayback = () => {
-    prompterState.isPlaying = !prompterState.isPlaying;
+    if (isPrompterFinished) {
+        prompterState.restartToken = Date.now();
+        isPrompterFinished = false;
+        prompterState.isPlaying = true;
+    } else {
+        prompterState.isPlaying = !prompterState.isPlaying;
+    }
+    updatePrompterPlayButtonUI();
+    broadcastPrompterState();
+};
+
+function updatePrompterPlayButtonUI() {
     const ico = document.getElementById('ico-prompter-play');
     const btn = document.getElementById('btn-prompter-play');
+    if (!ico || !btn) return;
 
     if (prompterState.isPlaying) {
         ico.className = 'ph ph-pause text-lg';
         btn.classList.add('bg-win-accent', 'text-white');
-        btn.classList.remove('bg-win-accent/20', 'text-win-accent');
+        btn.classList.remove('bg-win-accent/20', 'text-win-accent', 'border-green-500/50', 'text-green-500', 'bg-green-500/20');
+        btn.classList.add('border-win-accent/30');
     } else {
-        ico.className = 'ph ph-play text-lg';
-        btn.classList.remove('bg-win-accent', 'text-white');
-        btn.classList.add('bg-win-accent/20', 'text-win-accent');
+        if (isPrompterFinished) {
+            ico.className = 'ph ph-arrow-counter-clockwise text-lg text-green-500';
+            btn.classList.remove('bg-win-accent', 'text-white', 'border-win-accent/30', 'text-win-accent', 'bg-win-accent/20');
+            btn.classList.add('bg-green-500/20', 'border-green-500/50');
+            btn.title = "Reiniciar Letreiro";
+        } else {
+            ico.className = 'ph ph-play text-lg';
+            btn.classList.remove('bg-win-accent', 'text-white', 'border-green-500/50', 'text-green-500', 'bg-green-500/20');
+            btn.classList.add('bg-win-accent/20', 'text-win-accent', 'border-win-accent/30');
+            btn.title = "Rolar Texto";
+        }
     }
-    broadcastPrompterState();
-};
+}
 
 function broadcastPrompterState() {
     if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1741,6 +1774,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pText) {
         pText.addEventListener('input', (e) => {
             prompterState.text = e.target.value;
+            isPrompterFinished = false;
+            updatePrompterPlayButtonUI();
             broadcastPrompterState();
         });
     }

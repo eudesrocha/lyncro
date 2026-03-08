@@ -1683,6 +1683,8 @@ let currentPrompterSpeed = 5; // 1-10
 let isPrompterPlaying = false;
 let prompterScrollY = 0;
 let lastFrameTime = 0;
+let lastRestartToken = 0;
+let prompterAnimId = null;
 
 function updatePrompterState(state) {
     const container = document.getElementById('prompter-container');
@@ -1708,55 +1710,82 @@ function updatePrompterState(state) {
         prompterScrollY = 0;
         textView.style.transform = `translateY(0px)`;
         return;
-    } else {
-        // Checar se o convidado fechou manualmente. Se fechou, não abre de novo automático a não ser que o host mude o texto inteiro.
-        if (container.classList.contains('guest-closed') && textContent.textContent === state.text) {
-            // Ignora atualizações direcionadas a estado se ele ativamente escondeu
-            return;
-        }
-
-        if (!prompterActive) {
-            container.classList.remove('hidden');
-            container.classList.remove('guest-closed');
+        // Tratamento de Restart (Mesmo Texto)
+        let wasRestarted = false;
+        if (state.restartToken && state.restartToken !== lastRestartToken) {
+            lastRestartToken = state.restartToken;
+            wasRestarted = true;
+            prompterScrollY = 0;
+            textView.style.transform = `translateY(0px)`;
+            container.classList.remove('hidden', 'guest-closed');
+            container.style.opacity = '1';
             prompterActive = true;
-            // Iniciar anim loop
-            lastFrameTime = performance.now();
-            requestAnimationFrame(prompterAnimationLoop);
+        } else {
+            // Checar se o convidado fechou manualmente. Se fechou, não abre de novo automático a não ser que o host mude o texto inteiro.
+            if (container.classList.contains('guest-closed') && textContent.textContent === state.text) {
+                // Ignora atualizações direcionadas a estado se ele ativamente escondeu
+                return;
+            }
+
+            if (!prompterActive) {
+                container.classList.remove('hidden');
+                container.classList.remove('guest-closed');
+                container.style.opacity = '1';
+                prompterActive = true;
+                if (!prompterAnimId) {
+                    lastFrameTime = performance.now();
+                    prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
+                }
+            }
         }
-    }
 
-    // Update text
-    if (textContent.textContent !== state.text) {
-        textContent.textContent = state.text;
-        // Text changed significantly => reset scroll to top
-        prompterScrollY = 0;
-        textView.style.transform = `translateY(0px)`;
-        container.classList.remove('guest-closed'); // Host forced new text, re-open it
-        if (!prompterActive) {
-            container.classList.remove('hidden');
-            prompterActive = true;
-            lastFrameTime = performance.now();
-            requestAnimationFrame(prompterAnimationLoop);
+        // Update text
+        if (textContent.textContent !== state.text) {
+            textContent.textContent = state.text;
+            // Text changed significantly => reset scroll to top
+            if (!wasRestarted) {
+                prompterScrollY = 0;
+                textView.style.transform = `translateY(0px)`;
+            }
+            container.classList.remove('guest-closed'); // Host forced new text, re-open it
+            container.style.opacity = '1';
+            if (!prompterActive) {
+                container.classList.remove('hidden');
+                prompterActive = true;
+                if (!prompterAnimId) {
+                    lastFrameTime = performance.now();
+                    prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
+                }
+            }
         }
+
+        // Update Speed, Playback Status, Size and Margin
+        currentPrompterSpeed = state.speed || 5;
+        isPrompterPlaying = !!state.isPlaying;
+
+        // Se foi restart e já deve rolar, certifique-se que o animLoop está andando
+        if (wasRestarted && prompterActive && !prompterAnimId) {
+            lastFrameTime = performance.now();
+            prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
+        }
+
+        // Aplicar Margem (padding horizontal do container de rolagem)
+        // Map de 0 a 40 (O slider vai de 0 a 40, representa porcentagem da tela)
+        const marginPct = (state.margin !== undefined ? state.margin : 20);
+        // Mas para manter centrado e legal, dividimos por 2 e aplicamos nas laterais
+        textContent.style.padding = `0 ${marginPct}%`;
+
+        // Aplicar Tamanho da Fonte
+        const sizePx = state.size || 60;
+        textContent.style.fontSize = `${sizePx}px`;
     }
-
-    // Update Speed, Playback Status, Size and Margin
-    currentPrompterSpeed = state.speed || 5;
-    isPrompterPlaying = !!state.isPlaying;
-
-    // Aplicar Margem (padding horizontal do container de rolagem)
-    // Map de 0 a 40 (O slider vai de 0 a 40, representa porcentagem da tela)
-    const marginPct = (state.margin !== undefined ? state.margin : 20);
-    // Mas para manter centrado e legal, dividimos por 2 e aplicamos nas laterais
-    textContent.style.padding = `0 ${marginPct}%`;
-
-    // Aplicar Tamanho da Fonte
-    const sizePx = state.size || 60;
-    textContent.style.fontSize = `${sizePx}px`;
 }
 
 function prompterAnimationLoop(currentTime) {
-    if (!prompterActive) return; // Parar loop se sumiu
+    if (!prompterActive) {
+        prompterAnimId = null;
+        return;
+    }
 
     const deltaTime = currentTime - lastFrameTime;
     lastFrameTime = currentTime;
@@ -1788,18 +1817,23 @@ function prompterAnimationLoop(currentTime) {
                 // Chegou exatamente ao fim
                 const container = document.getElementById('prompter-container');
                 isPrompterPlaying = false;
+
+                // Avisa o host
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(JSON.stringify({ type: 'prompter-finished', roomId: roomName }));
+                }
+
                 if (container) {
                     container.style.opacity = '0'; // Dispara a transição css
                     setTimeout(() => {
-                        closeGuestPrompter();
+                        if (container.style.opacity === '0') closeGuestPrompter();
                         container.style.opacity = ''; // Reseta pro inline limpo
                     }, 500);
                 }
             }
         }
     }
-
-    requestAnimationFrame(prompterAnimationLoop);
+    prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
 }
 
 // Botão de fechar do convidado

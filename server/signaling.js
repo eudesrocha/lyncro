@@ -238,6 +238,13 @@ function setupSignaling(server) {
                         });
                         break;
 
+                    case 'prompter-finished':
+                        // Guest avisando o Host que a rolagem dele acabou
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'prompter-finished'
+                        });
+                        break;
+
                     case 'tally-change':
                         const room = roomManager.getRoom(normalizedRoomId);
                         if (room.host === participantId) {
