@@ -885,11 +885,11 @@
                         style="font-family: 'Segoe UI Black', Arial, sans-serif; font-weight: 900; box-shadow: 0 2px 15px rgba(0,120,212,0.6); -webkit-text-stroke: 0.5px black;">LYNCRO</span>
                 </div>
 
-                <!-- Botão Fechar Manual do Convidado -->
-                <button onclick="closeGuestPrompter()"
+                <!-- Botão FIXAR (Pin) do Convidado -->
+                <button id="btn-prompter-pin" onclick="togglePrompterPin()"
                     class="absolute top-4 right-4 z-50 text-white/50 hover:text-white transition-colors p-2 bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-md"
-                    title="Esconder Teleprompter">
-                    <i class="ph ph-x text-lg"></i>
+                    title="Fixar/Destrancar Teleprompter">
+                    <i id="ico-prompter-pin" class="ph ph-push-pin text-lg"></i>
                 </button>
 
                 <!-- Sombra Inferior (Fade effect) -->
@@ -913,6 +913,43 @@
                         roteiro...</span>
                 </div>
             </div>
+
+            <!-- Controles Remotos do Convidado (Fora da Caixa) -->
+            <div id="prompter-local-controls"
+                class="absolute top-[calc(45vh+2rem)] left-1/2 -translate-x-1/2 z-[70] hidden flex items-center gap-2 p-1.5 rounded-full border border-white/10 shadow-lg transition-all duration-500"
+                style="background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);">
+
+                <div class="flex items-center gap-1 bg-white/5 rounded-full px-3 py-1.5">
+                    <i class="ph ph-text-t text-[11px] text-gray-400 mr-1" title="Tamanho Local"></i>
+                    <button onclick="changeLocalPrompterSize(-5)"
+                        class="text-white/60 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors"
+                        title="Diminuir Fonte">
+                        <i class="ph ph-minus text-sm"></i>
+                    </button>
+                    <button onclick="changeLocalPrompterSize(5)"
+                        class="text-white/60 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors"
+                        title="Aumentar Fonte">
+                        <i class="ph ph-plus text-sm"></i>
+                    </button>
+                </div>
+
+                <div class="w-px h-5 bg-white/10"></div>
+
+                <div class="flex items-center gap-1 bg-white/5 rounded-full px-3 py-1.5">
+                    <i class="ph ph-gauge text-[11px] text-gray-400 mr-1" title="Velocidade Local"></i>
+                    <button onclick="changeLocalPrompterSpeed(-1)"
+                        class="text-white/60 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors"
+                        title="Reduzir Velocidade">
+                        <i class="ph ph-minus text-sm"></i>
+                    </button>
+                    <button onclick="changeLocalPrompterSpeed(1)"
+                        class="text-white/60 hover:text-white hover:bg-white/10 p-1.5 rounded-full transition-colors"
+                        title="Aumentar Velocidade">
+                        <i class="ph ph-plus text-sm"></i>
+                    </button>
+                </div>
+            </div>
+
 
             <!-- Nome do participante em destaque -->
             <div id="main-video-name" class="absolute bottom-32 sm:bottom-6 left-4 sm:left-6 z-30 hidden">

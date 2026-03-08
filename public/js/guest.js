@@ -1686,7 +1686,13 @@ let lastFrameTime = 0;
 let lastRestartToken = 0;
 let prompterAnimId = null;
 
+let isPrompterPinned = false;
+let localPrompterSizeDeficit = 0;
+let localPrompterSpeedDeficit = 0;
+let lastPrompterStateCache = null;
+
 function updatePrompterState(state) {
+    lastPrompterStateCache = state;
     const container = document.getElementById('prompter-container');
     const textView = document.getElementById('prompter-scroll-view');
     const textContent = document.getElementById('prompter-text-content');
@@ -1732,6 +1738,8 @@ function updatePrompterState(state) {
         if (!prompterActive) {
             container.classList.remove('hidden');
             container.classList.remove('guest-closed');
+            const controls = document.getElementById('prompter-local-controls');
+            if (controls) controls.classList.remove('hidden');
             container.style.opacity = '1';
             prompterActive = true;
             if (!prompterAnimId) {
@@ -1751,6 +1759,11 @@ function updatePrompterState(state) {
         }
         container.classList.remove('guest-closed'); // Host forced new text, re-open it
         container.style.opacity = '1';
+        const controls = document.getElementById('prompter-local-controls');
+        if (controls) {
+            controls.classList.remove('hidden');
+            controls.style.opacity = '1';
+        }
         if (!prompterActive) {
             container.classList.remove('hidden');
             prompterActive = true;
@@ -1762,7 +1775,7 @@ function updatePrompterState(state) {
     }
 
     // Update Speed, Playback Status, Size and Margin
-    currentPrompterSpeed = state.speed || 5;
+    currentPrompterSpeed = Math.max(1, Math.min(10, (state.speed || 5) + localPrompterSpeedDeficit));
     isPrompterPlaying = !!state.isPlaying;
 
     // Se foi restart e já deve rolar, certifique-se que o animLoop está andando
@@ -1778,12 +1791,13 @@ function updatePrompterState(state) {
     textContent.style.padding = `0 ${marginPct}%`;
 
     // Aplicar Tamanho da Fonte dinâmico (PC vs Mobile)
-    let sizePx = state.size || 60;
+    let baseSizePx = state.size || 60;
     // Se a tela for pequena (celular), aplica a proporção solicitada de 50px base para cada 60px do host
     if (window.innerWidth <= 768) {
-        sizePx = Math.round(sizePx * (50 / 60));
+        baseSizePx = Math.round(baseSizePx * (50 / 60));
     }
-    textContent.style.fontSize = `${sizePx}px`;
+    const finalSizePx = Math.max(15, baseSizePx + localPrompterSizeDeficit);
+    textContent.style.fontSize = `${finalSizePx}px`;
 }
 
 function prompterAnimationLoop(currentTime) {
@@ -1828,11 +1842,15 @@ function prompterAnimationLoop(currentTime) {
                     ws.send(JSON.stringify({ type: 'prompter-finished', roomId: roomName }));
                 }
 
-                if (container) {
+                if (container && !isPrompterPinned) {
                     container.style.opacity = '0'; // Dispara a transição css
+                    const controls = document.getElementById('prompter-local-controls');
+                    if (controls) controls.style.opacity = '0';
+
                     setTimeout(() => {
                         if (container.style.opacity === '0') closeGuestPrompter();
                         container.style.opacity = ''; // Reseta pro inline limpo
+                        if (controls) controls.style.opacity = '';
                     }, 500);
                 }
             }
@@ -1844,12 +1862,68 @@ function prompterAnimationLoop(currentTime) {
 // Botão de fechar do convidado
 window.closeGuestPrompter = () => {
     const container = document.getElementById('prompter-container');
+    const controls = document.getElementById('prompter-local-controls');
     if (container) {
         container.classList.add('hidden');
         container.classList.add('guest-closed');
+        if (controls) controls.classList.add('hidden');
+
         prompterActive = false;
         isPrompterPlaying = false;
+
+        // Reset local overrides e pin pra proxima chamada
+        isPrompterPinned = false;
+        localPrompterSizeDeficit = 0;
+        localPrompterSpeedDeficit = 0;
+
+        const ico = document.getElementById('ico-prompter-pin');
+        const btn = document.getElementById('btn-prompter-pin');
+        if (ico && btn) {
+            ico.classList.replace('ph-push-pin-fill', 'ph-push-pin');
+            btn.classList.remove('bg-win-accent', 'text-white', 'opacity-100');
+            btn.classList.add('bg-black/20', 'text-white/50');
+        }
     }
+};
+
+window.togglePrompterPin = () => {
+    isPrompterPinned = !isPrompterPinned;
+    const ico = document.getElementById('ico-prompter-pin');
+    const btn = document.getElementById('btn-prompter-pin');
+    if (ico && btn) {
+        if (isPrompterPinned) {
+            ico.classList.replace('ph-push-pin', 'ph-push-pin-fill');
+            btn.classList.add('bg-win-accent', 'text-white', 'opacity-100');
+            btn.classList.remove('bg-black/20', 'text-white/50');
+        } else {
+            ico.classList.replace('ph-push-pin-fill', 'ph-push-pin');
+            btn.classList.remove('bg-win-accent', 'text-white', 'opacity-100');
+            btn.classList.add('bg-black/20', 'text-white/50');
+
+            // Se desalfinetou e já estava rolando no vazio (terminado), então fecha.
+            if (!isPrompterPlaying) {
+                const containerHeight = document.documentElement.clientHeight * 0.45;
+                const textContent = document.getElementById('prompter-text-content');
+                if (textContent) {
+                    const textHeight = textContent.getBoundingClientRect().height;
+                    const maxScroll = (containerHeight / 2) + textHeight + 60;
+                    if (prompterScrollY <= -maxScroll) {
+                        closeGuestPrompter();
+                    }
+                }
+            }
+        }
+    }
+};
+
+window.changeLocalPrompterSize = (delta) => {
+    localPrompterSizeDeficit += delta;
+    if (lastPrompterStateCache) updatePrompterState(lastPrompterStateCache);
+};
+
+window.changeLocalPrompterSpeed = (delta) => {
+    localPrompterSpeedDeficit += delta;
+    if (lastPrompterStateCache) updatePrompterState(lastPrompterStateCache);
 };
 
 // ── Controles de Toque e Arraste do Convidado ───────────────────────────────
