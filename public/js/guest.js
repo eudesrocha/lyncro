@@ -1710,75 +1710,76 @@ function updatePrompterState(state) {
         prompterScrollY = 0;
         textView.style.transform = `translateY(0px)`;
         return;
-        // Tratamento de Restart (Mesmo Texto)
-        let wasRestarted = false;
-        if (state.restartToken && state.restartToken !== lastRestartToken) {
-            lastRestartToken = state.restartToken;
-            wasRestarted = true;
-            prompterScrollY = 0;
-            textView.style.transform = `translateY(0px)`;
-            container.classList.remove('hidden', 'guest-closed');
+    }
+
+    // Tratamento de Restart (Mesmo Texto)
+    let wasRestarted = false;
+    if (state.restartToken && state.restartToken !== lastRestartToken) {
+        lastRestartToken = state.restartToken;
+        wasRestarted = true;
+        prompterScrollY = 0;
+        textView.style.transform = `translateY(0px)`;
+        container.classList.remove('hidden', 'guest-closed');
+        container.style.opacity = '1';
+        prompterActive = true;
+    } else {
+        // Checar se o convidado fechou manualmente. Se fechou, não abre de novo automático a não ser que o host mude o texto inteiro.
+        if (container.classList.contains('guest-closed') && textContent.textContent === state.text) {
+            // Ignora atualizações direcionadas a estado se ele ativamente escondeu
+            return;
+        }
+
+        if (!prompterActive) {
+            container.classList.remove('hidden');
+            container.classList.remove('guest-closed');
             container.style.opacity = '1';
             prompterActive = true;
-        } else {
-            // Checar se o convidado fechou manualmente. Se fechou, não abre de novo automático a não ser que o host mude o texto inteiro.
-            if (container.classList.contains('guest-closed') && textContent.textContent === state.text) {
-                // Ignora atualizações direcionadas a estado se ele ativamente escondeu
-                return;
-            }
-
-            if (!prompterActive) {
-                container.classList.remove('hidden');
-                container.classList.remove('guest-closed');
-                container.style.opacity = '1';
-                prompterActive = true;
-                if (!prompterAnimId) {
-                    lastFrameTime = performance.now();
-                    prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
-                }
+            if (!prompterAnimId) {
+                lastFrameTime = performance.now();
+                prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
             }
         }
-
-        // Update text
-        if (textContent.textContent !== state.text) {
-            textContent.textContent = state.text;
-            // Text changed significantly => reset scroll to top
-            if (!wasRestarted) {
-                prompterScrollY = 0;
-                textView.style.transform = `translateY(0px)`;
-            }
-            container.classList.remove('guest-closed'); // Host forced new text, re-open it
-            container.style.opacity = '1';
-            if (!prompterActive) {
-                container.classList.remove('hidden');
-                prompterActive = true;
-                if (!prompterAnimId) {
-                    lastFrameTime = performance.now();
-                    prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
-                }
-            }
-        }
-
-        // Update Speed, Playback Status, Size and Margin
-        currentPrompterSpeed = state.speed || 5;
-        isPrompterPlaying = !!state.isPlaying;
-
-        // Se foi restart e já deve rolar, certifique-se que o animLoop está andando
-        if (wasRestarted && prompterActive && !prompterAnimId) {
-            lastFrameTime = performance.now();
-            prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
-        }
-
-        // Aplicar Margem (padding horizontal do container de rolagem)
-        // Map de 0 a 40 (O slider vai de 0 a 40, representa porcentagem da tela)
-        const marginPct = (state.margin !== undefined ? state.margin : 20);
-        // Mas para manter centrado e legal, dividimos por 2 e aplicamos nas laterais
-        textContent.style.padding = `0 ${marginPct}%`;
-
-        // Aplicar Tamanho da Fonte
-        const sizePx = state.size || 60;
-        textContent.style.fontSize = `${sizePx}px`;
     }
+
+    // Update text
+    if (textContent.textContent !== state.text) {
+        textContent.textContent = state.text;
+        // Text changed significantly => reset scroll to top
+        if (!wasRestarted) {
+            prompterScrollY = 0;
+            textView.style.transform = `translateY(0px)`;
+        }
+        container.classList.remove('guest-closed'); // Host forced new text, re-open it
+        container.style.opacity = '1';
+        if (!prompterActive) {
+            container.classList.remove('hidden');
+            prompterActive = true;
+            if (!prompterAnimId) {
+                lastFrameTime = performance.now();
+                prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
+            }
+        }
+    }
+
+    // Update Speed, Playback Status, Size and Margin
+    currentPrompterSpeed = state.speed || 5;
+    isPrompterPlaying = !!state.isPlaying;
+
+    // Se foi restart e já deve rolar, certifique-se que o animLoop está andando
+    if (wasRestarted && prompterActive && !prompterAnimId) {
+        lastFrameTime = performance.now();
+        prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
+    }
+
+    // Aplicar Margem (padding horizontal do container de rolagem)
+    // Map de 0 a 40 (O slider vai de 0 a 40, representa porcentagem da tela)
+    const marginPct = (state.margin !== undefined ? state.margin : 20);
+    // Mas para manter centrado e legal, dividimos por 2 e aplicamos nas laterais
+    textContent.style.padding = `0 ${marginPct}%`;
+
+    // Aplicar Tamanho da Fonte
+    const sizePx = state.size || 60;
+    textContent.style.fontSize = `${sizePx}px`;
 }
 
 function prompterAnimationLoop(currentTime) {
