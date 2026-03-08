@@ -226,12 +226,13 @@
             object-fit: cover !important;
         }
 
-        /* CNN Vertical: enquadramento portrait lado a lado (até 5/linha, depois reorganiza) */
+        /* CNN Vertical: enquadramento portrait 9:16 lado a lado */
         #grid-container.layout-cnn-vertical {
             gap: 2px;
             padding: 0;
             background: #000;
-            align-items: stretch;
+            align-items: center;
+            align-content: center;
             justify-content: center;
         }
 
@@ -239,8 +240,9 @@
             border-radius: 0;
             border: none;
             box-shadow: none;
-            aspect-ratio: unset;
-            /* flex-basis e height calculados via JS conforme contagem */
+            aspect-ratio: 9/16;
+            height: auto;
+            /* largura e max-height calculados via JS conforme contagem */
         }
 
         #grid-container.layout-cnn-vertical .grid-cell video {

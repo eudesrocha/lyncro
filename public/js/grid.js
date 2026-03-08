@@ -34,7 +34,7 @@ function calculateGrid() {
         }
     }
 
-    // CNN Vertical: JS calcula colunas e altura com base na contagem
+    // CNN Vertical: células portrait 9:16 lado a lado; JS controla largura e max-height por linha
     if (currentLayout === 'cnn-vertical') {
         const c = count || 1;
         let cols, rows;
@@ -44,13 +44,14 @@ function calculateGrid() {
         else if (c <= 9) { cols = 3; rows = 3; }
         else             { cols = 5; rows = Math.ceil(c / 5); }
 
-        const h = `calc(${100 / rows}vh - ${rows > 1 ? 1 : 0}px)`;
+        const maxH = `${100 / rows}vh`;
         const cells = document.querySelectorAll('.grid-cell');
         cells.forEach(cell => {
-            const basis = `calc(${100 / cols}% - ${cols > 1 ? 1 : 0}px)`;
-            cell.style.flex = `0 1 ${basis}`;
-            cell.style.maxWidth = basis;
-            cell.style.height = h;
+            const w = `calc(100% / ${cols})`;
+            cell.style.flex = `0 0 ${w}`;
+            cell.style.maxWidth = w;
+            cell.style.maxHeight = maxH;
+            cell.style.height = '';
         });
         return;
     }
