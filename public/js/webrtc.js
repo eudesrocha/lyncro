@@ -67,7 +67,7 @@ class WebRTCClient {
         pc.ontrack = (event) => {
             this.log(`Track received from: ${targetId} (${event.track.kind})`);
             const stream = event.streams[0] || new MediaStream([event.track]);
-            this.onTrack(targetId, stream);
+            this.onTrack(targetId, stream, event.track);
         };
 
         pc.onnegotiationneeded = () => {

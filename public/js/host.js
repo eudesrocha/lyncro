@@ -623,10 +623,15 @@ function renderParticipantCard(participant, isLocal = false) {
               </button>
               ` : ''}
               `}
-              <button id="btn-ov-toggle-${participant.id}" onclick="toggleOverlay('${participant.id}')" 
+              <button id="btn-ov-toggle-${participant.id}" onclick="toggleOverlay('${participant.id}')"
                 class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}">
-                ${participant.overlayActive ? 'Ocultar' : 'Disparar'}
+                Disparar
               </button>
+              ${participant.overlayActive ? `
+              <button onclick="hideOverlay('${participant.id}')" title="Ocultar Lower Third"
+                class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-win transition-all bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-500/30">
+                ×
+              </button>` : ''}
             </div>
           </div>
           <div class="flex gap-1.5">
@@ -958,22 +963,39 @@ window.toggleOverlay = (pId) => {
 
     const nameInput = document.getElementById(`ov-name-${pId}`);
     const titleInput = document.getElementById(`ov-title-${pId}`);
-    const action = p.overlayActive ? 'hide' : 'show';
 
     ws.send(JSON.stringify({
         type: 'overlay-control',
         roomId: roomName,
         targetId: pId,
-        action: action,
+        action: 'show',
         name: nameInput ? nameInput.value : p.name,
         title: titleInput ? titleInput.value : '',
         style: getLTStyle()
     }));
 
     // Atualização otimista
-    p.overlayActive = (action === 'show');
+    p.overlayActive = true;
     p.overlayName = nameInput ? nameInput.value : p.name;
     p.overlayTitle = titleInput ? titleInput.value : '';
+    updateParticipantStatus(p);
+};
+
+window.hideOverlay = (pId) => {
+    const p = currentParticipants.find(part => part.id === pId);
+    if (!p) return;
+
+    ws.send(JSON.stringify({
+        type: 'overlay-control',
+        roomId: roomName,
+        targetId: pId,
+        action: 'hide',
+        name: p.overlayName || '',
+        title: p.overlayTitle || '',
+        style: getLTStyle()
+    }));
+
+    p.overlayActive = false;
     updateParticipantStatus(p);
 };
 
