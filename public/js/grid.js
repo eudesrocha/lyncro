@@ -13,6 +13,7 @@ let participantsData = new Map(); // id -> { name, role }
 let activeStreams = new Map(); // id -> stream
 let videoElements = new Map(); // id -> videoEl
 let currentLayout = 'auto-grid';
+let showLabels = true;
 
 function init() {
     setupWebSocket();
@@ -134,6 +135,7 @@ function createVideoCell(id, stream) {
 
         cell.appendChild(video);
         cell.appendChild(badge);
+        if (!showLabels) badge.style.display = 'none';
 
         document.getElementById('grid-container').appendChild(cell);
         videoElements.set(id, video);
@@ -254,6 +256,12 @@ async function setupWebSocket() {
                 if (rtcClient && rtcClient.peers.has(data.from)) {
                     await rtcClient.handleCandidate(data.from, data.candidate);
                 }
+                break;
+            case 'labels-toggle':
+                showLabels = data.showLabels;
+                document.querySelectorAll('.name-badge').forEach(el => {
+                    el.style.display = showLabels ? '' : 'none';
+                });
                 break;
             case 'participant-left':
             case 'peer-reconnected':

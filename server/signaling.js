@@ -433,6 +433,13 @@ function setupSignaling(server) {
                             });
                         }
                         break;
+
+                    case 'labels-toggle':
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'labels-toggle',
+                            showLabels: data.showLabels
+                        });
+                        break;
                 }
             } catch (err) {
                 console.error('Error processing WS message:', err);

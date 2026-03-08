@@ -309,17 +309,50 @@
                 </select>
             </div>
 
-            <button id="btn-sound-toggle" onclick="toggleSoundNotifications()"
-                class="flex size-9 items-center justify-center rounded-xl hover:bg-white/10 border border-white/5 transition-colors text-gray-400 hover:text-white"
-                title="Silenciar notificações">
-                <i class="ph ph-bell text-lg"></i>
-            </button>
-
-            <button id="btn-settings" onclick="openSettingsModal()"
-                class="flex size-9 items-center justify-center rounded-xl hover:bg-white/10 border border-white/5 transition-colors text-gray-400 hover:text-white"
-                title="Configurações da Produção">
-                <i class="ph ph-gear text-lg"></i>
-            </button>
+            <div class="relative" id="settings-picker-wrap">
+                <button id="btn-settings" onclick="toggleSettingsPicker()"
+                    class="flex size-9 items-center justify-center rounded-xl hover:bg-white/10 border border-white/5 transition-colors text-gray-400 hover:text-white"
+                    title="Configurações da Produção">
+                    <i class="ph ph-gear text-lg"></i>
+                </button>
+                <div id="settings-picker-menu"
+                    class="hidden absolute top-full right-0 mt-2 w-56 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl z-[999]">
+                    <div class="p-1.5 flex flex-col gap-0.5">
+                        <div class="px-3 pt-2 pb-1.5">
+                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500">Produção</span>
+                        </div>
+                        <button onclick="toggleSoundNotifications()"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-left">
+                            <div class="flex items-center gap-2.5">
+                                <i class="ph ph-bell text-sm text-gray-400"></i>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Som de Entrada</span>
+                            </div>
+                            <div id="setting-sound-indicator" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors"></div>
+                        </button>
+                        <button onclick="toggleLabels()"
+                            class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-left">
+                            <div class="flex items-center gap-2.5">
+                                <i class="ph ph-identification-badge text-sm text-gray-400"></i>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Exibir Labels</span>
+                            </div>
+                            <div id="setting-labels-indicator" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors"></div>
+                        </button>
+                        <div class="my-1 border-t border-white/5"></div>
+                        <div class="px-3 pt-1 pb-1.5">
+                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500">Câmera Host</span>
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1.5">
+                            <i class="ph ph-video-camera text-sm text-gray-500"></i>
+                            <select id="host-quality-select-settings" onchange="changeHostQuality(this.value)"
+                                class="flex-1 bg-white/5 border border-white/10 text-[10px] font-bold text-gray-300 outline-none cursor-pointer uppercase tracking-tight rounded-lg px-2 py-1.5">
+                                <option value="1080_30">1080p 30fps</option>
+                                <option value="720" selected>720p HD</option>
+                                <option value="480">480p SD</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Logout / End -->
             <button

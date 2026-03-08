@@ -51,15 +51,26 @@
 
     // ── Stream collection ─────────────────────────────────────────────────────
     function collectVideoElements() {
-        const all = [];
+        const participants = window.lyncroParticipants || [];
+        const result = [];
         const localCard = document.getElementById('video-card-local');
-        if (localCard) { const v = localCard.querySelector('video'); if (v && v.srcObject) all.push(v); }
+        if (localCard) {
+            const v = localCard.querySelector('video');
+            if (v && v.srcObject) {
+                const nameInput = document.getElementById('host-display-name');
+                result.push({ el: v, name: nameInput ? nameInput.value : 'Host', role: 'host' });
+            }
+        }
         document.querySelectorAll('[id^="video-card-"]').forEach(card => {
             if (card.id === 'video-card-local') return;
             const v = card.querySelector('video');
-            if (v && v.srcObject) all.push(v);
+            if (v && v.srcObject) {
+                const pid = card.id.replace('video-card-', '');
+                const p = participants.find(p => p.id === pid);
+                result.push({ el: v, name: p ? p.name : 'Convidado', role: p ? p.role : 'guest' });
+            }
         });
-        return all;
+        return result;
     }
 
     // ── Layout calculator (mirrors grid.js + grid.html logic) ────────────────
@@ -166,13 +177,48 @@
         ctx.closePath();
     }
 
-    function drawFrame(videoEls, layout) {
+    function drawBadge(name, role, x, y, w, h) {
+        const fontSize = Math.max(14, Math.min(26, h * 0.042));
+        const label = name || 'Convidado';
+        const isHost = role === 'host';
+
+        ctx.font = `bold ${fontSize}px Inter, system-ui, sans-serif`;
+        const padX = 14, padY = 7;
+        const starW = isHost ? fontSize + 6 : 0;
+        const textW = ctx.measureText(label).width;
+        const bw = padX * 2 + starW + textW;
+        const bh = fontSize + padY * 2;
+        const bx = x + 12;
+        const by = y + h - 12 - bh;
+
+        // Badge background
+        ctx.fillStyle = 'rgba(0,0,0,0.65)';
+        roundedRect(bx, by, bw, bh, 7);
+        ctx.fill();
+
+        // Star for host
+        if (isHost) {
+            ctx.fillStyle = '#f59e0b';
+            ctx.font = `${fontSize * 0.88}px system-ui`;
+            ctx.fillText('★', bx + padX, by + padY + fontSize * 0.82);
+        }
+
+        // Name text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = `bold ${fontSize}px Inter, system-ui, sans-serif`;
+        ctx.fillText(label, bx + padX + starW, by + padY + fontSize * 0.85);
+    }
+
+    function drawFrame(items, layout) {
         ctx.fillStyle = '#050505';
         ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
 
-        videoEls.forEach((v, i) => {
+        const labelsOn = window.lyncroShowLabels !== false;
+
+        items.forEach((item, i) => {
             if (i >= layout.length) return;
             const { x, y, w, h, cover = false, rounded = 0 } = layout[i];
+            const v = item.el || item; // backwards compat
 
             if (v.readyState < 2 || !v.videoWidth || !v.videoHeight) {
                 ctx.fillStyle = '#1a1a22';
@@ -184,10 +230,8 @@
                 return;
             }
 
-            // Source rect: cover crops to fill, contain letterboxes
             let sx = 0, sy = 0, sw = v.videoWidth, sh = v.videoHeight;
             let dx = x, dy = y, dw = w, dh = h;
-
             const vAR = v.videoWidth / v.videoHeight;
             const cAR = w / h;
 
@@ -199,22 +243,22 @@
                 else           { dw = h * vAR; dx = x + (w - dw) / 2; }
             }
 
-            if (rounded > 0) {
-                ctx.save(); roundedRect(x, y, w, h, rounded); ctx.clip();
-            }
+            if (rounded > 0) { ctx.save(); roundedRect(x, y, w, h, rounded); ctx.clip(); }
             ctx.drawImage(v, sx, sy, sw, sh, dx, dy, dw, dh);
             if (rounded > 0) ctx.restore();
+
+            if (labelsOn && item.name) drawBadge(item.name, item.role, x, y, w, h);
         });
     }
 
-    function startCompositor(videoEls) {
+    function startCompositor(items) {
         canvas = document.createElement('canvas');
         canvas.width = CANVAS_W;
         canvas.height = CANVAS_H;
         ctx = canvas.getContext('2d');
 
         function loop() {
-            drawFrame(videoEls, computeLayout(videoEls.length));
+            drawFrame(items, computeLayout(items.length));
             animFrameId = requestAnimationFrame(loop);
         }
         loop();
@@ -273,14 +317,14 @@
     function start() {
         if (mediaRecorder) return;
 
-        const videoEls = collectVideoElements();
-        if (videoEls.length === 0) {
+        const items = collectVideoElements();
+        if (items.length === 0) {
             showToast && showToast('Nenhum vídeo disponível para gravar.', 'error');
             return;
         }
 
-        const videoStream = startCompositor(videoEls);
-        const audioStream = buildAudioMix(videoEls);
+        const videoStream = startCompositor(items);
+        const audioStream = buildAudioMix(items.map(i => i.el || i));
 
         const combinedStream = new MediaStream();
         videoStream.getVideoTracks().forEach(t => combinedStream.addTrack(t));

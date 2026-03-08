@@ -72,6 +72,7 @@ let currentVbImage = null;
 let currentParticipants = [];
 let isMonitorMuted = false;
 let soundEnabled = true;
+let showLabels = localStorage.getItem('lyncro_show_labels') !== '0';
 let prevWaitingIds = new Set(); // rastreia quais convidados já estavam na fila
 let isHostMicMuted = false;
 let isHostCamMuted = false;
@@ -91,9 +92,11 @@ if (inviteInput) {
 }
 
 async function init() {
-    // Restaurar preferência de som e aplicar estado visual do botão
+    // Restaurar preferências e aplicar estados visuais
     soundEnabled = localStorage.getItem('lyncro_sound_enabled') !== '0';
-    setTimeout(applySoundButtonState, 0);
+    showLabels = localStorage.getItem('lyncro_show_labels') !== '0';
+    window.lyncroShowLabels = showLabels;
+    setTimeout(applySettingsMenu, 0);
 
     // 1. Iniciar WebSocket imediatamente para ver a fila de espera
     setupWebSocket();
@@ -447,6 +450,8 @@ async function setupWebSocket() {
 
 function updateUI(participants) {
     currentParticipants = participants;
+    window.lyncroParticipants = participants;
+    window.lyncroShowLabels = showLabels;
     const videoGrid = document.getElementById('video-grid');
     const waitingList = document.getElementById('waiting-list');
     const emptyQueueMsg = document.getElementById('empty-queue-msg');
@@ -938,7 +943,15 @@ function playGuestJoinSound() {
     }
 }
 
+function applySettingsMenu() {
+    const soundInd = document.getElementById('setting-sound-indicator');
+    if (soundInd) soundInd.className = `w-2 h-2 rounded-full transition-colors ${soundEnabled ? 'bg-emerald-500' : 'bg-gray-600'}`;
+    const labelsInd = document.getElementById('setting-labels-indicator');
+    if (labelsInd) labelsInd.className = `w-2 h-2 rounded-full transition-colors ${showLabels ? 'bg-emerald-500' : 'bg-gray-600'}`;
+}
+
 function applySoundButtonState() {
+    applySettingsMenu();
     const btn = document.getElementById('btn-sound-toggle');
     if (!btn) return;
     if (soundEnabled) {
@@ -1741,6 +1754,34 @@ window.updateHostName = function (newName) {
         ws.send(JSON.stringify({ type: 'update-participant', roomId: roomName, updates: { name: displayName } }));
     }
 };
+
+window.toggleLabels = function () {
+    showLabels = !showLabels;
+    localStorage.setItem('lyncro_show_labels', showLabels ? '1' : '0');
+    window.lyncroShowLabels = showLabels;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'labels-toggle', roomId: roomName, showLabels }));
+    }
+    applySettingsMenu();
+};
+
+window.toggleSettingsPicker = function () {
+    const menu = document.getElementById('settings-picker-menu');
+    if (!menu) return;
+    const opening = menu.classList.contains('hidden');
+    menu.classList.toggle('hidden');
+    if (opening) applySettingsMenu();
+};
+
+window.closeSettingsPicker = function () {
+    const menu = document.getElementById('settings-picker-menu');
+    if (menu) menu.classList.add('hidden');
+};
+
+document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('settings-picker-wrap');
+    if (wrap && !wrap.contains(e.target)) closeSettingsPicker();
+});
 
 window.toggleLayoutPicker = function () {
     const menu = document.getElementById('layout-picker-menu');
