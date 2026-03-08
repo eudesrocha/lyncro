@@ -363,8 +363,8 @@ async function setupWebSocket() {
                     Array.from(rtcClient.peers.keys()).forEach(id => rtcClient.removePeer(id));
                 }
                 break;
-            case 'participant-update':
                 updateUI(data.participants);
+                window.currentRoomSettings = { layout: data.layout }; // Salva dados da sala
                 if (typeof broadcastPrompterState === 'function') {
                     broadcastPrompterState(); // Garante o sync imediato para quem acabou de entrar ou foi aprovado
                 }
@@ -449,6 +449,20 @@ function updateUI(participants) {
     const waitingList = document.getElementById('waiting-list');
     const emptyQueueMsg = document.getElementById('empty-queue-msg');
     const queueCountBadge = document.getElementById('queue-count');
+
+    // Atualiza Visual do Layout Atual
+    if (window.currentRoomSettings && window.currentRoomSettings.layout) {
+        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active', 'border-win-accent', 'bg-win-accent/10'));
+        const activeBtn = document.getElementById(`layout-${window.currentRoomSettings.layout}`);
+        if (activeBtn) activeBtn.classList.add('active', 'border-win-accent', 'bg-win-accent/10');
+    }
+
+    // Atualiza Visual do Layout Atual
+    if (window.currentRoomSettings && window.currentRoomSettings.layout) {
+        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active', 'border-win-accent', 'bg-win-accent/10'));
+        const activeBtn = document.getElementById(`layout-${window.currentRoomSettings.layout}`);
+        if (activeBtn) activeBtn.classList.add('active', 'border-win-accent', 'bg-win-accent/10');
+    }
 
     const currentParticipantIds = participants.filter(p => p.status === 'accepted' || p.role === 'host').map(p => p.id);
     let queueCount = 0;
@@ -1682,6 +1696,27 @@ window.copyMasterGridLink = () => {
             ico.className = 'ph ph-copy text-sm';
             btn.className = oldClasses;
         }, 3000);
+    }
+};
+
+// ── Controle Remoto de Layouts ───────────────────────────────────────────
+window.changeLayout = function (layoutId) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({
+            type: 'layout-change',
+            roomId: roomName,
+            layout: layoutId
+        }));
+
+        // Feedback Otimista na UI
+        if (!window.currentRoomSettings) window.currentRoomSettings = {};
+        window.currentRoomSettings.layout = layoutId;
+
+        document.querySelectorAll('.layout-btn').forEach(btn => btn.classList.remove('active', 'border-win-accent', 'bg-win-accent/10'));
+        const activeBtn = document.getElementById(`layout-${layoutId}`);
+        if (activeBtn) activeBtn.classList.add('active', 'border-win-accent', 'bg-win-accent/10');
+
+        showToast(`Layout alterado para ${layoutId.replace('-', ' ').toUpperCase()}`, 'success');
     }
 };
 

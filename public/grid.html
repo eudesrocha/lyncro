@@ -72,8 +72,8 @@
         .grid-cell video {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            /* preencher arredondado */
+            object-fit: contain;
+            /* preencher conforme o layout pedido (contain por padrão) */
         }
 
         /* Crachá moderno cinematográfico */
@@ -196,6 +196,66 @@
 
         .speaking .vu-ring {
             opacity: 1;
+        }
+
+        /* ── Layout Variations ── */
+
+        /* Transição suave para o container */
+        #grid-container {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* CNN Split: 50/50 Side by Side com corte de preenchimento */
+        #grid-container.layout-cnn-split {
+            gap: 2px;
+            padding: 0;
+            background: #000;
+        }
+
+        #grid-container.layout-cnn-split .grid-cell {
+            border-radius: 0;
+            border: none;
+            box-shadow: none;
+            aspect-ratio: auto;
+            height: 100vh;
+            flex: 1 1 45% !important;
+            max-width: 50% !important;
+        }
+
+        #grid-container.layout-cnn-split .grid-cell video {
+            object-fit: cover !important;
+        }
+
+        /* Speaker Highlight: O primeiro ganha destaque total */
+        #grid-container.layout-speaker-highlight {
+            align-content: center;
+            padding: 40px;
+        }
+
+        #grid-container.layout-speaker-highlight .grid-cell:first-child {
+            flex: 0 1 100% !important;
+            max-width: 1200px !important;
+            max-height: 75vh !important;
+            border: 2px solid rgba(0, 120, 212, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        #grid-container.layout-speaker-highlight .grid-cell:not(:first-child) {
+            flex: 0 1 180px !important;
+            max-width: 220px !important;
+            max-height: 120px !important;
+            opacity: 0.6;
+        }
+
+        /* Cinema 21:9: Proporção ultra-panorâmica */
+        #grid-container.layout-cinema-219 .grid-cell {
+            aspect-ratio: 21 / 9 !important;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        #grid-container.layout-cinema-219 .grid-cell video {
+            object-fit: contain !important;
         }
     </style>
 </head>

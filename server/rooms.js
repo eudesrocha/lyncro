@@ -3,25 +3,27 @@ const persistentStore = require('./store');
 
 class RoomManager {
     constructor() {
-        this.rooms = new Map(); // roomId -> { participants: Map(participantId -> data), host: participantId }
+        this.rooms = new Map(); // roomId -> { participants: Map(participantId -> data), host: participantId, layout... }
     }
 
     createRoom(roomId = uuidv4(), password = null) {
         if (!this.rooms.has(roomId)) {
-            // Recuperar metadados persistidos (password, hostUserId) se existirem
+            // Recuperar metadados persistidos (password, hostUserId, layout) se existirem
             const saved = persistentStore.getRoom(roomId);
             this.rooms.set(roomId, {
                 participants: new Map(),
                 host: null,
                 hostUserId: saved ? saved.hostUserId : null,
-                password: saved ? saved.password : (password ? String(password).trim() : null)
+                password: saved ? saved.password : (password ? String(password).trim() : null),
+                layout: saved?.layout || 'auto-grid'
             });
 
             // Persistir metadados se for uma sala nova
             if (!saved) {
                 persistentStore.setRoom(roomId, {
                     password: password ? String(password).trim() : null,
-                    hostUserId: null
+                    hostUserId: null,
+                    layout: 'auto-grid'
                 });
             }
         }
@@ -66,7 +68,8 @@ class RoomManager {
                 room.hostUserId = incomingUserId;
                 persistentStore.setRoom(roomId, {
                     password: room.password,
-                    hostUserId: incomingUserId
+                    hostUserId: incomingUserId,
+                    layout: room.layout || 'auto-grid'
                 });
             }
 
@@ -102,7 +105,7 @@ class RoomManager {
         }
 
         if (room.participants.size === 0) {
-            // Remove da memória mas mantém metadados no store (password, hostUserId)
+            // Remove da memória mas mantém metadados no store (password, hostUserId, layout)
             // para que o host possa reconectar com as mesmas credenciais
             this.rooms.delete(roomId);
         }
@@ -117,11 +120,30 @@ class RoomManager {
         return {
             id: roomId,
             host: room.host,
+            layout: room.layout,
             participants: Array.from(room.participants.values()).map(p => {
                 const { ws, userId, ...data } = p; // Remove WebSocket e userId do retorno
                 return data;
             })
         };
+    }
+
+    updateRoom(roomId, updates) {
+        const room = this.rooms.get(roomId);
+        if (!room) return null;
+
+        Object.assign(room, updates);
+
+        // Persistir se envolver dados raiz como layout
+        if (updates.layout !== undefined) {
+            persistentStore.setRoom(roomId, {
+                password: room.password,
+                hostUserId: room.hostUserId,
+                layout: room.layout
+            });
+        }
+
+        return room;
     }
 
     updateParticipant(roomId, participantId, updates) {
@@ -140,4 +162,4 @@ class RoomManager {
     }
 }
 
-module.exports = new RoomManager();
+module.exports = new RoomManager;

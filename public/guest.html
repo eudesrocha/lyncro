@@ -885,12 +885,19 @@
                         style="font-family: 'Segoe UI Black', Arial, sans-serif; font-weight: 900; box-shadow: 0 2px 15px rgba(0,120,212,0.6); -webkit-text-stroke: 0.5px black;">LYNCRO</span>
                 </div>
 
-                <!-- Botão FIXAR (Pin) do Convidado -->
-                <button id="btn-prompter-pin" onclick="togglePrompterPin()"
-                    class="absolute top-4 right-4 z-50 text-white/50 hover:text-white transition-colors p-2 bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-md"
-                    title="Fixar/Destrancar Teleprompter">
-                    <i id="ico-prompter-pin" class="ph ph-push-pin text-lg"></i>
-                </button>
+                <!-- Botões do Convidado (Pin e Fechar) -->
+                <div class="absolute top-4 right-4 z-50 flex items-center gap-2">
+                    <button id="btn-prompter-pin" onclick="togglePrompterPin()"
+                        class="text-white/50 hover:text-white transition-colors p-2 bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-md"
+                        title="Fixar/Destrancar Teleprompter">
+                        <i id="ico-prompter-pin" class="ph ph-push-pin text-lg"></i>
+                    </button>
+                    <button id="btn-prompter-close" onclick="closeGuestPrompter()"
+                        class="text-white/50 hover:text-red-400 transition-colors p-2 bg-black/20 hover:bg-black/40 rounded-full backdrop-blur-md"
+                        title="Fechar Teleprompter">
+                        <i class="ph ph-x text-lg"></i>
+                    </button>
+                </div>
 
                 <!-- Sombra Inferior (Fade effect) -->
                 <div

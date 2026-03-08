@@ -12,6 +12,7 @@ let myId;
 let participantsData = new Map(); // id -> { name, role }
 let activeStreams = new Map(); // id -> stream
 let videoElements = new Map(); // id -> videoEl
+let currentLayout = 'auto-grid';
 
 function init() {
     setupWebSocket();
@@ -19,8 +20,8 @@ function init() {
 
 // ── Lógica de Re-Cálculo de Grade (Matemática Flex/Grid) ─────────────
 function calculateGrid() {
-    const container = document.getElementById('grid-container');
     const loading = document.getElementById('loading');
+    const container = document.getElementById('grid-container');
 
     const count = activeStreams.size;
     if (count > 0) {
@@ -31,6 +32,16 @@ function calculateGrid() {
             loading.style.display = 'flex';
             setTimeout(() => { loading.style.opacity = '1'; }, 50);
         }
+    }
+
+    // Se houver um layout especial, o CSS cuida do cálculo
+    if (currentLayout !== 'auto-grid') {
+        const cells = document.querySelectorAll('.grid-cell');
+        cells.forEach(cell => {
+            cell.style.flex = '';
+            cell.style.maxWidth = '';
+        });
+        return;
     }
 
     // Usamos regras flexíveis baseadas na contagem de pessoas
@@ -45,6 +56,21 @@ function calculateGrid() {
         cell.style.flex = `0 1 ${basis}`;
         cell.style.maxWidth = basis;
     });
+}
+
+function applyLayout(layoutId) {
+    const container = document.getElementById('grid-container');
+    if (!container) return;
+
+    // Remover classes antigas
+    container.classList.remove('layout-auto-grid', 'layout-cnn-split', 'layout-speaker-highlight', 'layout-cinema-219');
+
+    // Adicionar nova
+    container.classList.add(`layout-${layoutId}`);
+    currentLayout = layoutId;
+
+    console.log(`[Grid] Layout aplicado: ${layoutId}`);
+    calculateGrid();
 }
 
 function updateCellInfo(id) {
@@ -157,6 +183,9 @@ async function setupWebSocket() {
                 if (rtcClient) rtcClient.updateConfig(data.iceServers);
                 break;
             case 'participant-update':
+                if (data.layout) {
+                    applyLayout(data.layout);
+                }
                 // Atualizar cache de nomes (IGNORAR waiting - só accepted)
                 data.participants.forEach(p => {
                     if (p.role !== 'observer' && p.status === 'accepted') {

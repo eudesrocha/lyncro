@@ -181,6 +181,7 @@ function setupSignaling(server) {
                         // Avisar a todos na sala sobre a atualização
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
+                            layout: roomManager.getRoom(normalizedRoomId).layout,
                             participants: roomManager.getRoom(normalizedRoomId).participants
                         });
                         break;
@@ -399,6 +400,21 @@ function setupSignaling(server) {
                             });
                         }
                         break;
+
+                    case 'layout-change':
+                        const rmLayout = roomManager.getRoom(normalizedRoomId);
+                        if (rmLayout && rmLayout.host === participantId) {
+                            // Atualizar estado global da sala
+                            roomManager.updateRoom(normalizedRoomId, { layout: data.layout });
+
+                            // Avisar a todos sobre o novo layout
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'participant-update',
+                                layout: data.layout,
+                                participants: roomManager.getRoom(normalizedRoomId).participants
+                            });
+                        }
+                        break;
                 }
             } catch (err) {
                 console.error('Error processing WS message:', err);
@@ -470,6 +486,7 @@ function setupSignaling(server) {
                 if (room && !isAcceptedGuest) {
                     broadcastToRoom(currentRoomId, {
                         type: 'participant-update',
+                        layout: room.layout,
                         participants: room.participants
                     });
                 }
