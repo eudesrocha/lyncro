@@ -363,6 +363,7 @@ async function setupWebSocket() {
                     Array.from(rtcClient.peers.keys()).forEach(id => rtcClient.removePeer(id));
                 }
                 break;
+            case 'participant-update':
                 updateUI(data.participants);
                 window.currentRoomSettings = { layout: data.layout }; // Salva dados da sala
                 if (typeof broadcastPrompterState === 'function') {
