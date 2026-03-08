@@ -1703,6 +1703,8 @@ function updatePrompterState(state) {
     if (state.targetId && state.targetId !== 'all' && state.targetId !== myId) {
         // Não é pra mim. Esconder sem marcar explicitamente que "eu fechei" pra não bugar se o host mandar de novo depois.
         container.classList.add('hidden');
+        const controls = document.getElementById('prompter-local-controls');
+        if (controls) controls.style.display = 'none';
         prompterActive = false;
         isPrompterPlaying = false;
         return;
@@ -1711,6 +1713,8 @@ function updatePrompterState(state) {
     // Se o texto for limpo e o prompter estiver parado, esconder a janela
     if (!state.text || state.text.trim() === '') {
         container.classList.add('hidden');
+        const controls = document.getElementById('prompter-local-controls');
+        if (controls) controls.style.display = 'none';
         prompterActive = false;
         isPrompterPlaying = false;
         prompterScrollY = 0;
@@ -1726,6 +1730,8 @@ function updatePrompterState(state) {
         prompterScrollY = 0;
         textView.style.transform = `translateY(0px)`;
         container.classList.remove('hidden', 'guest-closed');
+        const controls = document.getElementById('prompter-local-controls');
+        if (controls) controls.style.display = 'flex';
         container.style.opacity = '1';
         prompterActive = true;
     } else {
