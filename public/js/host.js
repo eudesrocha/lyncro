@@ -71,6 +71,8 @@ let currentVbMode = 'none';
 let currentVbImage = null;
 let currentParticipants = [];
 let isMonitorMuted = false;
+let soundEnabled = true;
+let prevWaitingIds = new Set(); // rastreia quais convidados já estavam na fila
 let isHostMicMuted = false;
 let isHostCamMuted = false;
 let isScreenSharing = false;
@@ -89,6 +91,10 @@ if (inviteInput) {
 }
 
 async function init() {
+    // Restaurar preferência de som e aplicar estado visual do botão
+    soundEnabled = localStorage.getItem('lyncro_sound_enabled') !== '0';
+    setTimeout(applySoundButtonState, 0);
+
     // 1. Iniciar WebSocket imediatamente para ver a fila de espera
     setupWebSocket();
 
@@ -425,6 +431,7 @@ function updateUI(participants) {
 
         if (p.status === 'waiting') {
             queueCount++;
+            if (!prevWaitingIds.has(p.id)) playGuestJoinSound();
             renderWaitingParticipant(p);
             return;
         }
@@ -468,6 +475,9 @@ function updateUI(participants) {
             rtcClient.removePeer(id);
         }
     });
+
+    // Atualizar snapshot da fila para detectar novos na próxima chamada
+    prevWaitingIds = new Set(participants.filter(p => p.status === 'waiting').map(p => p.id));
 }
 
 function renderWaitingParticipant(participant) {
@@ -834,6 +844,55 @@ function updateParticipantStatus(p) {
 async function initiateConnection(targetId) {
     const offer = await rtcClient.createOffer(targetId);
     ws.send(JSON.stringify({ type: 'offer', roomId: roomName, to: targetId, offer }));
+}
+
+// ── Notificação Sonora de Fila ────────────────────────────────────────────────
+function playGuestJoinSound() {
+    if (!soundEnabled) return;
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Sino suave: duas notas harmônicas sobrepostas
+        [[880, 0.18], [1320, 0.09]].forEach(([freq, gain], i) => {
+            const osc = ctx.createOscillator();
+            const env = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+            env.gain.setValueAtTime(0, ctx.currentTime + i * 0.04);
+            env.gain.linearRampToValueAtTime(gain, ctx.currentTime + i * 0.04 + 0.01);
+            env.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.04 + 0.55);
+            osc.connect(env);
+            env.connect(ctx.destination);
+            osc.start(ctx.currentTime + i * 0.04);
+            osc.stop(ctx.currentTime + i * 0.04 + 0.6);
+        });
+
+        setTimeout(() => ctx.close(), 1200);
+    } catch (e) {
+        console.warn('[Sound] Falha ao tocar notificação:', e);
+    }
+}
+
+function applySoundButtonState() {
+    const btn = document.getElementById('btn-sound-toggle');
+    if (!btn) return;
+    if (soundEnabled) {
+        btn.title = 'Silenciar notificações';
+        btn.querySelector('i').className = 'ph ph-bell text-lg';
+        btn.classList.remove('text-gray-600');
+        btn.classList.add('text-gray-400');
+    } else {
+        btn.title = 'Ativar notificações';
+        btn.querySelector('i').className = 'ph ph-bell-slash text-lg';
+        btn.classList.remove('text-gray-400');
+        btn.classList.add('text-gray-600');
+    }
+}
+
+function toggleSoundNotifications() {
+    soundEnabled = !soundEnabled;
+    localStorage.setItem('lyncro_sound_enabled', soundEnabled ? '1' : '0');
+    applySoundButtonState();
 }
 
 function handleRemoteTrack(targetId, stream) {
