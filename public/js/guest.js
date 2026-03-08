@@ -1700,8 +1700,15 @@ function updatePrompterState(state) {
         textView.style.transform = `translateY(0px)`;
         return;
     } else {
+        // Checar se o convidado fechou manualmente. Se fechou, não abre de novo automático a não ser que o host mude o texto inteiro.
+        if (container.classList.contains('guest-closed') && textContent.textContent === state.text) {
+            // Ignora atualizações direcionadas a estado se ele ativamente escondeu
+            return;
+        }
+
         if (!prompterActive) {
             container.classList.remove('hidden');
+            container.classList.remove('guest-closed');
             prompterActive = true;
             // Iniciar anim loop
             lastFrameTime = performance.now();
@@ -1712,6 +1719,16 @@ function updatePrompterState(state) {
     // Update text
     if (textContent.textContent !== state.text) {
         textContent.textContent = state.text;
+        // Text changed significantly => reset scroll to top
+        prompterScrollY = 0;
+        textView.style.transform = `translateY(0px)`;
+        container.classList.remove('guest-closed'); // Host forced new text, re-open it
+        if (!prompterActive) {
+            container.classList.remove('hidden');
+            prompterActive = true;
+            lastFrameTime = performance.now();
+            requestAnimationFrame(prompterAnimationLoop);
+        }
     }
 
     // Update Speed, Playback Status, Size and Margin
@@ -1751,3 +1768,14 @@ function prompterAnimationLoop(currentTime) {
 
     requestAnimationFrame(prompterAnimationLoop);
 }
+
+// Botão de fechar do convidado
+window.closeGuestPrompter = () => {
+    const container = document.getElementById('prompter-container');
+    if (container) {
+        container.classList.add('hidden');
+        container.classList.add('guest-closed');
+        prompterActive = false;
+        isPrompterPlaying = false;
+    }
+};
