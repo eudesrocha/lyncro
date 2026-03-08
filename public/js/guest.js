@@ -9,8 +9,8 @@ const VIDEO_QUALITY_PRESETS = {
 function buildVideoConstraints(qualityKey, extras = {}) {
     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
     return {
-        width:     { ideal: p.width,  max: p.width  },
-        height:    { ideal: p.height, max: p.height },
+        width: { ideal: p.width, max: p.width },
+        height: { ideal: p.height, max: p.height },
         frameRate: { ideal: p.frameRate },   // sem max — evita rejeição em câmeras com 29.97 fps
         ...extras
     };
@@ -136,8 +136,8 @@ async function startPreCall() {
             });
         }
 
-        if (!isMicOn && localStream.getAudioTracks().length > 0) {
-            localStream.getAudioTracks()[0].enabled = false;
+        if (localStream.getAudioTracks().length > 0) {
+            localStream.getAudioTracks()[0].enabled = isMicOn; // Assegura que o estado global permaneceu
         }
 
         // Aplicar processamento de Fundo Virtual (se ativo)
@@ -513,7 +513,10 @@ function unpinParticipant() {
         pinnedVideo.classList.add('hidden');
         pinnedVideo.srcObject = null;
     }
-    if (localVideoEl) localVideoEl.classList.remove('hidden');
+    if (localVideoEl) {
+        localVideoEl.srcObject = processedStream || localStream; // Garante que a tag de vídeo receba o stream atualizado após sair do PiP
+        localVideoEl.classList.remove('hidden');
+    }
     if (nameOverlay) nameOverlay.classList.add('hidden');
 
     // Mostrar PiP card de quem saiu do fullscreen
@@ -581,7 +584,10 @@ function autoSwitchBack() {
         pinnedVideo.classList.add('hidden');
         pinnedVideo.srcObject = null;
     }
-    if (localVideoEl) localVideoEl.classList.remove('hidden');
+    if (localVideoEl) {
+        localVideoEl.srcObject = processedStream || localStream; // Garante a reconexão da imagem
+        localVideoEl.classList.remove('hidden');
+    }
     if (nameOverlay) nameOverlay.classList.add('hidden');
 
     // Mostrar PiP de quem saiu do fullscreen
@@ -839,7 +845,7 @@ function updateOverlay(action, name, title, style) {
     if (!overlay || !nameEl || !titleEl) return;
 
     const useBottomAnim = BOTTOM_ANIM_STYLES.has(style);
-    const animIn  = useBottomAnim ? 'overlay-in-bottom'  : 'overlay-animated-in';
+    const animIn = useBottomAnim ? 'overlay-in-bottom' : 'overlay-animated-in';
     const animOut = useBottomAnim ? 'overlay-out-bottom' : 'overlay-animated-out';
 
     if (action === 'show') {

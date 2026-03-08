@@ -322,6 +322,11 @@ class WebRTCClient {
             const sender = senders.find(s => s.track && s.track.kind === newTrack.kind && s !== this.returnAudioSenders.get(targetId));
             if (sender) {
                 try {
+                    // Garantir que a flag de mutado original permaneça ao repassar
+                    // Em guest.js as variavels isMicOn/isVideoOn lidam com o mute
+                    // Observação de segurança: se a track vier acidentalmente enabled=true enquanto
+                    // a UI local achava que estava mutado, o app passa isMicOn/isVideoOn.
+                    // A nova track DEVE já ter .enabled corrigido no guest/host antes de chamar replaceTrack.
                     await sender.replaceTrack(newTrack);
                     this.log(`Track ${newTrack.kind} replaced for peer ${targetId}`);
                 } catch (e) {
