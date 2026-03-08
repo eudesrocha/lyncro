@@ -11,7 +11,7 @@ function buildVideoConstraints(qualityKey, extras = {}) {
     return {
         width: { ideal: p.width },
         height: { ideal: p.height },
-        frameRate: { ideal: p.frameRate },   // sem max — evita rejeição em câmeras com 29.97 fps
+        // Remover constrição amarrada de FPS para garantir que mais hardwares rodem em 1080p
         ...extras
     };
 }
@@ -962,6 +962,17 @@ async function setupWebSocket() {
                 updateRoomStatus(data.participants);
                 // --- Atualizar nomes e limpar cards PiP de quem saiu ---
                 updateRemoteNames(data.participants);
+
+                const hostP = data.participants.find(p => p.role === 'host');
+                if (hostP && hostP.status !== 'disconnected') {
+                    const banner = document.getElementById('session-banner');
+                    if (banner && banner.textContent.includes('desconectou')) {
+                        banner.className = 'fixed top-0 inset-x-0 z-[300] flex items-center justify-center gap-3 py-3 px-6 text-sm font-bold bg-green-600/90 text-white backdrop-blur-sm shadow-xl transition-opacity duration-1000';
+                        banner.innerHTML = '<i class="ph ph-check-circle text-lg"></i><span>Host reconectado</span>';
+                        setTimeout(() => { if (banner) banner.style.opacity = '0'; }, 2000);
+                        setTimeout(() => { if (banner) banner.remove(); }, 3000);
+                    }
+                }
                 break;
             case 'chat-typing':
                 handleTypingIndicator(data.name, data.isTyping);

@@ -45,7 +45,7 @@ function buildVideoConstraints(qualityKey, extras = {}) {
     return {
         width: { ideal: p.width },
         height: { ideal: p.height },
-        frameRate: { ideal: p.frameRate },   // sem max — evita rejeição em câmeras com 29.97 fps
+        // Sem framerate fixo. O celular usará o padrão que aguentar (30, 24 ou 60).
         ...extras
     };
 }
@@ -456,7 +456,7 @@ function updateUI(participants) {
             updateParticipantStatus(p);
         }
 
-        if (!rtcClient.peers.has(p.id) && p.role !== 'observer' && myId) {
+        if (!rtcClient.peers.has(p.id) && p.role !== 'observer' && myId && myId < p.id) {
             initiateConnection(p.id);
         }
     });

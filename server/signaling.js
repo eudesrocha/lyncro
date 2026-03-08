@@ -8,12 +8,12 @@ const MAX_CONNECTIONS_PER_IP = 10;
 const MAX_MESSAGES_PER_SECOND = 30;
 const connectionsByIp = new Map(); // ip -> count
 
-const HOST_GRACE_MS  = 30_000; // 30s para o host reconectar antes de encerrar a sessão
+const HOST_GRACE_MS = 30_000; // 30s para o host reconectar antes de encerrar a sessão
 const GUEST_GRACE_MS = 30_000; // 30s para convidado aceito reconectar antes de ser removido
 
 function setupSignaling(server) {
     const wss = new WebSocket.Server({ server });
-    const hostGraceTimers  = new Map(); // roomId       -> setTimeout handle
+    const hostGraceTimers = new Map(); // roomId       -> setTimeout handle
     const guestGraceTimers = new Map(); // participantId -> setTimeout handle
 
     wss.on('connection', (ws, req) => {
@@ -205,7 +205,10 @@ function setupSignaling(server) {
 
                     case 'media-control':
                         const rm = roomManager.getRoom(normalizedRoomId);
-                        if (rm && rm.host === participantId) {
+                        if (!rm) break;
+
+                        if (rm.host === participantId) {
+                            // Host tá mutando o convidado
                             const targetParticipant = rm.participants.find(p => p.id === data.targetId);
                             if (targetParticipant) {
                                 const isMute = data.action === 'mute';
@@ -220,13 +223,26 @@ function setupSignaling(server) {
                                     });
                                 }
                             }
-
                             sendToParticipant(normalizedRoomId, data.targetId, {
                                 type: 'media-control',
                                 mediaType: data.mediaType,
                                 action: data.action
                             });
+                        } else {
+                            // O próprio Convidado trocou o botão dele e quer avisar a sala
+                            const isMute = data.action === 'mute';
+                            if (data.mediaType === 'audio') {
+                                roomManager.updateParticipant(normalizedRoomId, participantId, { audioMuted: isMute });
+                            } else if (data.mediaType === 'video') {
+                                roomManager.updateParticipant(normalizedRoomId, participantId, { videoMuted: isMute });
+                            }
                         }
+
+                        // Pra todos atualizarem os hud com o estado novo da mídia (icones de mic cortado)
+                        broadcastToRoom(normalizedRoomId, {
+                            type: 'participant-update',
+                            participants: roomManager.getRoom(normalizedRoomId).participants
+                        });
                         break;
 
                     case 'room-admission':
