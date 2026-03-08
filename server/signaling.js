@@ -105,6 +105,7 @@ function setupSignaling(server) {
 
                                     broadcastToRoom(normalizedRoomId, {
                                         type: 'participant-update',
+                                        layout: existingRoom.layout,
                                         participants: roomManager.getRoom(normalizedRoomId).participants
                                     });
                                     break;
@@ -178,6 +179,12 @@ function setupSignaling(server) {
                             yourId: participantId
                         }));
 
+                        // [FIX] Crucial: Informar ao participante seu status (waiting/accepted)
+                        ws.send(JSON.stringify({
+                            type: 'admission-result',
+                            status: participant.status
+                        }));
+
                         // Avisar a todos na sala sobre a atualização
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
@@ -216,7 +223,11 @@ function setupSignaling(server) {
                             roomManager.leaveRoom(currentRoomId, participantId);
                             const roomNow = roomManager.getRoom(currentRoomId);
                             if (roomNow) {
-                                broadcastToRoom(currentRoomId, { type: 'participant-update', participants: roomNow.participants });
+                                broadcastToRoom(currentRoomId, {
+                                    type: 'participant-update',
+                                    layout: roomNow.layout,
+                                    participants: roomNow.participants
+                                });
                                 // Sinaliza pra limpar webRTC imediatamente no Grid e Host
                                 broadcastToRoom(currentRoomId, { type: 'participant-left', participantId: participantId });
                             }
@@ -253,6 +264,7 @@ function setupSignaling(server) {
 
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
+                                layout: room.layout,
                                 participants: roomManager.getRoom(normalizedRoomId).participants
                             });
                         }
@@ -296,6 +308,7 @@ function setupSignaling(server) {
                         // Pra todos atualizarem os hud com o estado novo da mídia (icones de mic cortado)
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
+                            layout: rm.layout,
                             participants: roomManager.getRoom(normalizedRoomId).participants
                         });
                         break;
@@ -312,6 +325,7 @@ function setupSignaling(server) {
                             // Atualizar a lista de todos
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
+                                layout: rmAdm.layout,
                                 participants: roomManager.getRoom(normalizedRoomId).participants
                             });
                         }
@@ -339,6 +353,7 @@ function setupSignaling(server) {
                             // Broadcast atualização
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
+                                layout: rmKick.layout,
                                 participants: roomManager.getRoom(normalizedRoomId)?.participants || []
                             });
 
@@ -359,6 +374,7 @@ function setupSignaling(server) {
                         roomManager.updateParticipant(normalizedRoomId, participantId, updates);
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
+                            layout: roomManager.getRoom(normalizedRoomId).layout,
                             participants: roomManager.getRoom(normalizedRoomId).participants
                         });
                         break;
@@ -369,6 +385,7 @@ function setupSignaling(server) {
                         });
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
+                            layout: roomManager.getRoom(normalizedRoomId).layout,
                             participants: roomManager.getRoom(normalizedRoomId).participants
                         });
                         break;
@@ -396,6 +413,7 @@ function setupSignaling(server) {
                             // Também avisar a todos sobre a atualização de estado (para quem entrar depois)
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
+                                layout: rmOverlay.layout,
                                 participants: roomManager.getRoom(normalizedRoomId).participants
                             });
                         }
