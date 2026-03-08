@@ -77,6 +77,7 @@ function calculateGrid() {
     cells.forEach(cell => {
         cell.style.flex = `0 1 ${basis}`;
         cell.style.maxWidth = basis;
+        cell.style.height = '';
     });
 }
 
