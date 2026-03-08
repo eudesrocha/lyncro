@@ -1691,7 +1691,7 @@ let localPrompterSizeDeficit = 0;
 let localPrompterSpeedDeficit = 0;
 let lastPrompterStateCache = null;
 
-function updatePrompterState(state) {
+function updatePrompterState(state, keepLocalPlayState = false) {
     lastPrompterStateCache = state;
     const container = document.getElementById('prompter-container');
     const textView = document.getElementById('prompter-scroll-view');
@@ -1782,7 +1782,11 @@ function updatePrompterState(state) {
 
     // Update Speed, Playback Status, Size and Margin
     currentPrompterSpeed = Math.max(1, Math.min(10, (state.speed || 5) + localPrompterSpeedDeficit));
-    isPrompterPlaying = !!state.isPlaying;
+
+    // Ignorar sobrescrita do play status se a chamada veio do redimensionamento do próprio convidado
+    if (!keepLocalPlayState) {
+        isPrompterPlaying = !!state.isPlaying;
+    }
 
     // Se foi restart e já deve rolar, certifique-se que o animLoop está andando
     if (wasRestarted && prompterActive && !prompterAnimId) {
@@ -1924,12 +1928,12 @@ window.togglePrompterPin = () => {
 
 window.changeLocalPrompterSize = (delta) => {
     localPrompterSizeDeficit += delta;
-    if (lastPrompterStateCache) updatePrompterState(lastPrompterStateCache);
+    if (lastPrompterStateCache) updatePrompterState(lastPrompterStateCache, true);
 };
 
 window.changeLocalPrompterSpeed = (delta) => {
     localPrompterSpeedDeficit += delta;
-    if (lastPrompterStateCache) updatePrompterState(lastPrompterStateCache);
+    if (lastPrompterStateCache) updatePrompterState(lastPrompterStateCache, true);
 };
 
 // ── Controles de Toque e Arraste do Convidado ───────────────────────────────
