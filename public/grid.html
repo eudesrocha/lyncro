@@ -240,9 +240,10 @@
             border-radius: 0;
             border: none;
             box-shadow: none;
-            aspect-ratio: 9/16;
-            height: auto;
-            /* largura e max-height calculados via JS conforme contagem */
+            aspect-ratio: 9/16 !important;
+            height: auto !important;
+            max-height: 100vh !important;
+            /* largura calculada via JS conforme contagem */
         }
 
         #grid-container.layout-cnn-vertical .grid-cell video {

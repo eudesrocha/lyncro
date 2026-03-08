@@ -44,10 +44,12 @@ function calculateGrid() {
         else if (c <= 9) { cols = 3; rows = 3; }
         else             { cols = 5; rows = Math.ceil(c / 5); }
 
+        const gapPx = 2;
         const maxH = `${100 / rows}vh`;
         const cells = document.querySelectorAll('.grid-cell');
         cells.forEach(cell => {
-            const w = `calc(100% / ${cols})`;
+            const totalGap = (cols - 1) * gapPx;
+            const w = `calc((100% - ${totalGap}px) / ${cols})`;
             cell.style.flex = `0 0 ${w}`;
             cell.style.maxWidth = w;
             cell.style.maxHeight = maxH;
