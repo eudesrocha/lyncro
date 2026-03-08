@@ -1691,6 +1691,15 @@ function updatePrompterState(state) {
 
     if (!container || !textView || !textContent) return;
 
+    // Verificar se a mensagem é para mim
+    if (state.targetId && state.targetId !== 'all' && state.targetId !== myId) {
+        // Não é pra mim. Esconder sem marcar explicitamente que "eu fechei" pra não bugar se o host mandar de novo depois.
+        container.classList.add('hidden');
+        prompterActive = false;
+        isPrompterPlaying = false;
+        return;
+    }
+
     // Se o texto for limpo e o prompter estiver parado, esconder a janela
     if (!state.text || state.text.trim() === '') {
         container.classList.add('hidden');
@@ -1761,8 +1770,32 @@ function prompterAnimationLoop(currentTime) {
         prompterScrollY -= deltaY;
 
         const textView = document.getElementById('prompter-scroll-view');
-        if (textView) {
+        const textContent = document.getElementById('prompter-text-content');
+
+        if (textView && textContent) {
             textView.style.transform = `translateY(${prompterScrollY}px)`;
+
+            // Auto fade-out quando termina de passar o texto
+            // Altura do container visível: container.offsetHeight (que é 45vh).
+            // O textView tem padding-top: 22vh.
+            const containerHeight = document.documentElement.clientHeight * 0.45;
+            const textHeight = textContent.getBoundingClientRect().height;
+            // Considerando o padding-top de 22vh (~metade da altura do container)
+            // O texto sai totalmente de tela quando subiu a sua própria altura + o padding superior
+            const maxScroll = (containerHeight / 2) + textHeight + 60; // Margem extra de safety
+
+            if (prompterScrollY < -maxScroll) {
+                // Chegou exatamente ao fim
+                const container = document.getElementById('prompter-container');
+                isPrompterPlaying = false;
+                if (container) {
+                    container.style.opacity = '0'; // Dispara a transição css
+                    setTimeout(() => {
+                        closeGuestPrompter();
+                        container.style.opacity = ''; // Reseta pro inline limpo
+                    }, 500);
+                }
+            }
         }
     }
 

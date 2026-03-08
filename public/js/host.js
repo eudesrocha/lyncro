@@ -497,6 +497,25 @@ function updateUI(participants) {
         }
     });
 
+    // Atualizar opções do Teleprompter
+    const targetSelect = document.getElementById('prompter-target');
+    if (targetSelect) {
+        const currentSelected = targetSelect.value;
+        let optionsHtml = '<option value="all">Todos os Convidados</option>';
+        participants.forEach(p => {
+            if (p.role !== 'host' && p.role !== 'observer' && p.status === 'accepted' && p.id !== myId) {
+                optionsHtml += `<option value="${p.id}">${p.name}</option>`;
+            }
+        });
+        targetSelect.innerHTML = optionsHtml;
+        if (Array.from(targetSelect.options).some(opt => opt.value === currentSelected)) {
+            targetSelect.value = currentSelected;
+        } else {
+            targetSelect.value = 'all';
+            prompterState.targetId = 'all';
+        }
+    }
+
     // Atualizar snapshot da fila para detectar novos na próxima chamada
     prevWaitingIds = new Set(participants.filter(p => p.status === 'waiting').map(p => p.id));
 }
@@ -1658,6 +1677,7 @@ window.copyMasterGridLink = () => {
 
 // ── Teleprompter Logic ───────────────────────────────────────────────────────
 let prompterState = {
+    targetId: 'all',
     text: '',
     isPlaying: false,
     speed: 5,
@@ -1706,11 +1726,18 @@ function broadcastPrompterState() {
 
 // Hook inputs após o carregamento
 document.addEventListener('DOMContentLoaded', () => {
+    const pTarget = document.getElementById('prompter-target');
     const pText = document.getElementById('prompter-text');
     const pSpeed = document.getElementById('prompter-speed');
     const pSize = document.getElementById('prompter-size');
     const pMargin = document.getElementById('prompter-margin');
 
+    if (pTarget) {
+        pTarget.addEventListener('change', (e) => {
+            prompterState.targetId = e.target.value;
+            broadcastPrompterState();
+        });
+    }
     if (pText) {
         pText.addEventListener('input', (e) => {
             prompterState.text = e.target.value;
