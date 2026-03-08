@@ -1847,3 +1847,73 @@ window.closeGuestPrompter = () => {
         isPrompterPlaying = false;
     }
 };
+
+// ── Controles de Toque e Arraste do Convidado ───────────────────────────────
+let isPrompterDragging = false;
+let prompterDragStartY = 0;
+let prompterDragStartScrollY = 0;
+let prompterHasMoved = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    const container = document.getElementById('prompter-container');
+    if (container) {
+        container.style.cursor = 'grab';
+        container.style.touchAction = 'none'; // Evita scroll natural da página no mobile
+
+        container.addEventListener('pointerdown', (e) => {
+            if (!prompterActive) return;
+            // Ignorar se clicou no botão de fechar
+            if (e.target.closest('button')) return;
+
+            isPrompterDragging = true;
+            prompterHasMoved = false;
+            prompterDragStartY = e.clientY;
+            prompterDragStartScrollY = prompterScrollY;
+            container.style.cursor = 'grabbing';
+            // Impede seleção de texto enquanto arrasta
+            e.preventDefault();
+        });
+
+        window.addEventListener('pointermove', (e) => {
+            if (!isPrompterDragging || !prompterActive) return;
+
+            const deltaY = e.clientY - prompterDragStartY;
+            if (Math.abs(deltaY) > 5) {
+                prompterHasMoved = true;
+            }
+
+            if (prompterHasMoved) {
+                prompterScrollY = prompterDragStartScrollY + deltaY;
+                isPrompterPlaying = false; // Pausa o motor automático
+
+                const textView = document.getElementById('prompter-scroll-view');
+                if (textView) {
+                    textView.style.transform = `translateY(${prompterScrollY}px)`;
+                }
+            }
+        });
+
+        window.addEventListener('pointerup', (e) => {
+            if (!isPrompterDragging) return;
+            isPrompterDragging = false;
+            if (container) container.style.cursor = 'grab';
+
+            if (!prompterHasMoved) {
+                // Foi apenas um clique, sem arrastar -> Toggle Play/Pause
+                isPrompterPlaying = !isPrompterPlaying;
+
+                // Forçar acordar animação se estava dormente
+                if (isPrompterPlaying && !prompterAnimId && prompterActive) {
+                    lastFrameTime = performance.now();
+                    prompterAnimId = requestAnimationFrame(prompterAnimationLoop);
+                }
+            }
+        });
+
+        window.addEventListener('pointercancel', (e) => {
+            if (!isPrompterDragging) return;
+            isPrompterDragging = false;
+            if (container) container.style.cursor = 'grab';
+        });
+    }
+});
