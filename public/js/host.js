@@ -627,11 +627,11 @@ function renderParticipantCard(participant, isLocal = false) {
                 class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}">
                 Disparar
               </button>
-              ${participant.overlayActive ? `
-              <button onclick="hideOverlay('${participant.id}')" title="Ocultar Lower Third"
-                class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-win transition-all bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-500/30">
+              <button id="btn-hide-ov-${participant.id}" onclick="hideOverlay('${participant.id}')" title="Ocultar Lower Third"
+                class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-win transition-all bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-500/30"
+                style="display:${participant.overlayActive ? 'inline-flex' : 'none'}; align-items:center; justify-content:center;">
                 ×
-              </button>` : ''}
+              </button>
             </div>
           </div>
           <div class="flex gap-1.5">
@@ -819,7 +819,11 @@ function updateParticipantStatus(p) {
     const btnOv = document.getElementById(`btn-ov-toggle-${p.id}`);
     if (btnOv) {
         btnOv.className = `text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${p.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}`;
-        btnOv.textContent = p.overlayActive ? 'Ocultar' : 'Disparar';
+        btnOv.textContent = 'Disparar';
+    }
+    const btnHideOv = document.getElementById(`btn-hide-ov-${p.id}`);
+    if (btnHideOv) {
+        btnHideOv.style.display = p.overlayActive ? 'inline-flex' : 'none';
     }
 }
 

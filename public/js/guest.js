@@ -819,27 +819,33 @@ function handleIceCandidate(targetId, candidate) {
     }
 }
 
-function updateOverlay(action, name, title) {
+const BOTTOM_ANIM_STYLES = new Set(['broadcast', 'corporate', 'fade']);
+
+function updateOverlay(action, name, title, style) {
     const overlay = document.getElementById('lower-third');
+    const box = document.getElementById('lt-box');
     const nameEl = document.getElementById('ov-display-name');
     const titleEl = document.getElementById('ov-display-title');
 
     if (!overlay || !nameEl || !titleEl) return;
 
+    const useBottomAnim = BOTTOM_ANIM_STYLES.has(style);
+    const animIn  = useBottomAnim ? 'overlay-in-bottom'  : 'overlay-animated-in';
+    const animOut = useBottomAnim ? 'overlay-out-bottom' : 'overlay-animated-out';
+
     if (action === 'show') {
+        if (box && style) box.className = `lt-${style}`;
         nameEl.textContent = name;
         titleEl.textContent = title;
-        overlay.classList.remove('overlay-animated-out');
-        overlay.classList.add('overlay-animated-in');
+        overlay.classList.remove('overlay-animated-in', 'overlay-animated-out', 'overlay-in-bottom', 'overlay-out-bottom');
+        void overlay.offsetWidth;
+        overlay.classList.add(animIn);
         overlay.style.opacity = '1';
     } else {
-        overlay.classList.remove('overlay-animated-in');
-        overlay.classList.add('overlay-animated-out');
-        // Oculta após a animação
+        overlay.classList.remove('overlay-animated-in', 'overlay-animated-out', 'overlay-in-bottom', 'overlay-out-bottom');
+        overlay.classList.add(animOut);
         setTimeout(() => {
-            if (overlay.classList.contains('overlay-animated-out')) {
-                overlay.style.opacity = '0';
-            }
+            if (overlay.classList.contains(animOut)) overlay.style.opacity = '0';
         }, 400);
     }
 }
@@ -985,7 +991,7 @@ async function setupWebSocket() {
                 break;
             case 'overlay-control':
                 console.log('Overlay control received:', data);
-                updateOverlay(data.action, data.name, data.title);
+                updateOverlay(data.action, data.name, data.title, data.style);
                 break;
             case 'chat':
                 appendChatMessage(data.name, data.text, data.timestamp);
