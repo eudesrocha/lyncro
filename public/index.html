@@ -577,7 +577,7 @@
                                             class="ph ph-hash absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
                                         <input type="text" id="hostRoomId" data-i18n-ph="ph_project" placeholder="Ex: Masterclass-Tech"
                                             class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
-                                            oninput="clearFieldError('err-create-room')">
+                                            oninput="slugifyRoomInput(this); clearFieldError('err-create-room')">
                                     </div>
                                     <p id="err-create-room"
                                         class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
@@ -830,6 +830,20 @@
             startAutoSlide();
         }
 
+
+        // Converte o que o usuário digita em slug URL-safe em tempo real
+        function slugifyRoomInput(el) {
+            const pos = el.selectionStart;
+            const raw = el.value;
+            // Substitui espaços por hífen durante a digitação; remove caracteres inválidos
+            el.value = raw
+                .replace(/ /g, '-')
+                .replace(/[^\w\-]/g, '')
+                .replace(/-{2,}/g, '-');
+            // Restaurar posição do cursor
+            const diff = raw.length - el.value.length;
+            el.setSelectionRange(Math.max(0, pos - diff), Math.max(0, pos - diff));
+        }
 
         // Submissão API
         async function handleCreateRoom() {

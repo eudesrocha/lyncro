@@ -10,6 +10,19 @@ const { verifySupabaseToken, getUserPlan } = require('./auth');
 const app = express();
 const server = http.createServer(app);
 
+// Converte o nome digitado pelo usuário num slug URL-safe
+// "Masterclass Tech 2024!" → "Masterclass-Tech-2024"
+function slugifyRoomName(raw) {
+    if (!raw || typeof raw !== 'string') return '';
+    return raw
+        .trim()
+        .replace(/\s+/g, '-')          // espaços → hífen
+        .replace(/[^\w\-]/g, '')       // remove chars especiais (mantém letras, dígitos, _ e -)
+        .replace(/-{2,}/g, '-')        // múltiplos hífens → um
+        .replace(/^-+|-+$/g, '')       // remove hífens nas pontas
+        .slice(0, 80);                 // limite de comprimento
+}
+
 // Configuração para Nuvem (Heroku, Railway, etc.)
 app.set('trust proxy', 1);
 
@@ -97,7 +110,9 @@ app.post('/api/rooms', async (req, res) => {
         }
 
         // Armazenar userId no metadata da sala para rastreamento
-        const { name, password } = req.body;
+        const { password } = req.body;
+        const name = slugifyRoomName(req.body.name);
+        if (!name) return res.status(400).json({ error: 'Nome da sala inválido.' });
         const roomId = roomManager.createRoom(name, password, supabaseUser.id);
         console.log(`[ROOM CREATED] "${name}" por userId=${supabaseUser.id} (plano=${plan})`);
         return res.json({ roomId, plan });
@@ -105,7 +120,9 @@ app.post('/api/rooms', async (req, res) => {
 
     // Dev mode sem Supabase: criar sala sem restrição (com aviso)
     console.warn('[ROOM CREATED] Dev mode — sem verificação de auth/plano.');
-    const { name, password } = req.body;
+    const { password } = req.body;
+    const name = slugifyRoomName(req.body.name);
+    if (!name) return res.status(400).json({ error: 'Nome da sala inválido.' });
     const roomId = roomManager.createRoom(name, password);
     res.json({ roomId });
 });
