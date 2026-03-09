@@ -431,8 +431,8 @@ async function setupWebSocket() {
                         }
                         // Se chegou aqui, sessão está realmente expirada
                         wsIntentionalClose = true;
-                        alert('Sessão expirada. Faça login novamente.');
-                        window.location.href = 'login.html';
+                        lyncroToast.warning('Sessão expirada. Redirecionando para login...', 3000);
+                        setTimeout(() => { window.location.href = 'login.html'; }, 2000);
                     })();
                 } else {
                     showToast(data.message || 'Erro no servidor.', 'error');
@@ -1634,7 +1634,7 @@ window.switchHostDevice = async (deviceId, kind) => {
         console.log(`Dispositivo [${kind}] do Host alterado para: ${deviceId}`);
     } catch (e) {
         console.error(`Erro ao trocar de ${kind} no Host:`, e);
-        alert('Mídia bloqueada ou ocupada. Tente novamente.');
+        lyncroToast.warning('Mídia bloqueada ou ocupada. Tente novamente.');
     }
 };
 

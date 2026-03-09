@@ -20,6 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/auth.js"></script>
     <script src="js/theme.js"></script>
+    <script src="js/toast.js"></script>
 </head>
 <style>
     .glass-panel {
@@ -89,6 +90,12 @@
                     class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
             </div>
 
+            <!-- Erro inline — aparece abaixo dos campos antes dos botões -->
+            <div id="login-error" class="hidden flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-[12px] font-medium">
+                <i class="ph ph-warning-circle text-base flex-shrink-0 mt-0.5"></i>
+                <span id="login-error-msg"></span>
+            </div>
+
             <div class="flex flex-col gap-3">
                 <button onclick="handlePasswordLogin()" id="btn-password"
                     class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-lg text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95">
@@ -124,11 +131,24 @@
     </div>
 
     <script>
+        function showLoginError(msg) {
+            const el  = document.getElementById('login-error');
+            const txt = document.getElementById('login-error-msg');
+            if (!el || !txt) return;
+            txt.textContent = msg;
+            el.classList.remove('hidden');
+        }
+        function clearLoginError() {
+            const el = document.getElementById('login-error');
+            if (el) el.classList.add('hidden');
+        }
+
         async function handlePasswordLogin() {
-            const email = document.getElementById('email').value.trim();
+            clearLoginError();
+            const email    = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
 
-            if (!email || !password) return alert('Insira seu email e senha');
+            if (!email || !password) return showLoginError('Insira seu email e senha.');
 
             const btn = document.getElementById('btn-password');
             btn.disabled = true;
@@ -136,18 +156,18 @@
 
             try {
                 await window.LYNCRO_AUTH.loginWithPassword(email, password);
-                // O evento supabase-ready será disparado pelo auth.js se der sucesso
                 window.location.href = 'index.html';
             } catch (err) {
-                alert('Erro ao fazer login: ' + err.message);
+                showLoginError('Erro ao fazer login: ' + err.message);
                 btn.disabled = false;
                 btn.textContent = 'Entrar com Senha';
             }
         }
 
         async function handleEmailLogin() {
+            clearLoginError();
             const email = document.getElementById('email').value.trim();
-            if (!email) return alert('Insira seu email');
+            if (!email) return showLoginError('Insira seu endereço de email.');
 
             const btn = document.getElementById('btn-email');
             btn.disabled = true;
@@ -158,7 +178,7 @@
                 document.getElementById('login-form').classList.add('hidden');
                 document.getElementById('check-email').classList.remove('hidden');
             } catch (err) {
-                alert('Erro ao enviar email: ' + err.message);
+                showLoginError('Erro ao enviar email: ' + err.message);
                 btn.disabled = false;
                 btn.innerHTML = '<i class="ph ph-envelope-simple text-sm"></i> Enviar Link Mágico';
             }

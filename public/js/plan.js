@@ -125,7 +125,7 @@
                 if (data.url) window.location.href = data.url;
             } catch (err) {
                 console.error('[plan] Erro ao criar checkout:', err.message);
-                alert(_t('err_checkout') + err.message);
+                lyncroToast.error(_t('err_checkout') + err.message);
                 if (btn) { btn.disabled = false; btn.textContent = _t('btn_subscribe'); }
             }
         },
@@ -136,7 +136,7 @@
                 if (data.url) window.open(data.url, '_blank');
             } catch (err) {
                 console.error('[plan] Erro ao abrir portal:', err.message);
-                alert(_t('err_portal') + err.message);
+                lyncroToast.error(_t('err_portal') + err.message);
             }
         },
 

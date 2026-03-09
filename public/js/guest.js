@@ -1028,8 +1028,7 @@ async function setupWebSocket() {
                     console.log('Fui aceito! Renderizando Call Screen e liberando Ice Candidates.');
                 } else if (data.status === 'rejected') {
                     wsIntentionalClose = true;
-                    alert('Sua entrada não foi aprovada pelo Produtor.');
-                    window.location.reload();
+                    showSessionEndedScreen('Sua entrada não foi aprovada pelo produtor.');
                 }
                 break;
             case 'offer':
@@ -1111,7 +1110,7 @@ async function setupWebSocket() {
                 break;
             case 'error':
                 console.error('SERVER ERROR:', data.message);
-                alert(data.message);
+                lyncroToast.error(data.message, 8000);
                 // Se o erro for senha, voltamos para a tela de pré-chamada
                 if (data.message.includes('Senha')) {
                     const waitingScreen = document.getElementById('waiting-screen');
@@ -1386,7 +1385,7 @@ if (mediaDropBtn && fileInput) {
             fileInput.value = ''; // Reset
         } catch (err) {
             console.error('Falha no Media Drop:', err);
-            alert(`Erro no P2P: ${err.message || 'Falha desconhecida'}`);
+            lyncroToast.error(`Erro no P2P: ${err.message || 'Falha desconhecida'}`);
             const progressEl = document.getElementById('file-progress-overlay');
             if (progressEl) progressEl.classList.add('hidden');
             fileInput.value = '';
@@ -1470,7 +1469,7 @@ window.switchDevice = async (deviceId, kind) => {
         console.log(`Dispositivo de ${kind} trocado com sucesso para ${deviceId}`);
     } catch (e) {
         console.error(`Erro ao trocar dispositivo de ${kind}:`, e);
-        alert('Erro ao trocar de câmera/microfone.');
+        lyncroToast.warning('Erro ao trocar de câmera/microfone.');
     }
 };
 
