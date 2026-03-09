@@ -648,12 +648,10 @@ function renderParticipantCard(participant, isLocal = false) {
           <i class="ph ph-text-aa text-sm"></i>
         </button>
 
-        <!-- Botão 4: Ajustes de Imagem (Guests only) -->
-        ${isLocal ? '' : `
+        <!-- Botão 4: Ajustes de Imagem -->
         <button onclick="toggleCardPanel('img-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/5 transition-all" title="Ajustes de Imagem">
           <i class="ph ph-sliders-horizontal text-sm"></i>
         </button>
-        `}
 
         <!-- Botão 5: VB (Host) / Tally (Guest) -->
         ${isLocal ? `
@@ -703,8 +701,7 @@ function renderParticipantCard(participant, isLocal = false) {
         </div>
       </div>
 
-      <!-- Painel Colapsável: Ajustes de Imagem (Guests only) -->
-      ${isLocal ? '' : `
+      <!-- Painel Colapsável: Ajustes de Imagem -->
       <div id="img-panel-${participant.id}" class="hidden px-3 pb-3 bg-white/5 border-t border-win-border/10">
         <div class="flex flex-col gap-2.5 pt-3">
           <div class="flex justify-between items-center">
@@ -756,7 +753,6 @@ function renderParticipantCard(participant, isLocal = false) {
           </div>
         </div>
       </div>
-      `}
 
       ${isLocal ? `
       <!-- Painel Colapsável: Fundo Virtual (Host Only) -->
@@ -1357,8 +1353,9 @@ function buildFilterCSS(f) {
 
 function sendVideoAdjust(pId) {
     const f = getVideoFilter(pId);
-    if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'video-adjust', roomId: roomName, targetId: pId, ...f }));
+    const targetId = pId === 'local' ? myId : pId; // grid uses server-assigned ID
+    if (ws && ws.readyState === WebSocket.OPEN && targetId) {
+        ws.send(JSON.stringify({ type: 'video-adjust', roomId: roomName, targetId, ...f }));
     }
 }
 
@@ -1857,7 +1854,7 @@ window.changeLayout = function (layoutId) {
         window.currentRoomSettings.layout = layoutId;
         applyLayoutPickerActive(layoutId);
 
-        const labels = { 'auto-grid': 'Auto Grid', 'cnn-split': 'CNN Split', 'cnn-vertical': 'CNN Vertical', 'portrait-cards': 'Portrait Cards', 'speaker-highlight': 'Highlight' };
+        const labels = { 'auto-grid': 'Auto Grid', 'dynamic-cards': 'Dynamic Cards', 'cnn-split': 'CNN Split', 'cnn-vertical': 'CNN Vertical', 'portrait-cards': 'Portrait Cards', 'speaker-highlight': 'Highlight' };
         showToast(`Layout: ${labels[layoutId] || layoutId}`, 'success');
     }
 };

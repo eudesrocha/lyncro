@@ -181,6 +181,24 @@
                 return cells;
             }
 
+            case 'dynamic-cards': {
+                const cols_dc = Math.ceil(Math.sqrt(n));
+                const rows_dc = Math.ceil(n / cols_dc);
+                const gapPx_dc = 12;
+                const padPx_dc = 12;
+                const availW_dc = CANVAS_W - padPx_dc * 2 - gapPx_dc * (cols_dc - 1);
+                const availH_dc = CANVAS_H - padPx_dc * 2 - gapPx_dc * (rows_dc - 1);
+                const cardW_dc = Math.round(availW_dc / cols_dc);
+                const cardH_dc = Math.round(availH_dc / rows_dc);
+                const totalRowW_dc = cols_dc * cardW_dc + (cols_dc - 1) * gapPx_dc;
+                const startX_dc = Math.round((CANVAS_W - totalRowW_dc) / 2);
+                return Array.from({ length: n }, (_, i) => ({
+                    x: startX_dc + (i % cols_dc) * (cardW_dc + gapPx_dc),
+                    y: padPx_dc  + Math.floor(i / cols_dc) * (cardH_dc + gapPx_dc),
+                    w: cardW_dc, h: cardH_dc, rounded: 16, cover: true,
+                }));
+            }
+
             default:
                 return computeAutoGrid(n);
         }

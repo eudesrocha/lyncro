@@ -99,6 +99,7 @@
             btn_invite_tooltip: 'Copiar Link de Convite',
             // Layouts
             layout_auto_grid: 'Auto Grid',
+            layout_dynamic_cards: 'Dynamic Cards',
             layout_cnn_split: 'CNN Split',
             layout_cnn_vertical: 'CNN Vertical',
             layout_portrait_cards: 'Portrait Cards',
@@ -267,6 +268,7 @@
             btn_invite_tooltip: 'Copy Invite Link',
             // Layouts
             layout_auto_grid: 'Auto Grid',
+            layout_dynamic_cards: 'Dynamic Cards',
             layout_cnn_split: 'CNN Split',
             layout_cnn_vertical: 'CNN Vertical',
             layout_portrait_cards: 'Portrait Cards',

@@ -482,6 +482,11 @@
                                     <i class="ph ph-squares-four text-sm shrink-0"></i>
                                     <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_auto_grid">Auto Grid</span>
                                 </button>
+                                <button onclick="changeLayout('dynamic-cards'); closeLayoutPicker()" id="layout-dynamic-cards"
+                                    class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
+                                    <i class="ph ph-browser text-sm shrink-0"></i>
+                                    <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_dynamic_cards">Dynamic Cards</span>
+                                </button>
                                 <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('CNN Split')) return; changeLayout('cnn-split'); closeLayoutPicker()" id="layout-cnn-split"
                                     data-pro-feature="CNN Split"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
@@ -714,6 +719,9 @@
             cursor: pointer;
             display: block;
         }
+        [data-theme="light"] .lyncro-slider {
+            background: rgba(0,0,0,0.18);
+        }
         .lyncro-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             width: 14px;
@@ -724,6 +732,9 @@
             box-shadow: 0 0 6px rgba(0,120,212,0.55);
             cursor: pointer;
             transition: transform 0.12s, box-shadow 0.12s;
+        }
+        [data-theme="light"] .lyncro-slider::-webkit-slider-thumb {
+            border-color: rgba(0,0,0,0.15);
         }
         .lyncro-slider::-webkit-slider-thumb:hover {
             transform: scale(1.25);
@@ -736,6 +747,9 @@
             background: #0078d4;
             border: 2px solid rgba(255,255,255,0.25);
             cursor: pointer;
+        }
+        [data-theme="light"] .lyncro-slider::-moz-range-thumb {
+            border-color: rgba(0,0,0,0.15);
         }
 
         #settings-modal-inner header {

@@ -61,6 +61,27 @@ function calculateGrid() {
         return;
     }
 
+    // Dynamic Cards: preenche a tela, sem 16:9. ceil(sqrt(n)) cols × ceil(n/cols) rows
+    if (currentLayout === 'dynamic-cards') {
+        const c = count || 1;
+        const cols = Math.ceil(Math.sqrt(c));
+        const rows = Math.ceil(c / cols);
+        const gapPx = 12;
+        const padPx = 12;
+        const availW = container.clientWidth  - padPx * 2 - gapPx * (cols - 1);
+        const availH = container.clientHeight - padPx * 2 - gapPx * (rows - 1);
+        const cardW = Math.floor(availW / cols);
+        const cardH = Math.floor(availH / rows);
+        document.querySelectorAll('.grid-cell').forEach(cell => {
+            cell.style.flex      = `0 0 ${cardW}px`;
+            cell.style.width     = `${cardW}px`;
+            cell.style.maxWidth  = `${cardW}px`;
+            cell.style.height    = `${cardH}px`;
+            cell.style.maxHeight = `${cardH}px`;
+        });
+        return;
+    }
+
     // Portrait Cards: height-first — todas as linhas cabem na tela, espaço lateral é livre
     if (currentLayout === 'portrait-cards') {
         const c = count || 1;
@@ -245,7 +266,7 @@ function applyLayout(layoutId) {
     }
 
     // Remover classes antigas
-    container.classList.remove('layout-auto-grid', 'layout-cnn-split', 'layout-cnn-vertical', 'layout-portrait-cards', 'layout-speaker-highlight');
+    container.classList.remove('layout-auto-grid', 'layout-cnn-split', 'layout-cnn-vertical', 'layout-portrait-cards', 'layout-speaker-highlight', 'layout-dynamic-cards');
 
     // Adicionar nova
     container.classList.add(`layout-${layoutId}`);
