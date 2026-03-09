@@ -37,7 +37,7 @@ begin
     new.email,
     -- Se o e-mail for o seu e-mail do Google, define como 'admin', senão define como 'user'
     case
-      when new.email = 'eudesrocha1@yahoo.com.br' then 'admin'
+      when new.email = 'eudesrocha1@gmail.com' then 'admin'
       else 'user'
     end,
     'free' -- plano padrão para novos usuários
@@ -52,10 +52,10 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- IMPORTANTE: Se a sua conta Google tiver outro email que não seja eudesrocha1@yahoo.com.br, altere na linha 25.
--- TAMBÉM IMPORTANTE: Se a sua conta "eudesrocha1@yahoo.com.br" JÁ EXISTIR no sistema (você já logou), o trigger de "novo usuário" não vai rodar para ela. 
+-- IMPORTANTE: Se a sua conta Google tiver outro email que não seja eudesrocha1@gmail.com, altere na linha 40.
+-- TAMBÉM IMPORTANTE: Se a sua conta "eudesrocha1@gmail.com" JÁ EXISTIR no sistema (você já logou), o trigger de "novo usuário" não vai rodar para ela.
 -- Nesse caso, rode esse comando extra abaixo separado para forçar ela a virar admin:
 
--- insert into public.profiles (id, email, role) 
--- select id, email, 'admin' from auth.users where email = 'eudesrocha1@yahoo.com.br'
+-- insert into public.profiles (id, email, role)
+-- select id, email, 'admin' from auth.users where email = 'eudesrocha1@gmail.com'
 -- on conflict (id) do update set role = 'admin';
