@@ -316,7 +316,7 @@
                     data-pro-feature="Gravação"
                     class="flex items-center justify-center px-3 h-8 rounded-lg border border-transparent hover:bg-red-600/20 hover:text-red-400 hover:border-red-500/30 transition-all text-[10px] font-bold uppercase tracking-widest text-gray-400 group gap-1.5">
                     <i class="ph ph-record text-sm"></i>
-                    <span class="rec-label pb-px hidden md:inline">Gravar</span>
+                    <span class="rec-label pb-px hidden md:inline" data-i18n="btn_record">Gravar</span>
                 </button>
             </div>
         </div>
@@ -350,13 +350,13 @@
                 </button>
                 <select id="return-audio-select"
                     class="bg-transparent border-none text-[10px] font-bold text-gray-400 outline-none w-24 cursor-pointer uppercase tracking-tight"
-                    title="Dispositivo de Áudio de Retorno">
-                    <option value="">Retorno (Auto)</option>
+                    data-i18n-title="title_return_audio" title="Dispositivo de Áudio de Retorno">
+                    <option value="" data-i18n="lbl_return">Retorno (Auto)</option>
                 </select>
                 <div class="w-px h-4 bg-white/10"></div>
                 <select id="host-quality-select" onchange="changeHostQuality(this.value)"
                     class="bg-transparent border-none text-[10px] font-bold text-gray-400 outline-none cursor-pointer uppercase tracking-tight"
-                    title="Qualidade da sua câmera local">
+                    data-i18n-title="title_cam_quality" title="Qualidade da sua câmera local">
                     <option value="1080_30">1080p30</option>
                     <option value="720" selected>720pHD</option>
                     <option value="480">480p</option>
@@ -366,7 +366,7 @@
             <div class="relative" id="settings-picker-wrap">
                 <button id="btn-settings" onclick="toggleSettingsPicker()"
                     class="flex size-9 items-center justify-center rounded-xl hover:bg-white/10 border border-white/5 transition-colors text-gray-400 hover:text-white"
-                    title="Configurações da Produção">
+                    data-i18n-title="title_settings" title="Configurações da Produção">
                     <i class="ph ph-gear text-lg"></i>
                 </button>
                 <div id="settings-picker-menu"
@@ -418,7 +418,7 @@
             <button
                 onclick="if(ws && ws.readyState === WebSocket.OPEN){ ws.send(JSON.stringify({type: 'session-ended', roomId: roomName})); ws.close(); wsIntentionalClose = true; } window.location.href='index.html'"
                 class="flex size-9 items-center justify-center rounded-xl bg-red-600/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 transition-colors text-red-500 hover:text-white"
-                title="Encerrar Sessão">
+                data-i18n-title="title_end_session" title="Encerrar Sessão">
                 <i class="ph ph-power text-lg"></i>
             </button>
 
@@ -537,7 +537,7 @@
                     class="px-5 py-3 border-b border-white/5 flex items-center justify-between bg-white/5 cursor-pointer"
                     onclick="togglePrompterUI()">
                     <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
-                        <i class="ph ph-scroll text-win-accent text-sm"></i> Teleprompter
+                        <i class="ph ph-scroll text-win-accent text-sm"></i> <span data-i18n="section_teleprompter">Teleprompter</span>
                     </h2>
                     <i class="ph ph-caret-down text-gray-400 transition-transform hover:text-white"
                         id="prompter-caret"></i>
@@ -547,24 +547,24 @@
                     <div class="flex flex-col gap-1.5">
                         <label
                             class="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5">
-                            <i class="ph ph-target"></i> Exibir para
+                            <i class="ph ph-target"></i> <span data-i18n="label_show_to">Exibir para</span>
                         </label>
                         <select id="prompter-target"
                             class="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-win-accent transition-colors appearance-none cursor-pointer">
-                            <option value="all">Todos os Convidados</option>
+                            <option value="all" data-i18n="label_all_guests">Todos os Convidados</option>
                         </select>
                     </div>
 
                     <textarea id="prompter-text"
                         class="w-full h-28 bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-win-accent transition-colors text-xs placeholder:text-gray-600 font-medium custom-scrollbar theme-text"
-                        placeholder="Cole o Roteiro para os Convidados aqui..."></textarea>
+                        data-i18n-ph="ph_prompter" placeholder="Cole o roteiro para os convidados aqui..."></textarea>
 
                     <!-- Linha única: Play + pílulas de Velocidade e Tamanho -->
                     <div class="flex items-center gap-2">
                         <!-- Play -->
                         <button id="btn-prompter-play" onclick="togglePrompterPlayback()"
                             class="w-8 h-8 rounded-xl bg-win-accent/20 text-win-accent border border-win-accent/30 hover:bg-win-accent hover:text-white flex items-center justify-center transition-all shrink-0"
-                            title="Rolar Texto">
+                            data-i18n-title="title_scroll" title="Rolar Texto">
                             <i id="ico-prompter-play" class="ph ph-play text-base"></i>
                         </button>
 
@@ -595,7 +595,7 @@
 
                     <!-- Slider de Margem (discreto) -->
                     <div class="flex items-center gap-2 px-1">
-                        <i class="ph ph-arrows-in-line-horizontal text-base text-gray-500 shrink-0" title="Margem Horizontal"></i>
+                        <i class="ph ph-arrows-in-line-horizontal text-base text-gray-500 shrink-0" data-i18n-title="title_margin_h" title="Margem Horizontal"></i>
                         <input id="slider-prompter-margin" type="range" min="0" max="40" step="5" value="5"
                             oninput="setPrompterMargin(this.value)"
                             class="flex-1 h-1 accent-win-accent cursor-pointer opacity-50 hover:opacity-90 transition-opacity">
@@ -607,7 +607,7 @@
             <section class="glass-panel rounded-2xl flex flex-col min-h-0 flex-1 overflow-hidden">
                 <header class="px-5 py-3 border-b border-white/5 bg-white/5">
                     <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
-                        <i class="ph ph-chat-text text-win-accent text-sm"></i> Chat de Produção
+                        <i class="ph ph-chat-text text-win-accent text-sm"></i> <span data-i18n="section_chat">Chat de Produção</span>
                     </h2>
                 </header>
                 <div id="tab-content-chat" class="flex-1 flex flex-col overflow-hidden">
@@ -617,7 +617,7 @@
                     </div>
                     <div id="typing-indicator" class="px-4 py-1 text-[10px] text-win-accent italic hidden"></div>
                     <div class="p-3 border-t border-white/5 bg-black/20 flex items-center gap-2 shrink-0">
-                        <input type="text" id="chat-input" placeholder="Mensagem para equipe..."
+                        <input type="text" id="chat-input" data-i18n-ph="ph_chat" placeholder="Mensagem para equipe..."
                             class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 outline-none focus:border-win-accent transition-colors text-xs placeholder:text-gray-600 font-medium">
                         <button id="send-chat"
                             class="bg-win-accent text-white w-10 h-10 rounded-xl flex items-center justify-center hover:bg-win-accent/90 transition-all active:scale-95 shadow-lg shadow-win-accent/20">
@@ -663,13 +663,11 @@
                 <i class="ph ph-qr-code text-win-accent text-3xl"></i>
             </div>
             <h3 class="text-xl font-bold mb-2 font-sync tracking-tight">Lyncro Camera</h3>
-            <p class="text-xs text-gray-400 mb-6 font-sans">Escaneie o código com seu celular para adicioná-lo como
-                câmera secundária (Multi-Cam).</p>
+            <p class="text-xs text-gray-400 mb-6 font-sans" data-i18n="qr_desc">Escaneie o código com seu celular para adicioná-lo como câmera secundária (Multi-Cam).</p>
             <div class="bg-white p-4 rounded-2xl inline-block mb-4 shadow-xl">
                 <div id="qrcode-container"></div>
             </div>
-            <p class="text-[10px] text-win-accent uppercase tracking-widest font-bold font-sans">Emparelhamento
-                Silencioso</p>
+            <p class="text-[10px] text-win-accent uppercase tracking-widest font-bold font-sans" data-i18n="qr_badge">Emparelhamento Silencioso</p>
         </div>
     </div>
 

@@ -150,6 +150,30 @@
             btn_loading_join: 'Verificando...',
             err_api: 'Erro ao criar sala. Verifique a conexão.',
             btn_logout: 'Sair',
+            // Host navbar / controles
+            btn_record: 'Gravar',
+            label_room: 'SALA',
+            label_room_active: 'SALA ATIVA',
+            lbl_return: 'Retorno',
+            title_return_audio: 'Dispositivo de Áudio de Retorno',
+            title_cam_quality: 'Qualidade da câmera local',
+            title_settings: 'Configurações da Produção',
+            title_end_session: 'Encerrar Sessão',
+            // Teleprompter
+            label_show_to: 'Exibir para',
+            label_all_guests: 'Todos os Convidados',
+            ph_prompter: 'Cole o roteiro para os convidados aqui...',
+            title_scroll: 'Rolar Texto',
+            title_margin_h: 'Margem Horizontal',
+            // Chat
+            ph_chat: 'Mensagem para equipe...',
+            // Fila de espera
+            label_in_queue: 'Na Fila',
+            title_approve: 'Aprovar',
+            title_reject: 'Recusar',
+            // QR Modal
+            qr_desc: 'Escaneie o código com seu celular para adicioná-lo como câmera secundária (Multi-Cam).',
+            qr_badge: 'Emparelhamento Silencioso',
         },
         en: {
             // ── Upgrade Modal ─────────────────────────────────────────────────────
@@ -294,6 +318,30 @@
             btn_loading_join: 'Checking...',
             err_api: 'Error creating room. Check your connection.',
             btn_logout: 'Sign out',
+            // Host navbar / controls
+            btn_record: 'Record',
+            label_room: 'ROOM',
+            label_room_active: 'ACTIVE ROOM',
+            lbl_return: 'Return',
+            title_return_audio: 'Return Audio Device',
+            title_cam_quality: 'Local camera quality',
+            title_settings: 'Production Settings',
+            title_end_session: 'End Session',
+            // Teleprompter
+            label_show_to: 'Show to',
+            label_all_guests: 'All Guests',
+            ph_prompter: 'Paste the script for guests here...',
+            title_scroll: 'Scroll Text',
+            title_margin_h: 'Horizontal Margin',
+            // Chat
+            ph_chat: 'Message to team...',
+            // Waiting queue
+            label_in_queue: 'In Queue',
+            title_approve: 'Approve',
+            title_reject: 'Reject',
+            // QR Modal
+            qr_desc: 'Scan the code with your phone to add it as a secondary camera (Multi-Cam).',
+            qr_badge: 'Silent Pairing',
         },
     };
 
@@ -328,6 +376,11 @@
         document.querySelectorAll('[data-i18n-title]').forEach(el => {
             const val = _t(el.getAttribute('data-i18n-title'));
             if (val) el.title = val;
+        });
+        // Atualiza aria-labels
+        document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+            const val = _t(el.getAttribute('data-i18n-aria'));
+            if (val) el.setAttribute('aria-label', val);
         });
         // Atualiza lang no <html>
         document.documentElement.lang = _lang === 'pt' ? 'pt-BR' : 'en';

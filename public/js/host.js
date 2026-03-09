@@ -85,7 +85,11 @@ const vuAnalyzers = new Map(); // participantId -> { analyzer, dataArray, animat
 
 const videoGrid = document.getElementById('video-grid');
 const roomIdDisplay = document.getElementById('room-id-display');
-if (roomIdDisplay) roomIdDisplay.innerHTML = `<span class="text-win-accent">SALA</span> <span class="text-gray-300">${roomName}</span>`;
+function _updateRoomLabel() {
+    if (roomIdDisplay) roomIdDisplay.innerHTML = `<span class="text-win-accent">${window.LYNCRO_I18N ? window.LYNCRO_I18N.t('label_room') : 'SALA'}</span> <span class="text-gray-300">${roomName}</span>`;
+}
+_updateRoomLabel();
+if (window.LYNCRO_I18N) window.LYNCRO_I18N.onLangChange(_updateRoomLabel);
 
 // Preencher invite link imediatamente caso o input exista
 const inviteInput = document.getElementById('invite-link-input');
@@ -201,7 +205,7 @@ async function enumerateDevices() {
 
         // Preencher Retorno de Áudio (Mix-Minus)
         if (returnSelect) {
-            returnSelect.innerHTML = '<option value="">Retorno</option>';
+            returnSelect.innerHTML = `<option value="">${window.LYNCRO_I18N ? window.LYNCRO_I18N.t('lbl_return') : 'Retorno'}</option>`;
             audioInputs.forEach(device => {
                 const option = document.createElement('option');
                 option.value = device.deviceId;
@@ -526,7 +530,8 @@ function updateUI(participants) {
     const targetSelect = document.getElementById('prompter-target');
     if (targetSelect) {
         const currentSelected = targetSelect.value;
-        let optionsHtml = '<option value="all">Todos os Convidados</option>';
+        const _t = window.LYNCRO_I18N ? window.LYNCRO_I18N.t.bind(window.LYNCRO_I18N) : (k) => k;
+        let optionsHtml = `<option value="all">${_t('label_all_guests')}</option>`;
         participants.forEach(p => {
             if (p.role !== 'host' && p.role !== 'observer' && p.status === 'accepted' && p.id !== myId) {
                 optionsHtml += `<option value="${p.id}">${p.name}</option>`;
@@ -560,14 +565,14 @@ function renderWaitingParticipant(participant) {
             </div>
             <div class="flex flex-col">
                 <span class="text-xs font-bold text-gray-200 truncate max-w-[110px]" title="${participant.name}">${participant.name}</span>
-                <span class="text-[9px] text-gray-600 uppercase font-bold tracking-tighter">Na Fila</span>
+                <span class="text-[9px] text-gray-600 uppercase font-bold tracking-tighter">${window.LYNCRO_I18N ? window.LYNCRO_I18N.t('label_in_queue') : 'Na Fila'}</span>
             </div>
         </div>
         <div class="flex gap-1.5 grayscale group-hover:grayscale-0 transition-all">
-            <button onclick="handleAdmission('${participant.id}', 'accepted')" class="w-8 h-8 rounded-win bg-green-500/10 text-green-500 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center" title="Aprovar">
+            <button onclick="handleAdmission('${participant.id}', 'accepted')" class="w-8 h-8 rounded-win bg-green-500/10 text-green-500 border border-green-500/20 hover:bg-green-500 hover:text-white transition-all flex items-center justify-center" title="${window.LYNCRO_I18N ? window.LYNCRO_I18N.t('title_approve') : 'Aprovar'}">
                 <i class="ph ph-check font-bold"></i>
             </button>
-            <button onclick="handleAdmission('${participant.id}', 'rejected')" class="w-8 h-8 rounded-win bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="Recusar">
+            <button onclick="handleAdmission('${participant.id}', 'rejected')" class="w-8 h-8 rounded-win bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center" title="${window.LYNCRO_I18N ? window.LYNCRO_I18N.t('title_reject') : 'Recusar'}">
                 <i class="ph ph-x font-bold"></i>
             </button>
         </div>
