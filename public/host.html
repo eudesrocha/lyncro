@@ -703,6 +703,41 @@
             background: rgba(255, 255, 255, 0.9);
         }
 
+        /* ── Lyncro Slider — Fluent Design ── */
+        .lyncro-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.12);
+            outline: none;
+            cursor: pointer;
+            display: block;
+        }
+        .lyncro-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #0078d4;
+            border: 2px solid rgba(255,255,255,0.25);
+            box-shadow: 0 0 6px rgba(0,120,212,0.55);
+            cursor: pointer;
+            transition: transform 0.12s, box-shadow 0.12s;
+        }
+        .lyncro-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.25);
+            box-shadow: 0 0 12px rgba(0,120,212,0.85);
+        }
+        .lyncro-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #0078d4;
+            border: 2px solid rgba(255,255,255,0.25);
+            cursor: pointer;
+        }
+
         #settings-modal-inner header {
             display: flex;
             align-items: center;

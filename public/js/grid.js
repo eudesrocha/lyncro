@@ -411,6 +411,20 @@ async function setupWebSocket() {
                     await rtcClient.handleCandidate(data.from, data.candidate);
                 }
                 break;
+            case 'video-adjust': {
+                const cell = document.getElementById(`grid-cell-${data.targetId}`);
+                if (cell) {
+                    const video = cell.querySelector('video');
+                    if (video) {
+                        let filterStr = `brightness(${data.brightness}) contrast(${data.contrast}) saturate(${data.saturate})`;
+                        if (data.style === 'grayscale') filterStr += ' grayscale(1)';
+                        else if (data.style === 'sepia') filterStr += ' sepia(1)';
+                        else if (data.style === 'invert') filterStr += ' invert(1)';
+                        video.style.filter = filterStr;
+                    }
+                }
+                break;
+            }
             case 'labels-toggle':
                 showLabels = data.showLabels;
                 document.querySelectorAll('.name-badge').forEach(el => {

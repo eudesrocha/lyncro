@@ -648,7 +648,14 @@ function renderParticipantCard(participant, isLocal = false) {
           <i class="ph ph-text-aa text-sm"></i>
         </button>
 
-        <!-- Botão 4: VB (Host) / Tally (Guest) -->
+        <!-- Botão 4: Ajustes de Imagem (Guests only) -->
+        ${isLocal ? '' : `
+        <button onclick="toggleCardPanel('img-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/5 transition-all" title="Ajustes de Imagem">
+          <i class="ph ph-sliders-horizontal text-sm"></i>
+        </button>
+        `}
+
+        <!-- Botão 5: VB (Host) / Tally (Guest) -->
         ${isLocal ? `
         <button onclick="toggleCardPanel('vb-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-purple-400 hover:bg-purple-500/5 transition-all" title="Fundo Virtual">
           <i class="ph ph-sparkle text-sm"></i>
@@ -695,6 +702,61 @@ function renderParticipantCard(participant, isLocal = false) {
           </div>
         </div>
       </div>
+
+      <!-- Painel Colapsável: Ajustes de Imagem (Guests only) -->
+      ${isLocal ? '' : `
+      <div id="img-panel-${participant.id}" class="hidden px-3 pb-3 bg-white/5 border-t border-win-border/10">
+        <div class="flex flex-col gap-2.5 pt-3">
+          <div class="flex justify-between items-center">
+            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest opacity-60 flex items-center gap-1.5">
+              <i class="ph ph-sliders-horizontal text-yellow-400 text-xs"></i> Imagem
+            </span>
+            <button onclick="resetImgAdjust('${participant.id}')" class="text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 rounded border border-win-border text-gray-500 hover:text-white hover:border-white/30 transition-all">Reset</button>
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between items-center">
+              <label class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Brilho</label>
+              <span id="lbl-brightness-${participant.id}" class="text-[9px] font-mono font-bold text-win-accent/80">1.00</span>
+            </div>
+            <input type="range" id="sl-brightness-${participant.id}" min="0.5" max="1.5" step="0.05" value="1"
+              oninput="handleImgAdjust('${participant.id}', 'brightness', this.value)" class="lyncro-slider w-full">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between items-center">
+              <label class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Contraste</label>
+              <span id="lbl-contrast-${participant.id}" class="text-[9px] font-mono font-bold text-win-accent/80">1.00</span>
+            </div>
+            <input type="range" id="sl-contrast-${participant.id}" min="0.5" max="1.5" step="0.05" value="1"
+              oninput="handleImgAdjust('${participant.id}', 'contrast', this.value)" class="lyncro-slider w-full">
+          </div>
+
+          <div class="flex flex-col gap-1">
+            <div class="flex justify-between items-center">
+              <label class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Satura\u00e7\u00e3o</label>
+              <span id="lbl-saturate-${participant.id}" class="text-[9px] font-mono font-bold text-win-accent/80">1.00</span>
+            </div>
+            <input type="range" id="sl-saturate-${participant.id}" min="0" max="2" step="0.05" value="1"
+              oninput="handleImgAdjust('${participant.id}', 'saturate', this.value)" class="lyncro-slider w-full">
+          </div>
+
+          <div class="flex flex-col gap-1.5">
+            <label class="text-[8px] font-bold text-gray-500 uppercase tracking-widest">Efeito</label>
+            <div class="flex gap-1">
+              <button onclick="handleImgStyle('${participant.id}', 'none')" id="imgstyle-none-${participant.id}"
+                class="flex-1 py-1 rounded-win text-[8px] font-bold border border-win-accent bg-win-accent/10 text-win-accent transition-all">Normal</button>
+              <button onclick="handleImgStyle('${participant.id}', 'grayscale')" id="imgstyle-grayscale-${participant.id}"
+                class="flex-1 py-1 rounded-win text-[8px] font-bold border border-win-border text-gray-500 hover:border-white/30 hover:text-white transition-all">P&amp;B</button>
+              <button onclick="handleImgStyle('${participant.id}', 'sepia')" id="imgstyle-sepia-${participant.id}"
+                class="flex-1 py-1 rounded-win text-[8px] font-bold border border-win-border text-gray-500 hover:border-white/30 hover:text-white transition-all">S\u00e9pia</button>
+              <button onclick="handleImgStyle('${participant.id}', 'invert')" id="imgstyle-invert-${participant.id}"
+                class="flex-1 py-1 rounded-win text-[8px] font-bold border border-win-border text-gray-500 hover:border-white/30 hover:text-white transition-all">Negativo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      `}
 
       ${isLocal ? `
       <!-- Painel Colapsável: Fundo Virtual (Host Only) -->
@@ -1265,7 +1327,7 @@ window.toggleCardPanel = (panelId) => {
     if (!panel) return;
     const card = panel.closest('[id^="video-card-"]');
     if (card) {
-        card.querySelectorAll('[id^="lt-panel-"], [id^="vb-panel-"]').forEach(p => {
+        card.querySelectorAll('[id^="lt-panel-"], [id^="vb-panel-"], [id^="img-panel-"]').forEach(p => {
             if (p.id !== panelId) p.classList.add('hidden');
         });
     }
@@ -1276,6 +1338,70 @@ window.toggleCardPanel = (panelId) => {
 window.toggleLTPanel = (panelId) => {
     if (!window.LYNCRO_PLAN.require('Lower Thirds')) return;
     window.toggleCardPanel(panelId);
+};
+
+// ── Ajustes de Imagem ─────────────────────────────────────────────────────────
+const videoFilters = new Map(); // pId -> { brightness, contrast, saturate, style }
+
+function getVideoFilter(pId) {
+    return videoFilters.get(pId) || { brightness: 1.0, contrast: 1.0, saturate: 1.0, style: 'none' };
+}
+
+function buildFilterCSS(f) {
+    let s = `brightness(${f.brightness}) contrast(${f.contrast}) saturate(${f.saturate})`;
+    if (f.style === 'grayscale') s += ' grayscale(1)';
+    else if (f.style === 'sepia') s += ' sepia(1)';
+    else if (f.style === 'invert') s += ' invert(1)';
+    return s;
+}
+
+function sendVideoAdjust(pId) {
+    const f = getVideoFilter(pId);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'video-adjust', roomId: roomName, targetId: pId, ...f }));
+    }
+}
+
+window.handleImgAdjust = (pId, prop, rawVal) => {
+    const f = getVideoFilter(pId);
+    f[prop] = parseFloat(rawVal);
+    videoFilters.set(pId, f);
+    const lbl = document.getElementById(`lbl-${prop}-${pId}`);
+    if (lbl) lbl.textContent = f[prop].toFixed(2);
+    const card = document.getElementById(`video-card-${pId}`);
+    if (card) { const v = card.querySelector('video'); if (v) v.style.filter = buildFilterCSS(f); }
+    sendVideoAdjust(pId);
+};
+
+window.handleImgStyle = (pId, style) => {
+    const f = getVideoFilter(pId);
+    f.style = style;
+    videoFilters.set(pId, f);
+    ['none', 'grayscale', 'sepia', 'invert'].forEach(s => {
+        const btn = document.getElementById(`imgstyle-${s}-${pId}`);
+        if (!btn) return;
+        if (s === style) {
+            btn.classList.add('border-win-accent', 'bg-win-accent/10', 'text-win-accent');
+            btn.classList.remove('border-win-border', 'text-gray-500');
+        } else {
+            btn.classList.remove('border-win-accent', 'bg-win-accent/10', 'text-win-accent');
+            btn.classList.add('border-win-border', 'text-gray-500');
+        }
+    });
+    const card = document.getElementById(`video-card-${pId}`);
+    if (card) { const v = card.querySelector('video'); if (v) v.style.filter = buildFilterCSS(f); }
+    sendVideoAdjust(pId);
+};
+
+window.resetImgAdjust = (pId) => {
+    videoFilters.set(pId, { brightness: 1.0, contrast: 1.0, saturate: 1.0, style: 'none' });
+    [['brightness', 1.0], ['contrast', 1.0], ['saturate', 1.0]].forEach(([prop, def]) => {
+        const sl = document.getElementById(`sl-${prop}-${pId}`);
+        const lbl = document.getElementById(`lbl-${prop}-${pId}`);
+        if (sl) sl.value = def;
+        if (lbl) lbl.textContent = def.toFixed(2);
+    });
+    window.handleImgStyle(pId, 'none');
 };
 
 // toggleCardDropdown definido abaixo com lógica completa de enumeração de dispositivos

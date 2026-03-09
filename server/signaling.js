@@ -575,6 +575,21 @@ function setupSignaling(server) {
                         }
                         break;
 
+                    case 'video-adjust': {
+                        const rmAdj = roomManager.getRoom(normalizedRoomId);
+                        if (rmAdj && rmAdj.host === participantId) {
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'video-adjust',
+                                targetId: data.targetId,
+                                brightness: data.brightness,
+                                contrast: data.contrast,
+                                saturate: data.saturate,
+                                style: data.style || 'none'
+                            });
+                        }
+                        break;
+                    }
+
                     case 'labels-toggle':
                         broadcastToRoom(normalizedRoomId, {
                             type: 'labels-toggle',
