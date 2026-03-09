@@ -1166,6 +1166,9 @@
     </div>
 
     <!-- Overlay de Progresso de Arquivo -->
+    <!-- Graphic Overlay: QR Code flutuante (somente quando o host ativa "Live + Convidados") -->
+    <div id="go-qr-guest" style="display:none;opacity:0;position:fixed;z-index:400;pointer-events:none;transition:opacity 0.4s ease;background:rgba(255,255,255,0.92);border-radius:8px;padding:10px;box-shadow:0 4px 24px rgba(0,0,0,0.55)"></div>
+
     <div id="file-progress-overlay"
         class="hidden fixed top-24 left-1/2 -translate-x-1/2 z-[100] w-72 glass-panel p-4 rounded-2xl shadow-2xl backdrop-blur-2xl">
         <div class="flex flex-col gap-3">

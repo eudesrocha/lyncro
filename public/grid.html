@@ -411,6 +411,41 @@
             transition: filter 1s ease;
         }
 
+        /* ── Graphic Overlays (Logo + QR) ── */
+        .graphic-overlay-el {
+            position: fixed;
+            z-index: 500;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        #go-logo {
+            display: none;
+            opacity: 0;
+        }
+
+        #go-logo img {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 4px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4);
+        }
+
+        #go-qr {
+            display: none;
+            opacity: 0;
+            background: rgba(255,255,255,0.92);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.55), 0 1px 4px rgba(0,0,0,0.4);
+        }
+
+        #go-qr canvas {
+            display: block;
+            border-radius: 4px;
+        }
+
         /* Sidebar de miniaturas */
         #speaker-sidebar {
             display: flex;
@@ -435,6 +470,10 @@
 </head>
 
 <body>
+    <!-- Graphic Overlays: Logo + QR -->
+    <div id="go-logo" class="graphic-overlay-el"></div>
+    <div id="go-qr" class="graphic-overlay-el"></div>
+
     <!-- Waiting Room Overlay -->
     <div id="waiting-overlay" style="display:none;opacity:0">
         <div id="waiting-bg" class="waiting-bg-cosmic"></div>
@@ -471,6 +510,7 @@
         </button>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="js/config.js"></script>
     <script src="js/webrtc.js"></script>
     <script src="js/grid.js"></script>

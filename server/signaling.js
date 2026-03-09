@@ -604,6 +604,34 @@ function setupSignaling(server) {
                         break;
                     }
 
+                    case 'graphic-overlay': {
+                        // Logo e QR Code sobrepostos no Clean Feed (grid) e opcionalmente nos guests
+                        const rmGo = roomManager.getRoom(normalizedRoomId);
+                        if (rmGo && rmGo.host === participantId) {
+                            audit('GRAPHIC_OVERLAY', { action: data.action, room: normalizedRoomId, participantId, ip });
+                            const payload = {
+                                type: 'graphic-overlay',
+                                action: data.action, // 'logo' | 'qr' | 'reset'
+                                // logo fields
+                                logoVisible: data.logoVisible,
+                                logoData:    data.logoData || null,
+                                logoX:       data.logoX,
+                                logoY:       data.logoY,
+                                logoScale:   data.logoScale,
+                                // qr fields
+                                qrVisible:     data.qrVisible,
+                                qrUrl:         data.qrUrl || '',
+                                qrScale:       data.qrScale,
+                                qrX:           data.qrX,
+                                qrY:           data.qrY,
+                                qrShowGuests:  !!data.qrShowGuests,
+                            };
+                            // Sempre envia ao grid (todos recebem; grid e guests filtram por role)
+                            broadcastToRoom(normalizedRoomId, payload);
+                        }
+                        break;
+                    }
+
                     case 'labels-toggle':
                         broadcastToRoom(normalizedRoomId, {
                             type: 'labels-toggle',

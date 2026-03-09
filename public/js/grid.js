@@ -453,6 +453,9 @@ async function setupWebSocket() {
                 }
                 break;
             }
+            case 'graphic-overlay':
+                handleGraphicOverlay(data);
+                break;
             case 'labels-toggle':
                 showLabels = data.showLabels;
                 document.querySelectorAll('.name-badge').forEach(el => {
@@ -544,4 +547,59 @@ function hideWaitingRoom() {
             container.style.filter = '';
         }
     }, 1000);
+}
+
+// ── Graphic Overlays (Logo + QR Code) ────────────────────────────────────────
+let _goQrInstance = null;
+
+function _goSetPosition(el, x, y, scale, sizePx) {
+    el.style.left  = x + '%';
+    el.style.top   = y + '%';
+    el.style.transform = `translate(-${x > 50 ? '100' : '0'}%, -${y > 50 ? '100' : '0'}%) scale(${scale})`;
+    el.style.transformOrigin = `${x > 50 ? 'right' : 'left'} ${y > 50 ? 'bottom' : 'top'}`;
+    if (sizePx) el.style.width = sizePx + 'px';
+}
+
+function _goShowEl(el) {
+    el.style.display = 'block';
+    requestAnimationFrame(() => { el.style.opacity = '1'; });
+}
+
+function _goHideEl(el) {
+    el.style.opacity = '0';
+    setTimeout(() => { el.style.display = 'none'; }, 420);
+}
+
+function handleGraphicOverlay(data) {
+    const logo = document.getElementById('go-logo');
+    const qr   = document.getElementById('go-qr');
+    if (!logo || !qr) return;
+
+    if (data.action === 'reset') {
+        _goHideEl(logo);
+        _goHideEl(qr);
+        return;
+    }
+
+    if (data.action === 'logo') {
+        if (!data.logoVisible) { _goHideEl(logo); return; }
+        if (data.logoData) {
+            logo.innerHTML = `<img src="${data.logoData}" alt="Logo">`;
+        }
+        const sizePx = Math.round(120 * (data.logoScale || 1));
+        logo.style.width = sizePx + 'px';
+        _goSetPosition(logo, data.logoX ?? 4, data.logoY ?? 4, 1, null);
+        _goShowEl(logo);
+    }
+
+    if (data.action === 'qr') {
+        if (!data.qrVisible) { _goHideEl(qr); return; }
+        const sizePx = Math.round(120 * (data.qrScale || 1));
+        qr.innerHTML = '';
+        if (typeof QRCode !== 'undefined' && data.qrUrl) {
+            new QRCode(qr, { text: data.qrUrl, width: sizePx, height: sizePx, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+        }
+        _goSetPosition(qr, data.qrX ?? 96, data.qrY ?? 96, 1, null);
+        _goShowEl(qr);
+    }
 }

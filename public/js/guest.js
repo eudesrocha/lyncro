@@ -1063,6 +1063,9 @@ async function setupWebSocket() {
                 console.log('Overlay control received:', data);
                 updateOverlay(data.action, data.name, data.title, data.style);
                 break;
+            case 'graphic-overlay':
+                handleGuestGraphicOverlay(data);
+                break;
             case 'prompter-sync':
                 if (data.payload) {
                     updatePrompterState(data.payload);
@@ -2032,3 +2035,37 @@ document.addEventListener('click', (e) => {
     const wrap = document.getElementById('more-menu-wrap');
     if (wrap && !wrap.contains(e.target)) closeMoreMenu();
 });
+
+// ── Graphic Overlay: QR Code para convidados ──────────────────────────────────
+function handleGuestGraphicOverlay(data) {
+    const qr = document.getElementById('go-qr-guest');
+    if (!qr) return;
+
+    if (data.action === 'reset' || (data.action === 'qr' && !data.qrVisible)) {
+        qr.style.opacity = '0';
+        setTimeout(() => { qr.style.display = 'none'; }, 420);
+        return;
+    }
+
+    // Logo: guests não exibem logo — apenas QR quando showGuests=true
+    if (data.action !== 'qr') return;
+    if (!data.qrShowGuests) {
+        qr.style.opacity = '0';
+        setTimeout(() => { qr.style.display = 'none'; }, 420);
+        return;
+    }
+
+    const sizePx = Math.round(120 * (data.qrScale || 1));
+    qr.innerHTML = '';
+    if (typeof QRCode !== 'undefined' && data.qrUrl) {
+        new QRCode(qr, { text: data.qrUrl, width: sizePx, height: sizePx, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+    }
+    // Position
+    const x = data.qrX ?? 96;
+    const y = data.qrY ?? 96;
+    qr.style.left  = x + '%';
+    qr.style.top   = y + '%';
+    qr.style.transform = `translate(-${x > 50 ? '100' : '0'}%, -${y > 50 ? '100' : '0'}%)`;
+    qr.style.display = 'block';
+    requestAnimationFrame(() => { qr.style.opacity = '1'; });
+}
