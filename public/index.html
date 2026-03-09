@@ -854,12 +854,29 @@
             if (password) payload.password = password;
 
             try {
+                // Obter token JWT atualizado para autenticação server-side
+                const headers = { 'Content-Type': 'application/json' };
+                if (window.LYNCRO_AUTH) {
+                    const session = await window.LYNCRO_AUTH.getFreshSession();
+                    if (session?.access_token) {
+                        headers['Authorization'] = `Bearer ${session.access_token}`;
+                    }
+                }
+
                 const res = await fetch('/api/rooms', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers,
                     body: JSON.stringify(payload)
                 });
-                if (!res.ok) throw new Error(window.LYNCRO_I18N ? window.LYNCRO_I18N.t('err_api') : 'Erro na API');
+                if (!res.ok) {
+                    const errBody = await res.json().catch(() => ({}));
+                    // Se o servidor retornou upgrade:true, mostrar modal de upgrade
+                    if (errBody.upgrade && window.LYNCRO_PLAN) {
+                        window.LYNCRO_PLAN.showUpgradeModal('Múltiplas Salas');
+                        throw new Error('upgrade');
+                    }
+                    throw new Error(errBody.error || (window.LYNCRO_I18N ? window.LYNCRO_I18N.t('err_api') : 'Erro na API'));
+                }
 
                 const data = await res.json();
                 currentRoomData = data;
@@ -876,7 +893,9 @@
 
             } catch (err) {
                 console.error('Erro ao criar sala:', err);
-                alert(window.LYNCRO_I18N ? window.LYNCRO_I18N.t('err_api') : 'Erro ao criar sala. Verifique a conexão.');
+                if (err.message !== 'upgrade') {
+                    alert(err.message && err.message !== 'Erro na API' ? err.message : (window.LYNCRO_I18N ? window.LYNCRO_I18N.t('err_api') : 'Erro ao criar sala. Verifique a conexão.'));
+                }
                 btn.disabled = false;
                 text.classList.remove('hidden');
                 loader.classList.add('hidden');
