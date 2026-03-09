@@ -12,7 +12,7 @@ let myId;
 let participantsData = new Map(); // id -> { name, role }
 let activeStreams = new Map(); // id -> stream
 let videoElements = new Map(); // id -> videoEl
-let currentLayout = 'auto-grid';
+let currentLayout = 'dynamic-cards';
 let showLabels = true;
 let speakerHighlightActive = false;
 

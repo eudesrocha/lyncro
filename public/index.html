@@ -73,13 +73,26 @@
             letter-spacing: -0.02em;
         }
 
-        .splash-logo span {
+        .splash-logo .dot {
             color: #0078d4;
-            /* win-accent */
             -webkit-text-stroke: 0;
             background: none;
             opacity: 0;
             animation: dotFadeIn 0.35s forwards 0.9s;
+        }
+
+        .splash-logo .live-badge {
+            font-size: 0.75rem;
+            font-weight: 900;
+            font-style: normal;
+            letter-spacing: 0.18em;
+            color: #0078d4;
+            -webkit-text-stroke: 0;
+            background: none;
+            opacity: 0;
+            animation: dotFadeIn 0.4s forwards 1.05s;
+            vertical-align: super;
+            margin-left: 2px;
         }
 
         @keyframes textReveal {
@@ -309,7 +322,7 @@
     <!-- Splash Screen -->
     <div id="splash-screen">
         <div class="splash-logo-container">
-            <div class="splash-logo">Lyncro<span>.</span></div>
+            <div class="splash-logo">Lyncro<span class="dot">.</span><span class="live-badge">LIVE</span></div>
         </div>
     </div>
     <script>

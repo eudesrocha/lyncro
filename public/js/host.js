@@ -2334,8 +2334,8 @@ window.resetAllOverlays = function() {
         }
     });
 
-    // 3. Reset layout to auto-grid
-    if (typeof changeLayout === 'function') changeLayout('auto-grid');
+    // 3. Reset layout to default (Dynamic Cards)
+    if (typeof changeLayout === 'function') changeLayout('dynamic-cards');
 
     // 4. Send graphic-overlay reset
     if (ws && ws.readyState === WebSocket.OPEN) {

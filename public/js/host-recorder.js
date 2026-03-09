@@ -75,7 +75,7 @@
 
     // ── Layout calculator (mirrors grid.js + grid.html logic) ────────────────
     function computeLayout(n) {
-        const layoutId = (window.currentRoomSettings && window.currentRoomSettings.layout) || 'auto-grid';
+        const layoutId = (window.currentRoomSettings && window.currentRoomSettings.layout) || 'dynamic-cards';
 
         if (n === 0) return [];
         if (n === 1) return [{ x: 0, y: 0, w: CANVAS_W, h: CANVAS_H, cover: true }];
