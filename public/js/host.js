@@ -1851,13 +1851,15 @@ let isPrompterFinished = false;
 window.togglePrompterUI = () => {
     const body = document.getElementById('prompter-body');
     const caret = document.getElementById('prompter-caret');
-    // Gate: only allow opening when PRO
-    if (body.classList.contains('hidden')) {
+    const isOpen = body.style.maxHeight && body.style.maxHeight !== '0px' && body.style.maxHeight !== '0';
+    if (!isOpen) {
         if (!window.LYNCRO_PLAN.require('Teleprompter')) return;
-        body.classList.remove('hidden');
+        body.style.maxHeight = body.scrollHeight + 64 + 'px';
+        body.style.padding = '1rem';
         caret.style.transform = 'rotate(-180deg)';
     } else {
-        body.classList.add('hidden');
+        body.style.maxHeight = '0';
+        body.style.padding = '0 1rem';
         caret.style.transform = 'rotate(0deg)';
     }
 };

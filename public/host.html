@@ -474,31 +474,31 @@
                                 <button onclick="changeLayout('auto-grid'); closeLayoutPicker()" id="layout-auto-grid"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-squares-four text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_auto_grid">Auto Grid</span>
+                                    <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_auto_grid">Auto Grid</span>
                                 </button>
                                 <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('CNN Split')) return; changeLayout('cnn-split'); closeLayoutPicker()" id="layout-cnn-split"
                                     data-pro-feature="CNN Split"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-layout text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_cnn_split">CNN Split</span>
+                                    <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_cnn_split">CNN Split</span>
                                     <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
                                 <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('CNN Vertical')) return; changeLayout('cnn-vertical'); closeLayoutPicker()" id="layout-cnn-vertical"
                                     data-pro-feature="CNN Vertical"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-rows text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_cnn_vertical">CNN Vertical</span>
+                                    <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_cnn_vertical">CNN Vertical</span>
                                     <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
                                 <button onclick="changeLayout('portrait-cards'); closeLayoutPicker()" id="layout-portrait-cards"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-cards text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_portrait_cards">Portrait Cards</span>
+                                    <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_portrait_cards">Portrait Cards</span>
                                 </button>
                                 <button onclick="changeLayout('speaker-highlight'); closeLayoutPicker()" id="layout-speaker-highlight"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-presentation-chart text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_highlight">Highlight</span>
+                                    <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_highlight">Highlight</span>
                                 </button>
                             </div>
                         </div>
@@ -542,7 +542,7 @@
                     <i class="ph ph-caret-down text-gray-400 transition-transform hover:text-white"
                         id="prompter-caret"></i>
                 </header>
-                <div id="prompter-body" class="p-4 flex flex-col gap-4 hidden">
+                <div id="prompter-body" class="flex flex-col gap-4 overflow-hidden" style="max-height:0;padding:0 1rem;transition:max-height .35s ease,padding .35s ease">
 
                     <div class="flex flex-col gap-1.5">
                         <label
