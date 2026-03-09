@@ -419,6 +419,14 @@
                 <i class="ph ph-power text-lg"></i>
             </button>
 
+            <!-- Language Switcher -->
+            <div style="display:flex;align-items:center;gap:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:3px;margin-left:4px;">
+                <button data-lang-btn="pt" onclick="window.LYNCRO_I18N.setLang('pt')" aria-pressed="true"
+                    style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:800;background:rgba(0,120,212,0.2);color:#0078d4;border:1px solid rgba(0,120,212,0.3);cursor:pointer;transition:all .15s;">🇧🇷 PT</button>
+                <button data-lang-btn="en" onclick="window.LYNCRO_I18N.setLang('en')" aria-pressed="false"
+                    style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:700;background:transparent;color:#6b7280;border:1px solid transparent;cursor:pointer;transition:all .15s;">🇺🇸 EN</button>
+            </div>
+
             <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
                 class="theme-toggle-btn ml-1" aria-label="Alternar tema claro/escuro">
                 <i class="ph ph-moon"></i>
@@ -944,6 +952,7 @@
     <script src="js/host-chat.js"></script>
     <script src="js/host-recorder.js"></script>
     <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/plan.js"></script>
     <script>
         // Gate do botão Gravar — intercepta o clique se usuário for FREE

@@ -300,6 +300,7 @@
     <script src="js/auth.js"></script>
     <script src="js/config.js"></script>
     <script src="js/theme.js"></script>
+    <script src="js/i18n.js"></script>
 </head>
 
 <body class="font-segoe selection:bg-win-accent selection:text-white min-h-screen overflow-x-hidden relative">
@@ -343,9 +344,17 @@
                     <div class="flex flex-col min-w-0 pt-0.5">
                         <span id="user-email"
                             class="text-[10px] font-bold theme-text truncate max-w-[120px] leading-tight">...</span>
-                        <button onclick="window.LYNCRO_AUTH.logout()"
+                        <button onclick="window.LYNCRO_AUTH.logout()" data-i18n="btn_logout"
                             class="text-[9px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors text-left leading-none mt-0.5">Sair</button>
                     </div>
+                </div>
+
+                <!-- Language Switcher -->
+                <div style="display:flex;align-items:center;gap:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:3px;" class="shrink-0">
+                    <button data-lang-btn="pt" onclick="window.LYNCRO_I18N.setLang('pt')" aria-pressed="true"
+                        style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:800;background:rgba(0,120,212,0.2);color:#0078d4;border:1px solid rgba(0,120,212,0.3);cursor:pointer;transition:all .15s;">🇧🇷 PT</button>
+                    <button data-lang-btn="en" onclick="window.LYNCRO_I18N.setLang('en')" aria-pressed="false"
+                        style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:700;background:transparent;color:#6b7280;border:1px solid transparent;cursor:pointer;transition:all .15s;">🇺🇸 EN</button>
                 </div>
 
                 <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
@@ -362,16 +371,16 @@
         <!-- Lado Esquerdo: Narrativa Sales Copy -->
         <section id="narrative-section" class="flex-1 text-center lg:text-left overflow-hidden">
             <div class="animate-reveal delay-2">
-                <span
+                <span data-i18n="tagline"
                     class="text-win-accent text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-4 block opacity-90 drop-shadow-md">
                     O Futuro da Produção Remota
                 </span>
                 <h1
                     class="font-sync text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[0.95] mb-6 uppercase theme-text italic">
-                    Sua Live.<br>
-                    <span class="text-win-accent not-italic">Sem Limites.</span>
+                    <span data-i18n="hero_line1">Sua Live.</span><br>
+                    <span data-i18n="hero_line2" class="text-win-accent not-italic">Sem Limites.</span>
                 </h1>
-                <p
+                <p data-i18n="hero_sub"
                     class="text-base md:text-lg lg:text-xl theme-text-secondary mb-8 max-w-xl leading-relaxed font-segoe mx-auto lg:mx-0">
                     Conecte-se com quem importa através de uma plataforma desenhada para fluidez e impacto. Abandone a
                     complexidade, foque na sua mensagem e entregue uma transmissão excepcional com a estabilidade e
@@ -392,10 +401,8 @@
                                     <i class="ph ph-rocket-launch text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Mobile
-                                        First, Sempre
-                                    </h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Convide pessoas de
+                                    <h3 data-i18n="s1_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Mobile First, Sempre</h3>
+                                    <p data-i18n="s1_desc" class="text-[12px] theme-text-secondary leading-relaxed">Convide pessoas de
                                         qualquer lugar. Eles entram pelo celular e você recebe áudio e vídeo em
                                         altíssima qualidade — sem burocracias.</p>
                                 </div>
@@ -410,12 +417,8 @@
                                     <i class="ph ph-broadcast text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">A Ponte
-                                        Perfeita (Clean Feed)
-                                    </h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Puxe fontes imaculadas
-                                        (Clean Feed) diretas para seu OBS Studio ou vMix, sem interfaces ou popups da
-                                        chamada vazando no ar.</p>
+                                    <h3 data-i18n="s2_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">A Ponte Perfeita (Clean Feed)</h3>
+                                    <p data-i18n="s2_desc" class="text-[12px] theme-text-secondary leading-relaxed">Puxe fontes imaculadas (Clean Feed) diretas para seu OBS Studio ou vMix, sem interfaces ou popups da chamada vazando no ar.</p>
                                 </div>
                             </div>
                         </div>
@@ -428,12 +431,8 @@
                                     <i class="ph ph-waveform text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Áudio
-                                        Quality
-                                        Studio</h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Desabilite cancelamentos
-                                        agressivos. Transmita o áudio limpo dos microfones como se estivessem no mesmo
-                                        estúdio.</p>
+                                    <h3 data-i18n="s3_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Áudio Quality Studio</h3>
+                                    <p data-i18n="s3_desc" class="text-[12px] theme-text-secondary leading-relaxed">Desabilite cancelamentos agressivos. Transmita o áudio limpo dos microfones como se estivessem no mesmo estúdio.</p>
                                 </div>
                             </div>
                         </div>
@@ -446,12 +445,8 @@
                                     <i class="ph ph-chats-teardrop text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Chat
-                                        Backstage
-                                    </h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Converse em tempo real
-                                        com
-                                        sua equipe e convidados de forma privada durante a transmissão.</p>
+                                    <h3 data-i18n="s4_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Chat Backstage</h3>
+                                    <p data-i18n="s4_desc" class="text-[12px] theme-text-secondary leading-relaxed">Converse em tempo real com sua equipe e convidados de forma privada durante a transmissão.</p>
                                 </div>
                             </div>
                         </div>
@@ -464,13 +459,8 @@
                                     <i class="ph ph-text-aa text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Lower Thirds
-                                        (GCs)</h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Injete letreiros
-                                        animados
-                                        com nome e profissão diretamente no feed visual dos participantes
-                                        instantaneamente.
-                                    </p>
+                                    <h3 data-i18n="s5_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Lower Thirds (GCs)</h3>
+                                    <p data-i18n="s5_desc" class="text-[12px] theme-text-secondary leading-relaxed">Injete letreiros animados com nome e profissão diretamente no feed visual dos participantes instantaneamente.</p>
                                 </div>
                             </div>
                         </div>
@@ -483,11 +473,8 @@
                                     <i class="ph ph-video-camera text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Multi-Cam
-                                        Suporte</h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Troque fluidamente entre
-                                        a
-                                        câmera frontal ou traseira (mobile) e selecione placas de captura (desktop).</p>
+                                    <h3 data-i18n="s6_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Multi-Cam Suporte</h3>
+                                    <p data-i18n="s6_desc" class="text-[12px] theme-text-secondary leading-relaxed">Troque fluidamente entre a câmera frontal ou traseira (mobile) e selecione placas de captura (desktop).</p>
                                 </div>
                             </div>
                         </div>
@@ -500,12 +487,8 @@
                                     <i class="ph ph-sliders text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Controle de
-                                        Mute
-                                        Total</h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">O diretor domina o
-                                        painel.
-                                        Corte ou libere o áudio dos convidados remotamente.</p>
+                                    <h3 data-i18n="s7_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Controle de Mute Total</h3>
+                                    <p data-i18n="s7_desc" class="text-[12px] theme-text-secondary leading-relaxed">O diretor domina o painel. Corte ou libere o áudio dos convidados remotamente.</p>
                                 </div>
                             </div>
                         </div>
@@ -518,13 +501,8 @@
                                     <i class="ph ph-files text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Media Drop /
-                                        Arquivos</h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Envie roteiros, pautas,
-                                        ou
-                                        imagens arrastando pro painel usando WebRTC (ponto a ponto, sem provedor no
-                                        meio).
-                                    </p>
+                                    <h3 data-i18n="s8_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Media Drop / Arquivos</h3>
+                                    <p data-i18n="s8_desc" class="text-[12px] theme-text-secondary leading-relaxed">Envie roteiros, pautas, ou imagens arrastando pro painel usando WebRTC (ponto a ponto, sem provedor no meio).</p>
                                 </div>
                             </div>
                         </div>
@@ -537,12 +515,8 @@
                                     <i class="ph ph-image-square text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Fundo
-                                        Virtual
-                                        Borrado</h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Convidados
-                                        desorganizados?
-                                        Use IA em tempo real para desfocar o fundo ou aplicar imagens corporativas.</p>
+                                    <h3 data-i18n="s9_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Fundo Virtual Borrado</h3>
+                                    <p data-i18n="s9_desc" class="text-[12px] theme-text-secondary leading-relaxed">Convidados desorganizados? Use IA em tempo real para desfocar o fundo ou aplicar imagens corporativas.</p>
                                 </div>
                             </div>
                         </div>
@@ -555,11 +529,8 @@
                                     <i class="ph ph-shield-check text-win-accent text-2xl drop-shadow-md"></i>
                                 </div>
                                 <div>
-                                    <h3 class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Rotas
-                                        Criptografadas</h3>
-                                    <p class="text-[12px] theme-text-secondary leading-relaxed">Conexões WebRTC
-                                        Peer-to-Peer
-                                        fortemente criptografadas. O que acontece na live, fica na live.</p>
+                                    <h3 data-i18n="s10_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Rotas Criptografadas</h3>
+                                    <p data-i18n="s10_desc" class="text-[12px] theme-text-secondary leading-relaxed">Conexões WebRTC Peer-to-Peer fortemente criptografadas. O que acontece na live, fica na live.</p>
                                 </div>
                             </div>
                         </div>
@@ -578,11 +549,11 @@
                 <nav id="card-tabs" class="flex border-b border-win-border">
                     <button id="tab-create" onclick="switchTab('create')"
                         class="flex-1 py-4 text-xs font-black uppercase tracking-widest tab-active transition-all outline-none">
-                        Criar Sala
+                        <span data-i18n="tab_create">Criar Sala</span>
                     </button>
                     <button id="tab-join" onclick="switchTab('join')"
                         class="flex-1 py-4 text-xs font-black uppercase tracking-widest tab-inactive transition-all outline-none">
-                        Entrar
+                        <span data-i18n="tab_join">Entrar</span>
                     </button>
                 </nav>
 
@@ -593,32 +564,28 @@
                         <!-- Estado Autenticado: Formulário -->
                         <div id="state-auth" class="hidden space-y-5">
                             <div class="text-center lg:text-left mb-6">
-                                <h3 class="font-sync text-2xl tracking-tight uppercase theme-text font-black">DIRIGIR
-                                    NOVA SESSÃO</h3>
-                                <p class="text-[11px] theme-text-secondary mt-1">Configure o elo de conexão pro seu OBS.
-                                </p>
+                                <h3 data-i18n="create_title" class="font-sync text-2xl tracking-tight uppercase theme-text font-black">DIRIGIR NOVA SESSÃO</h3>
+                                <p data-i18n="create_sub" class="text-[11px] theme-text-secondary mt-1">Configure o elo de conexão pro seu OBS.</p>
                             </div>
                             <div class="space-y-4">
                                 <div class="space-y-1.5 focus-within-glow">
-                                    <label
-                                        class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Nome
-                                        do Projeto/Sessão</label>
+                                    <label data-i18n="label_project"
+                                        class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Nome do Projeto/Sessão</label>
                                     <div class="relative">
                                         <i
                                             class="ph ph-hash absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
-                                        <input type="text" id="hostRoomId" placeholder="Ex: Masterclass-Tech"
+                                        <input type="text" id="hostRoomId" data-i18n-ph="ph_project" placeholder="Ex: Masterclass-Tech"
                                             class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
                                             oninput="clearFieldError('err-create-room')">
                                     </div>
                                     <p id="err-create-room"
                                         class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
-                                        <i class="ph ph-warning-circle"></i> Defina um nome para a sessão
+                                        <i class="ph ph-warning-circle"></i> <span data-i18n="err_room">Defina um nome para a sessão</span>
                                     </p>
                                 </div>
                                 <div class="space-y-1.5">
                                     <label
-                                        class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Senha
-                                        (Privacidade) <span class="text-gray-500">(Opcional)</span></label>
+                                        class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90"><span data-i18n="label_password">Senha (Privacidade)</span> <span data-i18n="label_password_opt" class="text-gray-500">(Opcional)</span></label>
                                     <div class="relative">
                                         <i
                                             class="ph ph-lock-key absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
@@ -627,24 +594,23 @@
                                     </div>
                                 </div>
                                 <div class="space-y-1.5">
-                                    <label
-                                        class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Nome
-                                        na Tela (Você)</label>
+                                    <label data-i18n="label_screenname"
+                                        class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Nome na Tela (Você)</label>
                                     <div class="relative">
                                         <i
                                             class="ph ph-user-circle absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
-                                        <input type="text" id="userNameHost" placeholder="Seu nome"
+                                        <input type="text" id="userNameHost" data-i18n-ph="ph_name" placeholder="Seu nome"
                                             class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
                                             oninput="clearFieldError('err-create-name')">
                                     </div>
                                     <p id="err-create-name"
                                         class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
-                                        <i class="ph ph-warning-circle"></i> Informe seu nome
+                                        <i class="ph ph-warning-circle"></i> <span data-i18n="err_name">Informe seu nome</span>
                                     </p>
                                 </div>
                                 <button onclick="handleCreateRoom()" id="btn-create"
                                     class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/30 transition-all flex items-center justify-center gap-2 mt-4 active:scale-[0.98]">
-                                    <span id="btn-create-text">GERAR MASTER LINK</span>
+                                    <span id="btn-create-text" data-i18n="btn_create">GERAR MASTER LINK</span>
                                     <div id="btn-create-loader" class="win-loader hidden"></div>
                                 </button>
                             </div>
@@ -656,15 +622,13 @@
                                 class="w-20 h-20 mx-auto bg-win-accent/10 rounded-2xl flex items-center justify-center mb-6 border border-win-accent/20 rotate-3 transition-transform hover:rotate-6">
                                 <i class="ph ph-identification-badge text-4xl text-win-accent"></i>
                             </div>
-                            <h3 class="font-sync text-2xl tracking-tight uppercase theme-text font-black">Área Restrita
-                            </h3>
-                            <p class="text-sm theme-text-secondary leading-relaxed px-2">
-                                Apenas produtores de conteúdo têm acesso à criação de salas. Faça login com um clique na
-                                plataforma Cloud para iniciar.
+                            <h3 data-i18n="noauth_title" class="font-sync text-2xl tracking-tight uppercase theme-text font-black">Área Restrita</h3>
+                            <p data-i18n="noauth_desc" class="text-sm theme-text-secondary leading-relaxed px-2">
+                                Apenas produtores de conteúdo têm acesso à criação de salas. Faça login com um clique na plataforma Cloud para iniciar.
                             </p>
                             <button onclick="window.location.href='login.html'"
                                 class="w-full border-2 border-win-accent bg-win-accent/10 hover:bg-win-accent text-win-accent hover:text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                                LOGIN DO PRODUTOR <i class="ph ph-arrow-right font-bold text-sm"></i>
+                                <span data-i18n="btn_login">LOGIN DO PRODUTOR</span> <i class="ph ph-arrow-right font-bold text-sm"></i>
                             </button>
                         </div>
 
@@ -680,8 +644,7 @@
                                     SALA ATIVA</h3>
                             </div>
 
-                            <p class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">Seu Link
-                                Mestre</p>
+                            <p data-i18n="label_master_link" class="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1 mb-2">Seu Link Mestre</p>
                             <div
                                 class="flex gap-2 mb-8 bg-black/30 p-1.5 rounded-xl border border-win-border shadow-inner">
                                 <input type="text" id="invite-link-input" readonly
@@ -694,7 +657,7 @@
 
                             <button onclick="goToHost()"
                                 class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-black py-5 rounded-xl text-xs uppercase tracking-widest shadow-lg shadow-win-accent/30 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                                ENTRAR NO COMMAND CENTER <i class="ph ph-arrow-right font-bold text-base"></i>
+                                <span data-i18n="btn_enter_cc">ENTRAR NO COMMAND CENTER</span> <i class="ph ph-arrow-right font-bold text-base"></i>
                             </button>
                         </div>
                     </div>
@@ -702,50 +665,44 @@
                     <!-- Aba Entrar na Sala -->
                     <div id="panel-join" class="panel-wrapper panel-hidden w-full">
                         <div class="text-center mb-6">
-                            <h3 class="font-sync text-2xl tracking-tight uppercase theme-text font-black">
-                                ACESSAR ESTÚDIO
-                            </h3>
-                            <p class="text-[11px] theme-text-secondary mt-2 px-4">Você foi convidado. Insira as
-                                credenciais para transmitir seu áudio e vídeo em alta qualidade.</p>
+                            <h3 data-i18n="join_title" class="font-sync text-2xl tracking-tight uppercase theme-text font-black">ACESSAR ESTÚDIO</h3>
+                            <p data-i18n="join_sub" class="text-[11px] theme-text-secondary mt-2 px-4">Você foi convidado. Insira as credenciais para transmitir seu áudio e vídeo em alta qualidade.</p>
                         </div>
 
                         <div class="space-y-4">
                             <div class="space-y-1.5 focus-within-glow">
-                                <label
-                                    class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">ID
-                                    do Estúdio (Sala)</label>
+                                <label data-i18n="label_studio_id"
+                                    class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">ID do Estúdio (Sala)</label>
                                 <div class="relative">
                                     <i
                                         class="ph ph-hash absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
-                                    <input type="text" id="joinRoomId" placeholder="Fornecido pelo diretor"
+                                    <input type="text" id="joinRoomId" data-i18n-ph="ph_studio_id" placeholder="Fornecido pelo diretor"
                                         class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
                                         oninput="clearFieldError('err-join-room')">
                                 </div>
                                 <p id="err-join-room"
                                     class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
-                                    <i class="ph ph-warning-circle"></i> <span id="err-join-room-msg">Informe a
-                                        sala</span>
+                                    <i class="ph ph-warning-circle"></i> <span id="err-join-room-msg" data-i18n="err_join_room">Informe a sala</span>
                                 </p>
                             </div>
                             <div class="space-y-1.5 focus-within-glow">
-                                <label
-                                    class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Seu
-                                    Nome para a TV</label>
+                                <label data-i18n="label_tv_name"
+                                    class="text-[10px] font-bold text-win-accent uppercase tracking-widest ml-1 opacity-90">Seu Nome para a TV</label>
                                 <div class="relative">
                                     <i
                                         class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-lg"></i>
-                                    <input type="text" id="userNameGuest" placeholder="Como o público verá você?"
+                                    <input type="text" id="userNameGuest" data-i18n-ph="ph_tv_name" placeholder="Como o público verá você?"
                                         class="w-full pl-11 pr-4 py-3.5 rounded-xl win-input text-sm font-semibold transition-all focus:ring-2 focus:ring-win-accent/50 outline-none"
                                         oninput="clearFieldError('err-join-name')">
                                 </div>
                                 <p id="err-join-name"
                                     class="hidden text-[11px] text-red-500 font-bold ml-1 flex items-center gap-1 mt-1">
-                                    <i class="ph ph-warning-circle"></i> Informe seu nome
+                                    <i class="ph ph-warning-circle"></i> <span data-i18n="err_name">Informe seu nome</span>
                                 </p>
                             </div>
                             <button onclick="handleJoinRoom()"
                                 class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-black py-4 rounded-xl text-xs uppercase tracking-[0.2em] shadow-lg shadow-win-accent/30 transition-all active:scale-[0.98] mt-6 flex items-center justify-center gap-2">
-                                <i class="ph ph-video-camera font-bold text-base"></i> ENTRAR AO VIVO
+                                <i class="ph ph-video-camera font-bold text-base"></i> <span data-i18n="btn_join">ENTRAR AO VIVO</span>
                             </button>
                         </div>
                     </div>
@@ -902,7 +859,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
-                if (!res.ok) throw new Error('Erro na API');
+                if (!res.ok) throw new Error(window.LYNCRO_I18N ? window.LYNCRO_I18N.t('err_api') : 'Erro na API');
 
                 const data = await res.json();
                 currentRoomData = data;
@@ -919,7 +876,7 @@
 
             } catch (err) {
                 console.error('Erro ao criar sala:', err);
-                alert('Erro ao criar sala. Verifique a conexão.');
+                alert(window.LYNCRO_I18N ? window.LYNCRO_I18N.t('err_api') : 'Erro ao criar sala. Verifique a conexão.');
                 btn.disabled = false;
                 text.classList.remove('hidden');
                 loader.classList.add('hidden');
@@ -976,19 +933,20 @@
             const btn = document.querySelector('#panel-join button[onclick]');
             const originalTextHTML = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = 'Verificando... <div class="win-loader ml-2 inline-block"></div>';
+            const _i = window.LYNCRO_I18N;
+            btn.innerHTML = (_i ? _i.t('btn_loading_join') : 'Verificando...') + ' <div class="win-loader ml-2 inline-block"></div>';
 
             try {
                 const res = await fetch(`/api/rooms/${encodeURIComponent(room)}`);
                 if (!res.ok) {
-                    document.getElementById('err-join-room-msg').textContent = 'Sala não encontrada. Verifique o ID.';
+                    document.getElementById('err-join-room-msg').textContent = _i ? _i.t('err_room_notfound') : 'Sala não encontrada. Verifique o ID.';
                     showFieldError('err-join-room');
                     btn.disabled = false;
                     btn.innerHTML = originalTextHTML;
                     return;
                 }
             } catch {
-                document.getElementById('err-join-room-msg').textContent = 'Erro de conexão. Tente novamente.';
+                document.getElementById('err-join-room-msg').textContent = _i ? _i.t('err_connection') : 'Erro de conexão. Tente novamente.';
                 showFieldError('err-join-room');
                 btn.disabled = false;
                 btn.innerHTML = originalTextHTML;
