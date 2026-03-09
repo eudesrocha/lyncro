@@ -107,18 +107,6 @@ window.LYNCRO_AUTH = {
         return true;
     },
 
-    async loginWithPassword(email, password) {
-        const client = initSupabase();
-        if (!client) throw new Error("Supabase não está pronto. Recarregue a página.");
-
-        const { error } = await client.auth.signInWithPassword({
-            email,
-            password,
-        });
-        if (error) throw error;
-        return true;
-    },
-
     async loginWithGoogle() {
         const client = initSupabase();
         if (!client) throw new Error("Supabase não está pronto. Recarregue a página.");

@@ -76,39 +76,31 @@
             <p class="text-[10px] font-bold text-win-accent tracking-[0.3em] uppercase">HOST LOGIN</p>
         </header>
 
-        <div id="login-form" class="space-y-6">
+        <div id="login-form" class="space-y-5">
             <div class="space-y-2">
                 <label class="text-[10px] font-bold theme-text-secondary uppercase tracking-widest ml-1">E-mail</label>
                 <input type="email" id="email" placeholder="seu@email.com"
-                    class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
+                    class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 focus:border-win-accent outline-none transition-all"
+                    onkeydown="if(event.key==='Enter') handleEmailLogin()">
             </div>
 
-            <div class="space-y-2">
-                <label class="text-[10px] font-bold theme-text-secondary uppercase tracking-widest ml-1">Senha <span
-                        class="text-[8px] opacity-50 lowercase">(Opcional para Link Mágico)</span></label>
-                <input type="password" id="password" placeholder="••••••••"
-                    class="w-full px-4 py-4 rounded-lg bg-black/40 border border-white/10 border-bottom-2 focus:border-win-accent outline-none transition-all">
-            </div>
-
-            <!-- Erro inline — aparece abaixo dos campos antes dos botões -->
+            <!-- Erro inline -->
             <div id="login-error" class="hidden flex items-start gap-2.5 px-3.5 py-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-[12px] font-medium">
                 <i class="ph ph-warning-circle text-base flex-shrink-0 mt-0.5"></i>
                 <span id="login-error-msg"></span>
             </div>
 
-            <div class="flex flex-col gap-3">
-                <button onclick="handlePasswordLogin()" id="btn-password"
-                    class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-lg text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95">
-                    Entrar com Senha
-                </button>
+            <button onclick="handleEmailLogin()" id="btn-email"
+                class="w-full bg-win-accent hover:bg-win-accent/90 text-white font-bold py-4 rounded-xl text-xs uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 active:scale-95 shadow-lg">
+                <i class="ph ph-envelope-simple text-base"></i>
+                Enviar Link de Acesso
+            </button>
 
-                <button onclick="handleEmailLogin()" id="btn-email"
-                    class="w-full bg-white/5 hover:bg-white/10 text-white font-bold py-3.5 rounded-lg text-[10px] uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 active:scale-95 border border-white/10 shadow-lg">
-                    <i class="ph ph-envelope-simple text-sm"></i> Enviar Link Mágico
-                </button>
-            </div>
+            <p class="text-center text-[10px] theme-text-secondary leading-relaxed px-2">
+                Você receberá um link seguro no seu e-mail para entrar sem precisar de senha.
+            </p>
 
-            <div class="relative flex items-center justify-center py-2">
+            <div class="relative flex items-center justify-center py-1">
                 <div class="w-full border-t border-white/10"></div>
                 <span class="absolute px-4 text-[10px] theme-text-secondary font-bold uppercase tracking-widest"
                     style="background:var(--card)">ou</span>
@@ -143,44 +135,23 @@
             if (el) el.classList.add('hidden');
         }
 
-        async function handlePasswordLogin() {
-            clearLoginError();
-            const email    = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-
-            if (!email || !password) return showLoginError('Insira seu email e senha.');
-
-            const btn = document.getElementById('btn-password');
-            btn.disabled = true;
-            btn.textContent = 'Entrando...';
-
-            try {
-                await window.LYNCRO_AUTH.loginWithPassword(email, password);
-                window.location.href = 'index.html';
-            } catch (err) {
-                showLoginError('Erro ao fazer login: ' + err.message);
-                btn.disabled = false;
-                btn.textContent = 'Entrar com Senha';
-            }
-        }
-
         async function handleEmailLogin() {
             clearLoginError();
             const email = document.getElementById('email').value.trim();
-            if (!email) return showLoginError('Insira seu endereço de email.');
+            if (!email) return showLoginError('Insira seu endereço de e-mail.');
 
             const btn = document.getElementById('btn-email');
             btn.disabled = true;
-            btn.innerHTML = 'Enviando...';
+            btn.innerHTML = '<i class="ph ph-circle-notch animate-spin text-base"></i> Enviando...';
 
             try {
                 await window.LYNCRO_AUTH.loginWithEmail(email);
                 document.getElementById('login-form').classList.add('hidden');
                 document.getElementById('check-email').classList.remove('hidden');
             } catch (err) {
-                showLoginError('Erro ao enviar email: ' + err.message);
+                showLoginError('Erro ao enviar e-mail: ' + err.message);
                 btn.disabled = false;
-                btn.innerHTML = '<i class="ph ph-envelope-simple text-sm"></i> Enviar Link Mágico';
+                btn.innerHTML = '<i class="ph ph-envelope-simple text-base"></i> Enviar Link de Acesso';
             }
         }
 
