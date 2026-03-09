@@ -292,12 +292,10 @@
         class="flex items-center justify-between px-4 py-3 md:px-6 glass-panel sticky top-0 z-50 border-b-0 border-x-0 border-t-0 shadow-md">
         <!-- Esquerda: Logo + Controles -->
         <div class="flex items-center gap-4">
-            <div class="flex items-center justify-center bg-win-accent/10 rounded-xl p-2 border border-win-accent/20">
-                <i class="ph ph-broadcast text-win-accent text-2xl font-bold"></i>
-            </div>
-            <h1 class="text-2xl font-logo font-black italic tracking-tight text-white leading-none hidden sm:block flex items-center gap-2">
+            <h1 class="text-2xl font-logo font-black italic tracking-tight text-white leading-none flex items-center gap-2">
                 Lyncro
-                <span id="plan-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-gray-400 tracking-widest">FREE</span>
+                <span id="plan-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 tracking-widest" style="color: #9ca3af;">FREE</span>
+                <!-- color updated by plan.js _applyGates() -->
             </h1>
 
             <div class="w-px h-6 bg-white/10 mx-2 hidden md:block"></div>
@@ -323,15 +321,21 @@
             </div>
         </div>
 
-        <!-- Centro: ID da Sala -->
-        <div class="flex flex-col items-center">
-            <span class="text-[9px] uppercase tracking-[0.2em] text-win-accent font-bold opacity-80">Command
-                Center</span>
-            <div id="room-id-display" class="text-white text-sm font-black tracking-widest">
-                <!-- Injetado via JS -->
+        <!-- Centro: ID da Sala + Invite -->
+        <div class="flex flex-col items-center gap-1">
+            <span class="text-[9px] uppercase tracking-[0.2em] text-win-accent font-bold opacity-80">Command Center</span>
+            <div class="flex items-center gap-2">
+                <div id="room-id-display" class="text-white text-sm font-black tracking-widest">
+                    <!-- Injetado via JS -->
+                </div>
+                <button onclick="copyInviteLink()" title="Copiar Link de Convite"
+                    class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-win-accent/10 border border-win-accent/20 text-win-accent hover:bg-win-accent hover:text-white transition-all text-[9px] font-bold uppercase tracking-widest">
+                    <i class="ph ph-user-plus text-xs"></i>
+                    <span class="hidden md:inline">Convidar</span>
+                </button>
             </div>
             <!-- REC indicator -->
-            <div id="rec-badge" class="hidden flex items-center gap-1 mt-0.5">
+            <div id="rec-badge" class="hidden flex items-center gap-1">
                 <span class="w-1.5 h-1.5 rounded-full bg-red-500 badge-pulse inline-block"></span>
                 <span id="rec-timer" class="text-[9px] font-mono font-bold text-red-400">00:00</span>
             </div>
@@ -447,19 +451,10 @@
         <!-- Right Side Panel (Switchboard) -->
         <aside class="w-full xl:w-[340px] flex flex-col gap-4 flex-shrink-0 min-h-0 h-[60vh] xl:h-auto">
 
-            <!-- Invite Block -->
-            <div class="glass-panel rounded-2xl p-4 flex flex-col gap-2 shrink-0 relative z-10">
-                <label class="text-[10px] font-black text-win-accent uppercase tracking-[0.2em]">Link de
-                    Convite</label>
-                <div class="flex items-center gap-2 bg-black/30 rounded-xl p-2 border border-white/10 shadow-inner">
-                    <input id="invite-link-input"
-                        class="bg-transparent border-none text-[10px] font-mono text-gray-300 w-full focus:ring-0 outline-none"
-                        readonly="" type="text" value="Gerando link..." />
-                    <button onclick="copyInviteLinkGlobal()" id="copy-global-btn"
-                        class="w-8 h-8 rounded-lg bg-win-accent/20 text-win-accent hover:bg-win-accent hover:text-white flex items-center justify-center transition-all shrink-0">
-                        <i id="copy-global-ico" class="ph ph-copy text-sm"></i>
-                    </button>
-                </div>
+            <!-- Dashboard Block -->
+            <!-- invite-link-input kept hidden for JS compatibility -->
+            <input id="invite-link-input" type="hidden" value="" />
+            <div class="glass-panel rounded-2xl p-3 flex flex-col gap-2 shrink-0 relative z-10">
                 <!-- Master Dashboard (Grid) Controls -->
                 <div class="flex items-center gap-2 mt-1">
                     <button onclick="openMasterGrid()"

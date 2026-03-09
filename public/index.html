@@ -977,7 +977,8 @@
 
         function goToHost() {
             if (currentRoomData) {
-                window.location.href = `host.html?room=${currentRoomData.roomId}`;
+                const name = document.getElementById('userNameHost')?.value.trim() || localStorage.getItem('sv_last_name') || '';
+                window.location.href = `host.html?room=${currentRoomData.roomId}${name ? '&name=' + encodeURIComponent(name) : ''}`;
             }
         }
 

@@ -105,7 +105,7 @@ async function init() {
     setupWebSocket();
 
     // 2. Renderizar card local (vazio inicialmente)
-    renderParticipantCard({ id: 'local', name: userName, role: 'host' }, true);
+    renderParticipantCard({ id: 'local', name: displayName, role: 'host' }, true);
 
     // 3. Solicitar mídias em background
     try {
@@ -647,7 +647,7 @@ function renderParticipantCard(participant, isLocal = false) {
       </div>
 
       <!-- Barra de Controles Compacta (4 botões) -->
-      <div class="p-2 flex items-center justify-between bg-white/5 border-t border-win-border gap-1">
+      <div class="p-2 flex items-center justify-end bg-white/5 border-t border-win-border gap-1">
         <!-- Botão 1: Microfone + Dropdown -->
         <div class="relative flex items-center">
           <button id="btn-audio-${participant.id}" class="${participant.audioMuted ? 'text-red-500 bg-red-600/10 border-red-500/20' : 'text-gray-400 border-win-border hover:text-white hover:bg-white/5'} p-1.5 border rounded-l-win transition-all" onclick="remoteMute('${participant.id}')">
@@ -673,7 +673,7 @@ function renderParticipantCard(participant, isLocal = false) {
         </div>
 
         <!-- Botão 3: Lower Third -->
-        <button onclick="toggleCardPanel('lt-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-win-accent hover:bg-win-accent/5 transition-all" title="Lower Third">
+        <button onclick="toggleLTPanel('lt-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-win-accent hover:bg-win-accent/5 transition-all" title="Lower Third">
           <i class="ph ph-text-aa text-sm"></i>
         </button>
 
@@ -711,13 +711,8 @@ function renderParticipantCard(participant, isLocal = false) {
               ` : ''}
               `}
               <button id="btn-ov-toggle-${participant.id}" onclick="toggleOverlay('${participant.id}')"
-                class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}">
-                Disparar
-              </button>
-              <button id="btn-hide-ov-${participant.id}" onclick="hideOverlay('${participant.id}')" title="Ocultar Lower Third"
-                class="text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-win transition-all bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white border border-red-500/30"
-                style="display:${participant.overlayActive ? 'inline-flex' : 'none'}; align-items:center; justify-content:center;">
-                ×
+                class="text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${participant.overlayActive ? 'bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600 hover:text-white' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}">
+                ${participant.overlayActive ? 'Desativar' : 'Disparar'}
               </button>
             </div>
           </div>
@@ -780,29 +775,46 @@ function renderParticipantCard(participant, isLocal = false) {
                         </button>
 
                         <!-- Animated -->
-                        <button onclick="setVirtualBackground('anim-window', null, this.id)"
-                            id="vb-btn-anim-window"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-sky-400 to-green-700">
-                            <i class="ph ph-window text-white/60 text-lg absolute top-2"></i>
-                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
-                            <span class="mt-4 text-[8px] font-bold text-white uppercase tracking-widest">Janela</span>
+                        <button onclick="setVirtualBackground('anim-fireflies', null, this.id)"
+                            id="vb-btn-anim-fireflies"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-[#050d1a] to-[#061022]">
+                            <i class="ph ph-sparkle text-[#b3ff6e]/60 text-lg absolute top-2"></i>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span class="mt-4 text-[8px] font-bold text-[#b3ff6e] uppercase tracking-widest">Vaga-lumes</span>
                         </button>
-                        <button onclick="setVirtualBackground('anim-studio', null, this.id)" id="vb-btn-anim-studio"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-br from-blue-900 to-black relative">
-                            <i class="ph ph-film-strip text-white/40 text-lg absolute top-3"></i>
-                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
-                            <span class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Premium</span>
+                        <button onclick="setVirtualBackground('anim-geometric', null, this.id)"
+                            id="vb-btn-anim-geometric"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-br from-[#070d1e] to-[#100820]">
+                            <i class="ph ph-hexagon text-[#c77dff]/60 text-lg absolute top-2"></i>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span class="mt-4 text-[9px] font-bold text-[#c77dff] uppercase tracking-widest">Geométrico</span>
                         </button>
-                        <button onclick="setVirtualBackground('anim-particles', null, this.id)"
-                            id="vb-btn-anim-particles"
-                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-tr from-purple-900 to-[#1a0a1f] relative">
-                            <i class="ph ph-sparkle text-white/40 text-lg absolute top-3"></i>
-                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i
-                                    class="ph ph-film-strip text-white text-[10px]"></i></div>
-                            <span
-                                class="mt-4 text-[9px] font-bold text-white uppercase tracking-widest">Partículas</span>
+                        <button onclick="setVirtualBackground('anim-waves', null, this.id)"
+                            id="vb-btn-anim-waves"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-[#080c14] to-[#0c1220]">
+                            <i class="ph ph-wave-sine text-[#00b4d8]/60 text-lg absolute top-2"></i>
+                            <div class="absolute top-1 right-1 bg-black/60 rounded px-1"><i class="ph ph-film-strip text-white text-[10px]"></i></div>
+                            <span class="mt-4 text-[9px] font-bold text-[#00b4d8] uppercase tracking-widest">Ondas</span>
+                        </button>
+
+                        <!-- Static Canvas BGs -->
+                        <button onclick="setVirtualBackground('homeoffice', null, this.id)"
+                            id="vb-btn-homeoffice"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-[#d4c9b8] to-[#8b6943]">
+                            <i class="ph ph-house text-white/60 text-lg absolute top-2"></i>
+                            <span class="mt-4 text-[8px] font-bold text-white uppercase tracking-widest">Home Office</span>
+                        </button>
+                        <button onclick="setVirtualBackground('kitchen', null, this.id)"
+                            id="vb-btn-kitchen"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-[#f2f0ec] to-[#c8c0b4]">
+                            <i class="ph ph-cooking-pot text-gray-500 text-lg absolute top-2"></i>
+                            <span class="mt-4 text-[8px] font-bold text-gray-600 uppercase tracking-widest">Cozinha</span>
+                        </button>
+                        <button onclick="setVirtualBackground('balcony', null, this.id)"
+                            id="vb-btn-balcony"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-xl border border-transparent overflow-hidden transition-all hover:border-win-accent cursor-pointer group relative w-[5.5rem] h-16 bg-gradient-to-b from-[#3d9be9] to-[#1a5f8a]">
+                            <i class="ph ph-ocean text-white/60 text-lg absolute top-2"></i>
+                            <span class="mt-4 text-[8px] font-bold text-white uppercase tracking-widest">Varanda</span>
                         </button>
           </div>
         </div>
@@ -905,12 +917,8 @@ function updateParticipantStatus(p) {
 
     const btnOv = document.getElementById(`btn-ov-toggle-${p.id}`);
     if (btnOv) {
-        btnOv.className = `text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${p.overlayActive ? 'bg-win-accent text-white shadow-lg shadow-win-accent/20 border border-win-accent' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}`;
-        btnOv.textContent = 'Disparar';
-    }
-    const btnHideOv = document.getElementById(`btn-hide-ov-${p.id}`);
-    if (btnHideOv) {
-        btnHideOv.style.display = p.overlayActive ? 'inline-flex' : 'none';
+        btnOv.className = `text-[9px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-win transition-all ${p.overlayActive ? 'bg-red-600/20 text-red-400 border border-red-500/30 hover:bg-red-600 hover:text-white' : 'bg-win-surface/30 text-gray-500 hover:text-white border border-win-border'}`;
+        btnOv.textContent = p.overlayActive ? 'Desativar' : 'Disparar';
     }
 }
 
@@ -1106,33 +1114,48 @@ function getLTStyle() {
 }
 
 window.toggleOverlay = (pId) => {
+    if (!window.LYNCRO_PLAN.require('Lower Thirds')) return;
+
     const p = currentParticipants.find(part => part.id === pId) || (pId === 'local' ? { id: 'local', overlayActive: false } : null);
     if (!p) return;
 
     const nameInput = document.getElementById(`ov-name-${pId}`);
     const titleInput = document.getElementById(`ov-title-${pId}`);
 
-    ws.send(JSON.stringify({
-        type: 'overlay-control',
-        roomId: roomName,
-        targetId: pId,
-        action: 'show',
-        name: nameInput ? nameInput.value : p.name,
-        title: titleInput ? titleInput.value : '',
-        style: getLTStyle()
-    }));
+    if (p.overlayActive) {
+        // Toggle OFF
+        ws.send(JSON.stringify({
+            type: 'overlay-control',
+            roomId: roomName,
+            targetId: pId,
+            action: 'hide',
+            name: p.overlayName || '',
+            title: p.overlayTitle || '',
+            style: getLTStyle()
+        }));
+        p.overlayActive = false;
+    } else {
+        // Toggle ON
+        ws.send(JSON.stringify({
+            type: 'overlay-control',
+            roomId: roomName,
+            targetId: pId,
+            action: 'show',
+            name: nameInput ? nameInput.value : p.name,
+            title: titleInput ? titleInput.value : '',
+            style: getLTStyle()
+        }));
+        p.overlayActive = true;
+        p.overlayName = nameInput ? nameInput.value : p.name;
+        p.overlayTitle = titleInput ? titleInput.value : '';
+    }
 
-    // Atualização otimista
-    p.overlayActive = true;
-    p.overlayName = nameInput ? nameInput.value : p.name;
-    p.overlayTitle = titleInput ? titleInput.value : '';
     updateParticipantStatus(p);
 };
 
 window.hideOverlay = (pId) => {
     const p = currentParticipants.find(part => part.id === pId);
     if (!p) return;
-
     ws.send(JSON.stringify({
         type: 'overlay-control',
         roomId: roomName,
@@ -1142,7 +1165,6 @@ window.hideOverlay = (pId) => {
         title: p.overlayTitle || '',
         style: getLTStyle()
     }));
-
     p.overlayActive = false;
     updateParticipantStatus(p);
 };
@@ -1274,7 +1296,6 @@ window.copyCleanFeed = (pId, type = 'camera') => {
 window.toggleCardPanel = (panelId) => {
     const panel = document.getElementById(panelId);
     if (!panel) return;
-    // Fechar outros painéis do mesmo card
     const card = panel.closest('[id^="video-card-"]');
     if (card) {
         card.querySelectorAll('[id^="lt-panel-"], [id^="vb-panel-"]').forEach(p => {
@@ -1282,6 +1303,12 @@ window.toggleCardPanel = (panelId) => {
         });
     }
     panel.classList.toggle('hidden');
+};
+
+// Lower third panel toggle with PRO gate
+window.toggleLTPanel = (panelId) => {
+    if (!window.LYNCRO_PLAN.require('Lower Thirds')) return;
+    window.toggleCardPanel(panelId);
 };
 
 // toggleCardDropdown definido abaixo com lógica completa de enumeração de dispositivos
@@ -1312,6 +1339,8 @@ function showToast(message, type = "info") {
 
 // Funcao exposta pro HTML para selecionar Fundo (Host)
 window.setVirtualBackground = async (mode, imageUrl = null, btnId = null) => {
+    if (mode !== 'none' && !window.LYNCRO_PLAN.require('Fundo Virtual')) return;
+
     currentVbMode = mode;
     currentVbImage = imageUrl;
 
@@ -1641,6 +1670,11 @@ document.addEventListener('click', (e) => {
 });
 
 window.changeHostQuality = async (qualityKey) => {
+    if (qualityKey === '1080_30' && !window.LYNCRO_PLAN.require('1080p Full HD')) {
+        // Revert selector to current value
+        document.querySelectorAll('#host-quality-select, #host-quality-select-settings').forEach(sel => { if (sel) sel.value = getHostQuality(); });
+        return;
+    }
     localStorage.setItem('lyncro_host_quality', qualityKey);
     const preset = VIDEO_QUALITY_PRESETS[qualityKey];
     if (!preset) return;
@@ -1817,7 +1851,9 @@ let isPrompterFinished = false;
 window.togglePrompterUI = () => {
     const body = document.getElementById('prompter-body');
     const caret = document.getElementById('prompter-caret');
+    // Gate: only allow opening when PRO
     if (body.classList.contains('hidden')) {
+        if (!window.LYNCRO_PLAN.require('Teleprompter')) return;
         body.classList.remove('hidden');
         caret.style.transform = 'rotate(-180deg)';
     } else {

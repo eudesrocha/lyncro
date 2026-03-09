@@ -182,8 +182,10 @@
             if (badge) {
                 badge.textContent = _plan === 'pro' ? 'PRO' : 'FREE';
                 badge.className = _plan === 'pro'
-                    ? 'text-[9px] font-black px-1.5 py-0.5 rounded bg-win-accent text-white tracking-widest'
-                    : 'text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 text-gray-400 tracking-widest';
+                    ? 'text-[9px] font-black px-1.5 py-0.5 rounded bg-win-accent tracking-widest'
+                    : 'text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 tracking-widest';
+                // Force white text on PRO regardless of light/dark mode
+                badge.style.color = _plan === 'pro' ? '#ffffff' : '';
             }
         },
     };
