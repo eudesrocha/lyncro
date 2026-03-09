@@ -8,7 +8,7 @@ const MAX_CONNECTIONS_PER_IP = 10;
 const MAX_MESSAGES_PER_SECOND = 30;
 const connectionsByIp = new Map(); // ip -> count
 
-const HOST_GRACE_MS = 30_000; // 30s para o host reconectar antes de encerrar a sessão
+const HOST_GRACE_MS = 45_000; // 45s para o host reconectar antes de encerrar a sessão
 const GUEST_GRACE_MS = 30_000; // 30s para convidado aceito reconectar antes de ser removido
 
 function setupSignaling(server) {
@@ -210,6 +210,27 @@ function setupSignaling(server) {
                             text: data.text,
                             timestamp: Date.now()
                         });
+                        break;
+
+                    case 'session-ended':
+                        // Host encerrou a sessão intencionalmente
+                        if (currentRoomId && participantId) {
+                            console.log(`[SESSION-END] Host ${participantId} encerrou a sessão "${currentRoomId}" intencionalmente.`);
+                            // Avisar todos os convidados antes de limpar
+                            broadcastToRoom(currentRoomId, { type: 'session-ended', reason: 'host_ended' });
+                            // Cancelar grace timer se houver
+                            if (hostGraceTimers.has(currentRoomId)) {
+                                clearTimeout(hostGraceTimers.get(currentRoomId));
+                                hostGraceTimers.delete(currentRoomId);
+                            }
+                            // Fechar conexões dos convidados após breve delay
+                            setTimeout(() => {
+                                const r = roomManager.getRoom(currentRoomId);
+                                if (r) roomManager.getParticipants(currentRoomId).forEach(p => {
+                                    if (p.ws) try { p.ws.close(); } catch (_) { }
+                                });
+                            }, 1500);
+                        }
                         break;
 
                     case 'leave':
@@ -490,7 +511,7 @@ function setupSignaling(server) {
 
                         if (hasGuests) {
                             console.log(`[GRACE] Host não reconectou à sala "${currentRoomId}". Encerrando sessão para ${room.participants.length} convidado(s).`);
-                            broadcastToRoom(currentRoomId, { type: 'session-ended' });
+                            broadcastToRoom(currentRoomId, { type: 'session-ended', reason: 'host_timeout' });
                             // Fechar conexões dos convidados após breve delay para garantir entrega
                             setTimeout(() => {
                                 roomManager.getParticipants(currentRoomId).forEach(p => {

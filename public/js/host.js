@@ -1914,13 +1914,19 @@ window.adjustPrompter = (field, delta) => {
     const config = {
         speed:  { min: 1,  max: 10,  step: 1,  label: 'lbl-prompter-speed',  suffix: 'x' },
         size:   { min: 30, max: 120, step: 5,  label: 'lbl-prompter-size',   suffix: 'px' },
-        margin: { min: 0,  max: 40,  step: 5,  label: 'lbl-prompter-margin', suffix: '%' },
     };
     const c = config[field];
     if (!c) return;
     prompterState[field] = Math.max(c.min, Math.min(c.max, prompterState[field] + delta));
     const lbl = document.getElementById(c.label);
     if (lbl) lbl.innerText = prompterState[field] + c.suffix;
+    broadcastPrompterState();
+};
+
+window.setPrompterMargin = (val) => {
+    prompterState.margin = Number(val);
+    const lbl = document.getElementById('lbl-prompter-margin');
+    if (lbl) lbl.innerText = val + '%';
     broadcastPrompterState();
 };
 

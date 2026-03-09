@@ -1079,16 +1079,23 @@ async function setupWebSocket() {
                 }
                 break;
             case 'host-disconnected':
-                showSessionBanner('O host desconectou. Aguardando reconexão...', 'warning');
+                showSessionBanner(
+                    window.LYNCRO_I18N ? LYNCRO_I18N.t('host_disconnected') : 'Produtor desconectado. Aguardando reconexão...',
+                    'warning'
+                );
                 break;
 
-            case 'session-ended':
+            case 'session-ended': {
                 wsIntentionalClose = true;
                 if (localStream) localStream.getTracks().forEach(t => t.stop());
                 if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) { } }); rtcClient.peers.clear(); }
                 if (speakerDetectionInterval) { clearInterval(speakerDetectionInterval); speakerDetectionInterval = null; }
-                showSessionEndedScreen('O host encerrou a sessão.');
+                const endReason = data.reason === 'host_timeout'
+                    ? (window.LYNCRO_I18N ? LYNCRO_I18N.t('session_ended_timeout') : 'Conexão do produtor foi perdida.')
+                    : (window.LYNCRO_I18N ? LYNCRO_I18N.t('session_ended_host') : 'O produtor encerrou a sessão.');
+                showSessionEndedScreen(endReason);
                 break;
+            }
 
             case 'kicked':
                 wsIntentionalClose = true;
@@ -2004,4 +2011,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (container) container.style.cursor = 'grab';
         });
     }
+});
+
+// ── More Menu (toolbar do convidado) ──────────────────────────────────────────
+window.toggleMoreMenu = function () {
+    const menu = document.getElementById('more-menu');
+    if (menu) menu.classList.toggle('hidden');
+};
+
+window.closeMoreMenu = function () {
+    const menu = document.getElementById('more-menu');
+    if (menu) menu.classList.add('hidden');
+};
+
+document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('more-menu-wrap');
+    if (wrap && !wrap.contains(e.target)) closeMoreMenu();
 });

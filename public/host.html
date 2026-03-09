@@ -323,15 +323,14 @@
 
         <!-- Centro: ID da Sala + Invite -->
         <div class="flex flex-col items-center gap-1">
-            <span class="text-[9px] uppercase tracking-[0.2em] text-win-accent font-bold opacity-80">Command Center</span>
             <div class="flex items-center gap-2">
-                <div id="room-id-display" class="text-white text-sm font-black tracking-widest">
+                <div id="room-id-display" class="text-white text-base font-black tracking-widest">
                     <!-- Injetado via JS -->
                 </div>
-                <button onclick="copyInviteLink()" title="Copiar Link de Convite"
-                    class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-win-accent/10 border border-win-accent/20 text-win-accent hover:bg-win-accent hover:text-white transition-all text-[9px] font-bold uppercase tracking-widest">
-                    <i class="ph ph-user-plus text-xs"></i>
-                    <span class="hidden md:inline">Convidar</span>
+                <button onclick="copyInviteLink()" data-i18n-title="btn_invite_tooltip"
+                    class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-win-accent/20 border border-win-accent/40 text-win-accent hover:bg-win-accent hover:text-white transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                    <i class="ph ph-user-plus text-sm"></i>
+                    <span class="hidden md:inline" data-i18n="btn_invite">Convidar</span>
                 </button>
             </div>
             <!-- REC indicator -->
@@ -371,22 +370,22 @@
                     <i class="ph ph-gear text-lg"></i>
                 </button>
                 <div id="settings-picker-menu"
-                    class="hidden absolute top-full right-0 mt-2 w-56 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl z-[999]">
+                    class="hidden absolute top-full right-0 mt-2 w-80 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl z-[999]">
                     <div class="p-1.5 flex flex-col gap-0.5">
                         <button onclick="openSettingsModal(); closeSettingsPicker()"
                             class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-left">
                             <i class="ph ph-text-aa text-sm text-win-accent"></i>
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Letreiros & Lower Thirds</span>
+                            <span class="text-[10px] font-bold tracking-wide text-gray-300" data-i18n="menu_lower_thirds">Letreiros & Lower Thirds</span>
                         </button>
                         <div class="my-0.5 border-t border-white/5"></div>
                         <div class="px-3 pt-2 pb-1.5">
-                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500">Produção</span>
+                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500" data-i18n="section_production">Produção</span>
                         </div>
                         <button onclick="toggleSoundNotifications()"
                             class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-left">
                             <div class="flex items-center gap-2.5">
                                 <i class="ph ph-bell text-sm text-gray-400"></i>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Som de Entrada</span>
+                                <span class="text-[10px] font-bold tracking-wide text-gray-300" data-i18n="menu_sound">Som de Entrada</span>
                             </div>
                             <div id="setting-sound-indicator" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors"></div>
                         </button>
@@ -394,13 +393,13 @@
                             class="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-left">
                             <div class="flex items-center gap-2.5">
                                 <i class="ph ph-identification-badge text-sm text-gray-400"></i>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-gray-300">Exibir Labels</span>
+                                <span class="text-[10px] font-bold tracking-wide text-gray-300" data-i18n="menu_labels">Exibir Labels</span>
                             </div>
                             <div id="setting-labels-indicator" class="w-2 h-2 rounded-full bg-emerald-500 transition-colors"></div>
                         </button>
                         <div class="my-1 border-t border-white/5"></div>
                         <div class="px-3 pt-1 pb-1.5">
-                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500">Câmera Host</span>
+                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500" data-i18n="section_host_cam">Câmera Host</span>
                         </div>
                         <div class="flex items-center gap-2 px-3 py-1.5">
                             <i class="ph ph-video-camera text-sm text-gray-500"></i>
@@ -417,7 +416,7 @@
 
             <!-- Logout / End -->
             <button
-                onclick="if(ws && ws.readyState === WebSocket.OPEN){ ws.send(JSON.stringify({type: 'leave', roomId: roomName})); ws.close(); wsIntentionalClose = true; } window.location.href='index.html'"
+                onclick="if(ws && ws.readyState === WebSocket.OPEN){ ws.send(JSON.stringify({type: 'session-ended', roomId: roomName})); ws.close(); wsIntentionalClose = true; } window.location.href='index.html'"
                 class="flex size-9 items-center justify-center rounded-xl bg-red-600/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 transition-colors text-red-500 hover:text-white"
                 title="Encerrar Sessão">
                 <i class="ph ph-power text-lg"></i>
@@ -459,7 +458,7 @@
                 <div class="flex items-center gap-2 mt-1">
                     <button onclick="openMasterGrid()"
                         class="flex-1 bg-gradient-to-r from-purple-900/40 to-win-accent/30 text-purple-300 border border-purple-500/30 hover:from-purple-800 hover:to-win-accent hover:text-white rounded-lg py-2 text-[10px] uppercase font-bold tracking-widest transition-all drop-shadow-lg flex items-center justify-center gap-1.5">
-                        <i class="ph ph-grid-four text-sm"></i> View Dashboard
+                        <i class="ph ph-grid-four text-sm"></i> <span data-i18n="btn_open_dashboard">Painel ao Vivo</span>
                     </button>
 
                     <!-- Layout Picker Dropdown -->
@@ -470,36 +469,36 @@
                             <i class="ph ph-squares-four text-sm"></i>
                         </button>
                         <div id="layout-picker-menu"
-                            class="hidden absolute bottom-full right-0 mb-2 w-44 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-[999]">
+                            class="hidden absolute bottom-full right-0 mb-2 w-80 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl overflow-hidden z-[999]">
                             <div class="p-1.5 flex flex-col gap-0.5">
                                 <button onclick="changeLayout('auto-grid'); closeLayoutPicker()" id="layout-auto-grid"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-squares-four text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Auto Grid</span>
+                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_auto_grid">Auto Grid</span>
                                 </button>
                                 <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('CNN Split')) return; changeLayout('cnn-split'); closeLayoutPicker()" id="layout-cnn-split"
                                     data-pro-feature="CNN Split"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-layout text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">CNN Split</span>
+                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_cnn_split">CNN Split</span>
                                     <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
                                 <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('CNN Vertical')) return; changeLayout('cnn-vertical'); closeLayoutPicker()" id="layout-cnn-vertical"
                                     data-pro-feature="CNN Vertical"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-rows text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">CNN Vertical</span>
+                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_cnn_vertical">CNN Vertical</span>
                                     <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
                                 <button onclick="changeLayout('portrait-cards'); closeLayoutPicker()" id="layout-portrait-cards"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-cards text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Portrait Cards</span>
+                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_portrait_cards">Portrait Cards</span>
                                 </button>
                                 <button onclick="changeLayout('speaker-highlight'); closeLayoutPicker()" id="layout-speaker-highlight"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-presentation-chart text-sm shrink-0"></i>
-                                    <span class="text-[10px] font-bold uppercase tracking-wider">Highlight</span>
+                                    <span class="text-[10px] font-bold tracking-wide" data-i18n="layout_highlight">Highlight</span>
                                 </button>
                             </div>
                         </div>
@@ -560,40 +559,41 @@
                         class="w-full h-28 bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-win-accent transition-colors text-xs placeholder:text-gray-600 font-medium custom-scrollbar theme-text"
                         placeholder="Cole o Roteiro para os Convidados aqui..."></textarea>
 
-                    <div class="flex items-center gap-3">
+                    <!-- Linha única: Play + Velocidade + Tamanho -->
+                    <div class="flex items-center gap-2">
                         <button id="btn-prompter-play" onclick="togglePrompterPlayback()"
-                            class="w-10 h-10 rounded-xl bg-win-accent/20 text-win-accent border border-win-accent/30 hover:bg-win-accent hover:text-white flex items-center justify-center transition-all shrink-0 shadow-lg shadow-win-accent/10"
+                            class="w-8 h-8 rounded-xl bg-win-accent/20 text-win-accent border border-win-accent/30 hover:bg-win-accent hover:text-white flex items-center justify-center transition-all shrink-0"
                             title="Rolar Texto">
-                            <i id="ico-prompter-play" class="ph ph-play text-lg"></i>
+                            <i id="ico-prompter-play" class="ph ph-play text-base"></i>
                         </button>
 
-                        <div class="flex-1 flex flex-col gap-1.5 mt-1">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest">Velocidade</span>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="adjustPrompter('speed',-1)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">−</button>
-                                <span id="lbl-prompter-speed" class="flex-1 text-center text-[11px] font-bold text-gray-200">4x</span>
-                                <button onclick="adjustPrompter('speed',1)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">+</button>
-                            </div>
+                        <div class="w-px h-5 bg-white/10 shrink-0"></div>
+
+                        <!-- Velocidade -->
+                        <div class="flex items-center gap-1 flex-1">
+                            <span class="text-[9px] text-gray-500 uppercase tracking-widest shrink-0">Vel</span>
+                            <button onclick="adjustPrompter('speed',-1)" class="w-6 h-6 rounded-md bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-xs font-bold">−</button>
+                            <span id="lbl-prompter-speed" class="w-7 text-center text-[11px] font-bold text-gray-200">4x</span>
+                            <button onclick="adjustPrompter('speed',1)" class="w-6 h-6 rounded-md bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-xs font-bold">+</button>
+                        </div>
+
+                        <div class="w-px h-5 bg-white/10 shrink-0"></div>
+
+                        <!-- Tamanho -->
+                        <div class="flex items-center gap-1 flex-1">
+                            <span class="text-[9px] text-gray-500 uppercase tracking-widest shrink-0" title="Tamanho da Fonte"><i class="ph ph-text-t"></i></span>
+                            <button onclick="adjustPrompter('size',-5)" class="w-6 h-6 rounded-md bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-xs font-bold">−</button>
+                            <span id="lbl-prompter-size" class="w-9 text-center text-[11px] font-bold text-gray-200">60px</span>
+                            <button onclick="adjustPrompter('size',5)" class="w-6 h-6 rounded-md bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-xs font-bold">+</button>
                         </div>
                     </div>
 
-                    <div class="flex items-center gap-5 mt-1">
-                        <div class="flex-1 flex flex-col gap-1.5">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest" title="Tamanho da Fonte no PC do Convidado"><i class="ph ph-text-t"></i> Tamanho</span>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="adjustPrompter('size',-5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">−</button>
-                                <span id="lbl-prompter-size" class="flex-1 text-center text-[11px] font-bold text-gray-200">60px</span>
-                                <button onclick="adjustPrompter('size',5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">+</button>
-                            </div>
-                        </div>
-                        <div class="flex-1 flex flex-col gap-1.5">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest" title="Distância Horizontal do Texto"><i class="ph ph-arrows-in-line-horizontal"></i> Margem</span>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="adjustPrompter('margin',-5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">−</button>
-                                <span id="lbl-prompter-margin" class="flex-1 text-center text-[11px] font-bold text-gray-200">5%</span>
-                                <button onclick="adjustPrompter('margin',5)" class="w-7 h-7 rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent flex items-center justify-center transition-all text-sm font-bold">+</button>
-                            </div>
-                        </div>
+                    <!-- Slider de Margem (discreto) -->
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="text-[9px] text-gray-600 uppercase tracking-widest shrink-0 w-12" title="Margem Horizontal"><i class="ph ph-arrows-in-line-horizontal"></i> <span id="lbl-prompter-margin" class="text-gray-500">5%</span></span>
+                        <input id="slider-prompter-margin" type="range" min="0" max="40" step="5" value="5"
+                            oninput="setPrompterMargin(this.value)"
+                            class="flex-1 h-1 accent-win-accent cursor-pointer opacity-60 hover:opacity-100 transition-opacity">
                     </div>
             </section>
 

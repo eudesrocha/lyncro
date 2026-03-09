@@ -717,6 +717,36 @@
                             class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
                             <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
                         </button>
+                        <button onclick="setVirtualBackground('anim-fireflies', null, this.id)" id="pre-vb-btn-fireflies"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-indigo-950/60 border border-indigo-500/20 transition-all hover:bg-indigo-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-sparkle text-xl text-indigo-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-indigo-300" data-i18n="vb_fireflies">Partículas</span>
+                        </button>
+                        <button onclick="setVirtualBackground('anim-geometric', null, this.id)" id="pre-vb-btn-geometric"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-purple-950/60 border border-purple-500/20 transition-all hover:bg-purple-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-shapes text-xl text-purple-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-purple-300" data-i18n="vb_geometric">Geométrico</span>
+                        </button>
+                        <button onclick="setVirtualBackground('anim-waves', null, this.id)" id="pre-vb-btn-waves"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-cyan-950/60 border border-cyan-500/20 transition-all hover:bg-cyan-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-wave-sine text-xl text-cyan-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-cyan-300" data-i18n="vb_waves">Ondas</span>
+                        </button>
+                        <button onclick="setVirtualBackground('homeoffice', null, this.id)" id="pre-vb-btn-homeoffice"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-amber-950/60 border border-amber-500/20 transition-all hover:bg-amber-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-house text-xl text-amber-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-amber-300" data-i18n="vb_home">Home Office</span>
+                        </button>
+                        <button onclick="setVirtualBackground('kitchen', null, this.id)" id="pre-vb-btn-kitchen"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-orange-950/60 border border-orange-500/20 transition-all hover:bg-orange-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-cooking-pot text-xl text-orange-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-orange-300" data-i18n="vb_kitchen">Cozinha</span>
+                        </button>
+                        <button onclick="setVirtualBackground('balcony', null, this.id)" id="pre-vb-btn-balcony"
+                            class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-sky-950/60 border border-sky-500/20 transition-all hover:bg-sky-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                            <i class="ph ph-buildings text-xl text-sky-300 mb-1"></i>
+                            <span class="text-[8px] font-bold uppercase tracking-widest text-sky-300" data-i18n="vb_balcony">Varanda</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -770,12 +800,10 @@
             Você Está no Ar!
         </div>
 
-        <!-- Indicador de Status Lyncro Minimalista -->
-        <div
-            class="absolute top-4 sm:top-6 left-4 sm:left-6 z-50 flex items-center gap-3 glass-panel px-4 py-2 rounded-full shadow-xl">
+        <!-- Indicador de Status (só dot, sem texto) -->
+        <div class="absolute top-4 sm:top-6 left-4 sm:left-6 z-50 flex items-center gap-2 glass-panel px-3 py-2 rounded-full shadow-xl">
             <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.8)]"></div>
-            <span class="text-[10px] uppercase font-bold tracking-widest text-white/90"
-                id="room-status-indicator">LYNCRO LIVE</span>
+            <span id="room-status-indicator" class="text-[10px] font-bold tracking-widest text-white/70 hidden"></span>
         </div>
 
         <!-- Screen Share Indicator -->
@@ -864,6 +892,37 @@
                         id="vb-btn-studio-pro"
                         class="flex-none snap-start flex flex-col items-center justify-center p-0 rounded-2xl border border-transparent overflow-hidden transition-all hover:border-win-accent hover:shadow-[0_0_15px_rgba(0,120,212,0.4)] cursor-pointer group relative w-[5.5rem] h-16 shadow-lg">
                         <img src="img/bg-studio-pro.png" alt="Studio" class="w-full h-full object-cover">
+                    </button>
+                    <!-- Backgrounds animados e cenas -->
+                    <button onclick="setVirtualBackground('anim-fireflies', null, this.id)" id="vb-btn-fireflies"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-indigo-950/60 border border-indigo-500/20 transition-all hover:bg-indigo-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-sparkle text-xl text-indigo-300 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-indigo-300" data-i18n="vb_fireflies">Partículas</span>
+                    </button>
+                    <button onclick="setVirtualBackground('anim-geometric', null, this.id)" id="vb-btn-geometric"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-purple-950/60 border border-purple-500/20 transition-all hover:bg-purple-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-shapes text-xl text-purple-300 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-purple-300" data-i18n="vb_geometric">Geométrico</span>
+                    </button>
+                    <button onclick="setVirtualBackground('anim-waves', null, this.id)" id="vb-btn-waves"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-cyan-950/60 border border-cyan-500/20 transition-all hover:bg-cyan-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-wave-sine text-xl text-cyan-300 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-cyan-300" data-i18n="vb_waves">Ondas</span>
+                    </button>
+                    <button onclick="setVirtualBackground('homeoffice', null, this.id)" id="vb-btn-homeoffice"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-amber-950/60 border border-amber-500/20 transition-all hover:bg-amber-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-house text-xl text-amber-300 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-amber-300" data-i18n="vb_home">Home Office</span>
+                    </button>
+                    <button onclick="setVirtualBackground('kitchen', null, this.id)" id="vb-btn-kitchen"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-orange-950/60 border border-orange-500/20 transition-all hover:bg-orange-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-cooking-pot text-xl text-orange-300 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-orange-300" data-i18n="vb_kitchen">Cozinha</span>
+                    </button>
+                    <button onclick="setVirtualBackground('balcony', null, this.id)" id="vb-btn-balcony"
+                        class="flex-none snap-start flex flex-col items-center justify-center p-2 rounded-2xl bg-sky-950/60 border border-sky-500/20 transition-all hover:bg-sky-900/60 hover:border-win-accent cursor-pointer w-[5.5rem] h-16 shadow-lg">
+                        <i class="ph ph-buildings text-xl text-sky-300 mb-1"></i>
+                        <span class="text-[8px] font-bold uppercase tracking-widest text-sky-300" data-i18n="vb_balcony">Varanda</span>
                     </button>
                 </div>
             </div>
@@ -994,105 +1053,114 @@
         <!-- Controles Inferiores Flutuantes (Mobile-First Glassmorphism) -->
         <div class="absolute bottom-6 left-2 right-2 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto z-50">
             <!-- Ilha de Controles Central -->
-            <div
-                class="glass-panel rounded-[2rem] p-2 flex items-center justify-between sm:justify-center gap-2 sm:gap-3 w-full shadow-[0_20px_50px_-10px_rgba(0,0,0,0.8)] border border-white/10 backdrop-blur-2xl relative">
+            <div class="glass-panel rounded-[2rem] p-2 flex items-center justify-between gap-2 sm:gap-3 w-full shadow-[0_20px_50px_-10px_rgba(0,0,0,0.8)] border border-white/10 backdrop-blur-2xl relative">
 
-                <!-- Mic / Cam groups -->
-                <div class="relative flex flex-col items-center">
-                    <div id="mic-menu"
-                        class="hidden absolute bottom-[calc(100%+12px)] w-48 glass-panel rounded-2xl p-2 flex flex-col gap-1 z-50 shadow-2xl">
-                        <div
-                            class="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-2 pb-2 border-b border-white/10 mb-2">
-                            Microfones</div>
-                        <div id="mic-list"
-                            class="flex flex-col gap-1 max-h-40 overflow-y-auto custom-scrollbar text-xs"></div>
+                <!-- Grupo Esquerdo: Mic + Cam -->
+                <div class="flex items-center gap-2">
+                    <!-- Mic -->
+                    <div class="relative flex flex-col items-center">
+                        <div id="mic-menu"
+                            class="hidden absolute bottom-[calc(100%+12px)] left-0 w-48 glass-panel rounded-2xl p-2 flex flex-col gap-1 z-50 shadow-2xl">
+                            <div class="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-2 pb-2 border-b border-white/10 mb-2" data-i18n="menu_mics">Microfones</div>
+                            <div id="mic-list" class="flex flex-col gap-1 max-h-40 overflow-y-auto custom-scrollbar text-xs"></div>
+                        </div>
+                        <div class="flex items-center bg-white/5 hover:bg-white/10 rounded-full transition-all border border-white/5" id="mic-group">
+                            <button id="toggleMic" class="w-12 h-12 flex items-center justify-center text-gray-200">
+                                <i class="ph ph-microphone text-[22px]"></i>
+                            </button>
+                            <div class="w-px h-6 bg-white/10"></div>
+                            <button id="btn-mic-menu" class="w-8 h-12 flex items-center justify-center text-gray-400 hover:text-white">
+                                <i class="ph ph-caret-up text-[10px]"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="flex items-center bg-white/5 hover:bg-white/10 rounded-full transition-all border border-white/5"
-                        id="mic-group">
-                        <button id="toggleMic" class="w-12 h-12 flex items-center justify-center text-gray-200">
-                            <i class="ph ph-microphone text-[22px]"></i>
-                        </button>
-                        <div class="w-px h-6 bg-white/10"></div>
-                        <button id="btn-mic-menu"
-                            class="w-8 h-12 flex items-center justify-center text-gray-400 hover:text-white">
-                            <i class="ph ph-caret-up text-[10px]"></i>
+
+                    <!-- Cam -->
+                    <div class="relative flex flex-col items-center">
+                        <div id="cam-menu"
+                            class="hidden absolute bottom-[calc(100%+12px)] left-0 w-48 glass-panel rounded-2xl p-2 flex flex-col gap-1 z-50 shadow-2xl">
+                            <div class="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-2 pb-2 border-b border-white/10 mb-2" data-i18n="menu_cams">Câmeras</div>
+                            <div id="cam-list" class="flex flex-col gap-1 max-h-40 overflow-y-auto custom-scrollbar text-xs"></div>
+                        </div>
+                        <div class="flex items-center bg-white/5 hover:bg-white/10 rounded-full transition-all border border-white/5" id="cam-group">
+                            <button id="toggleVideo" class="w-12 h-12 flex items-center justify-center text-gray-200">
+                                <i class="ph ph-video-camera text-[22px]"></i>
+                            </button>
+                            <div class="w-px h-6 bg-white/10"></div>
+                            <button id="btn-cam-menu" class="w-8 h-12 flex items-center justify-center text-gray-400 hover:text-white">
+                                <i class="ph ph-caret-up text-[10px]"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Separador -->
+                <div class="w-px h-6 bg-white/10 shrink-0"></div>
+
+                <!-- Grupo Central: Chat + Mais -->
+                <div class="flex items-center gap-2">
+                    <button id="toggleChat"
+                        class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all relative"
+                        data-i18n-title="section_chat">
+                        <i class="ph ph-chat-text text-[22px] text-gray-300"></i>
+                        <span id="chat-badge" class="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-[#101a22] rounded-full text-[0px] hidden"></span>
+                    </button>
+
+                    <!-- Botão "+" com dropdown -->
+                    <div class="relative" id="more-menu-wrap">
+                        <div id="more-menu"
+                            class="hidden absolute bottom-[calc(100%+12px)] right-0 w-52 glass-panel rounded-2xl p-2 flex flex-col gap-0.5 z-50 shadow-2xl">
+                            <button onclick="toggleScreenShare(); closeMoreMenu()"
+                                class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-all text-left text-gray-300">
+                                <i class="ph ph-screencast text-lg text-gray-400"></i>
+                                <span class="text-[11px] font-semibold" data-i18n="menu_share_screen">Compartilhar Tela</span>
+                            </button>
+                            <button onclick="document.getElementById('openMobileCam').click(); closeMoreMenu()"
+                                class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-all text-left text-gray-300">
+                                <i class="ph ph-qr-code text-lg text-gray-400"></i>
+                                <span class="text-[11px] font-semibold" data-i18n="menu_qr_code">Câmera do Celular</span>
+                            </button>
+                            <button onclick="document.getElementById('fileInput').click(); closeMoreMenu()"
+                                class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-all text-left text-gray-300">
+                                <i class="ph ph-paperclip text-lg text-gray-400"></i>
+                                <span class="text-[11px] font-semibold" data-i18n="menu_attach">Anexar Arquivo</span>
+                            </button>
+                            <button onclick="document.getElementById('toggleSettings').click(); closeMoreMenu()"
+                                class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-all text-left text-gray-300">
+                                <i class="ph ph-sliders text-lg text-gray-400"></i>
+                                <span class="text-[11px] font-semibold" data-i18n="menu_prefs">Preferências</span>
+                            </button>
+                            <button id="switchCamera" onclick="closeMoreMenu()"
+                                class="w-full sm:hidden flex items-center gap-2.5 px-3 py-2.5 rounded-xl hover:bg-white/10 transition-all text-left text-gray-300">
+                                <i class="ph ph-camera-rotate text-lg text-gray-400"></i>
+                                <span class="text-[11px] font-semibold">Inverter Câmera</span>
+                            </button>
+                        </div>
+                        <button id="btn-more-menu" onclick="toggleMoreMenu()"
+                            class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
+                            data-i18n-title="btn_more">
+                            <i class="ph ph-plus text-[22px] text-gray-300"></i>
                         </button>
                     </div>
                 </div>
 
-                <div class="relative flex flex-col items-center">
-                    <div id="cam-menu"
-                        class="hidden absolute bottom-[calc(100%+12px)] w-48 glass-panel rounded-2xl p-2 flex flex-col gap-1 z-50 shadow-2xl">
-                        <div
-                            class="text-[9px] text-gray-400 font-bold uppercase tracking-widest px-2 pb-2 border-b border-white/10 mb-2">
-                            Câmeras</div>
-                        <div id="cam-list"
-                            class="flex flex-col gap-1 max-h-40 overflow-y-auto custom-scrollbar text-xs"></div>
-                    </div>
-                    <div class="flex items-center bg-white/5 hover:bg-white/10 rounded-full transition-all border border-white/5"
-                        id="cam-group">
-                        <button id="toggleVideo" class="w-12 h-12 flex items-center justify-center text-gray-200">
-                            <i class="ph ph-video-camera text-[22px]"></i>
-                        </button>
-                        <div class="w-px h-6 bg-white/10"></div>
-                        <button id="btn-cam-menu"
-                            class="w-8 h-12 flex items-center justify-center text-gray-400 hover:text-white">
-                            <i class="ph ph-caret-up text-[10px]"></i>
-                        </button>
-                    </div>
-                </div>
+                <!-- Separador -->
+                <div class="w-px h-6 bg-white/10 shrink-0"></div>
 
-                <div class="w-px h-6 bg-white/10 hidden sm:block"></div>
-
-                <!-- Botões utilitários -->
-                <div class="flex md:hidden mr-1"></div> <!-- Spacer mobile -->
-
-                <button id="btn-share-screen" onclick="toggleScreenShare()"
-                    class="hidden sm:flex w-12 h-12 items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 hover:border-win-accent transition-all group"
-                    title="Tela">
-                    <i class="ph ph-screencast text-[22px] text-gray-300 group-hover:text-white"></i>
-                </button>
-
-                <button id="toggleChat"
-                    class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all relative"
-                    title="Chat">
-                    <i class="ph ph-chat-text text-[22px] text-gray-300"></i>
-                    <span id="chat-badge"
-                        class="absolute top-0 right-0 w-3.5 h-3.5 bg-red-500 border-2 border-[#101a22] rounded-full text-[0px] hidden"></span>
-                </button>
-
-                <button id="switchCamera"
-                    class="w-12 h-12 sm:hidden flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
-                    title="Inverter">
-                    <i class="ph ph-camera-rotate text-[22px] text-gray-300"></i>
-                </button>
-
-                <!-- Lyncro Cam QR -->
-                <button id="openMobileCam"
-                    class="w-12 h-12 hidden md:flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-win-accent hover:border-win-accent transition-all group"
-                    title="Add Celular">
-                    <i class="ph ph-qr-code text-[22px] text-gray-300 group-hover:text-white"></i>
-                </button>
-
-                <button id="mediaDrop"
-                    class="w-12 h-12 hidden sm:flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 hover:text-win-accent transition-all group"
-                    title="Mídia">
-                    <i class="ph ph-paperclip text-[22px] text-gray-300"></i>
-                    <input type="file" id="fileInput" class="hidden">
-                </button>
-
-                <button id="toggleSettings"
-                    class="w-12 h-12 flex items-center justify-center rounded-full bg-white/5 border border-white/5 hover:bg-white/10 transition-all"
-                    title="Preferências">
-                    <i class="ph ph-sliders text-[22px] text-gray-300"></i>
-                </button>
-
-                <!-- Botão Sair Crucial Destacado -->
+                <!-- Botão Desligar — Destaque Central -->
                 <button id="leaveRoom"
-                    class="w-12 h-12 flex items-center justify-center rounded-full bg-red-600 border border-red-500 text-white hover:bg-red-700 hover:shadow-[0_0_20px_rgba(220,38,38,0.5)] transition-all ml-1"
-                    title="Sair">
+                    class="w-14 h-12 flex items-center justify-center rounded-2xl bg-red-600 border border-red-500 text-white hover:bg-red-700 hover:shadow-[0_0_24px_rgba(220,38,38,0.6)] transition-all"
+                    data-i18n-title="btn_leave">
                     <i class="ph ph-phone-disconnect text-[22px]"></i>
                 </button>
+
+                <!-- Elementos ocultos (compatibilidade JS) -->
+                <button id="openMobileCam" class="hidden"></button>
+                <button id="toggleSettings" class="hidden"></button>
+                <button id="mediaDrop" class="hidden">
+                    <input type="file" id="fileInput" class="hidden">
+                </button>
+                <button id="btn-share-screen" class="hidden"></button>
             </div>
         </div>
     </div>
