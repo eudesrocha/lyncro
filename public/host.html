@@ -559,36 +559,37 @@
                         class="w-full h-28 bg-black/40 border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-win-accent transition-colors text-xs placeholder:text-gray-600 font-medium custom-scrollbar theme-text"
                         placeholder="Cole o Roteiro para os Convidados aqui..."></textarea>
 
-                    <!-- Linha única: Play + Velocidade + Tamanho -->
-                    <div class="flex items-center gap-2 bg-black/20 rounded-2xl px-3 py-2 border border-white/5">
+                    <!-- Linha única: Play + pílulas de Velocidade e Tamanho -->
+                    <div class="flex items-center gap-2">
+                        <!-- Play -->
                         <button id="btn-prompter-play" onclick="togglePrompterPlayback()"
                             class="w-8 h-8 rounded-xl bg-win-accent/20 text-win-accent border border-win-accent/30 hover:bg-win-accent hover:text-white flex items-center justify-center transition-all shrink-0"
                             title="Rolar Texto">
                             <i id="ico-prompter-play" class="ph ph-play text-base"></i>
                         </button>
 
-                        <div class="w-px h-5 bg-white/10 shrink-0"></div>
-
-                        <!-- Velocidade -->
-                        <div class="flex items-center gap-1.5 flex-1">
-                            <i class="ph ph-gauge text-base text-gray-400 shrink-0" title="Velocidade"></i>
+                        <!-- Pílula Velocidade -->
+                        <div class="flex items-center rounded-xl overflow-hidden border border-white/10 bg-black/30 shrink-0">
+                            <span class="px-2 flex items-center text-gray-400 border-r border-white/10 h-8">
+                                <i class="ph ph-gauge text-sm"></i>
+                            </span>
                             <button onclick="adjustPrompter('speed',-1)"
-                                class="w-7 h-7 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 flex items-center justify-center transition-all text-sm font-bold leading-none">−</button>
-                            <span id="lbl-prompter-speed" class="w-7 text-center text-[11px] font-bold text-gray-200">4x</span>
+                                class="w-7 h-8 flex items-center justify-center text-gray-400 hover:bg-win-accent/20 hover:text-win-accent transition-all text-sm font-bold border-r border-white/10 leading-none">−</button>
+                            <span id="lbl-prompter-speed" class="w-8 text-center text-[11px] font-bold text-gray-200 border-r border-white/10 h-8 flex items-center justify-center">4x</span>
                             <button onclick="adjustPrompter('speed',1)"
-                                class="w-7 h-7 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 flex items-center justify-center transition-all text-sm font-bold leading-none">+</button>
+                                class="w-7 h-8 flex items-center justify-center text-gray-400 hover:bg-win-accent/20 hover:text-win-accent transition-all text-sm font-bold leading-none">+</button>
                         </div>
 
-                        <div class="w-px h-5 bg-white/10 shrink-0"></div>
-
-                        <!-- Tamanho -->
-                        <div class="flex items-center gap-1.5 flex-1">
-                            <i class="ph ph-text-t text-base text-gray-400 shrink-0" title="Tamanho da Fonte"></i>
+                        <!-- Pílula Tamanho -->
+                        <div class="flex items-center rounded-xl overflow-hidden border border-white/10 bg-black/30 shrink-0">
+                            <span class="px-2 flex items-center text-gray-400 border-r border-white/10 h-8">
+                                <i class="ph ph-text-t text-sm"></i>
+                            </span>
                             <button onclick="adjustPrompter('size',-5)"
-                                class="w-7 h-7 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 flex items-center justify-center transition-all text-sm font-bold leading-none">−</button>
-                            <span id="lbl-prompter-size" class="w-9 text-center text-[11px] font-bold text-gray-200">60px</span>
+                                class="w-7 h-8 flex items-center justify-center text-gray-400 hover:bg-win-accent/20 hover:text-win-accent transition-all text-sm font-bold border-r border-white/10 leading-none">−</button>
+                            <span id="lbl-prompter-size" class="w-10 text-center text-[11px] font-bold text-gray-200 border-r border-white/10 h-8 flex items-center justify-center">60px</span>
                             <button onclick="adjustPrompter('size',5)"
-                                class="w-7 h-7 rounded-xl bg-white/5 border border-white/10 text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 flex items-center justify-center transition-all text-sm font-bold leading-none">+</button>
+                                class="w-7 h-8 flex items-center justify-center text-gray-400 hover:bg-win-accent/20 hover:text-win-accent transition-all text-sm font-bold leading-none">+</button>
                         </div>
                     </div>
 
