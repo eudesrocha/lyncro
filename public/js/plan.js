@@ -238,20 +238,13 @@
     function _renderPricingCards(region) {
         const { plans } = PRICING[region];
         return plans.map(p => `
-            <div data-plan-key="${p.key}"
-                 class="relative flex flex-col rounded-xl border p-3.5 cursor-pointer transition-all
-                        ${p.badge ? 'border-purple-500/60 bg-purple-900/20' : 'border-white/10 bg-white/5 hover:border-white/20'}">
-                ${p.badge ? `<span class="absolute -top-2.5 left-1/2 -translate-x-1/2 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-600 to-blue-500 text-white whitespace-nowrap">${p.badge}</span>` : ''}
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-gray-400">${p.period}</span>
-                    ${p.savings ? `<span class="text-[9px] font-bold text-green-400 bg-green-400/10 px-1.5 py-0.5 rounded-full">${p.savings}</span>` : ''}
-                </div>
-                <div class="flex items-baseline gap-0.5 mb-3">
-                    <span class="text-xl font-black text-white">${p.price}</span>
-                    <span class="text-[10px] text-gray-500">${p.sub}</span>
-                </div>
-                <button class="plan-cta-btn w-full py-2 rounded-lg text-[11px] font-bold text-white transition-all
-                               ${p.badge ? 'bg-gradient-to-r from-purple-600 to-blue-500 hover:opacity-90' : 'bg-white/10 hover:bg-white/20'}"
+            <div data-plan-key="${p.key}" class="upgrade-plan-card ${p.badge ? 'featured' : ''}">
+                ${p.badge ? `<span class="plan-badge">${p.badge}</span>` : ''}
+                <div class="plan-period">${p.period}</div>
+                <div class="plan-price">${p.price}</div>
+                <div class="plan-sub">${p.sub}</div>
+                ${p.savings ? `<div class="plan-savings">${p.savings}</div>` : '<div style="height:16px;margin-bottom:8px;"></div>'}
+                <button class="plan-cta-btn ${p.badge ? 'featured-btn' : ''}"
                         onclick="window.LYNCRO_PLAN.startCheckout('${p.key}')">
                     Assinar
                 </button>
@@ -265,9 +258,9 @@
         if (container) container.innerHTML = _renderPricingCards(region);
         tabs.forEach(t => {
             const active = t.dataset.regionTab === region;
-            t.className = active
-                ? 'px-3 py-1 rounded-lg text-[10px] font-bold bg-white/15 text-white transition-all'
-                : 'px-3 py-1 rounded-lg text-[10px] font-bold text-gray-500 hover:text-white transition-all';
+            t.style.cssText = active
+                ? 'flex:1;padding:5px 0;border-radius:7px;font-size:10px;font-weight:700;background:rgba(255,255,255,0.08);color:#efefef;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all .15s;'
+                : 'flex:1;padding:5px 0;border-radius:7px;font-size:10px;font-weight:700;background:transparent;color:#6b7280;border:1px solid transparent;cursor:pointer;transition:all .15s;';
         });
     }
 
@@ -279,63 +272,251 @@
     function _buildUpgradeModal() {
         const el = document.createElement('div');
         el.id = 'lyncro-upgrade-modal';
-        el.className = 'hidden fixed inset-0 z-[9999] items-center justify-center bg-black/70 backdrop-blur-sm p-4';
+        el.className = 'hidden fixed inset-0 z-[9999] items-center justify-center p-4';
+        el.style.cssText = 'background: rgba(0,0,0,0.65); backdrop-filter: blur(6px);';
+
         el.innerHTML = `
-            <div class="relative w-full max-w-md rounded-2xl border border-white/10 overflow-hidden shadow-2xl"
-                 style="background: linear-gradient(160deg, #0e0e1c 0%, #140d2e 100%);">
-                <!-- Glow decorativo -->
-                <div class="absolute inset-0 pointer-events-none"
-                     style="background: radial-gradient(ellipse at 50% 0%, rgba(109,40,217,0.3) 0%, transparent 65%);"></div>
+            <div id="upgrade-modal-inner">
+                <!-- Glow superior sutil -->
+                <div style="position:absolute;inset:0;pointer-events:none;border-radius:20px;
+                            background:radial-gradient(ellipse at 50% 0%, rgba(0,120,212,0.10) 0%, transparent 65%);"></div>
 
-                <div class="relative p-5">
-                    <!-- Header -->
-                    <div class="flex items-start justify-between mb-4">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-                                 style="background: linear-gradient(135deg, #6d28d9, #0078d4);">
-                                <i class="ph ph-crown text-lg text-white"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-base font-black text-white leading-tight">Lyncro PRO</h2>
-                                <p id="upgrade-modal-feature" class="text-[11px] text-gray-400 leading-tight">
-                                    Desbloqueie todos os recursos.
-                                </p>
-                            </div>
+                <!-- Header -->
+                <header style="display:flex;align-items:center;justify-content:space-between;
+                               padding:18px 22px;border-bottom:1px solid rgba(255,255,255,0.05);
+                               background:linear-gradient(to bottom,rgba(255,255,255,0.03),transparent);
+                               flex-shrink:0;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+                                    background:linear-gradient(135deg,rgba(0,120,212,0.3),rgba(0,120,212,0.1));
+                                    border:1px solid rgba(0,120,212,0.3);">
+                            <i class="ph ph-crown" style="color:#0078d4;font-size:15px;"></i>
                         </div>
-                        <button onclick="window.LYNCRO_PLAN.closeUpgradeModal()"
-                                class="text-gray-600 hover:text-white transition-colors p-1 -mr-1 -mt-1">
-                            <i class="ph ph-x text-base"></i>
-                        </button>
+                        <div>
+                            <div class="modal-title" style="display:flex;align-items:center;gap:8px;">
+                                LYNCRO PRO
+                                <span style="font-size:9px;font-weight:900;padding:2px 6px;border-radius:4px;
+                                             background:rgba(0,120,212,0.2);color:#0078d4;letter-spacing:0.1em;border:1px solid rgba(0,120,212,0.3);">
+                                    UPGRADE
+                                </span>
+                            </div>
+                            <p id="upgrade-modal-feature"
+                               style="font-size:11px;color:#6b7280;margin-top:1px;font-weight:500;">
+                                Desbloqueie todos os recursos.
+                            </p>
+                        </div>
+                    </div>
+                    <button onclick="window.LYNCRO_PLAN.closeUpgradeModal()" class="modal-close">
+                        <i class="ph ph-x" style="font-size:13px;"></i>
+                    </button>
+                </header>
+
+                <!-- Body -->
+                <div style="padding:18px 22px;overflow-y:auto;flex:1;">
+
+                    <!-- Benefícios -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;">
+                        <div class="upgrade-feat"><i class="ph ph-record" style="color:#f87171;"></i> Gravação</div>
+                        <div class="upgrade-feat"><i class="ph ph-layout" style="color:#0078d4;"></i> Layouts Premium</div>
+                        <div class="upgrade-feat"><i class="ph ph-users" style="color:#34d399;"></i> Até 10 participantes</div>
+                        <div class="upgrade-feat"><i class="ph ph-text-aa" style="color:#a78bfa;"></i> Lower Thirds</div>
                     </div>
 
-                    <!-- Benefícios (compacto) -->
-                    <div class="grid grid-cols-2 gap-1.5 mb-4">
-                        <div class="flex items-center gap-1.5 text-[10px] text-gray-300"><i class="ph ph-record text-red-400 shrink-0"></i> Gravação de transmissão</div>
-                        <div class="flex items-center gap-1.5 text-[10px] text-gray-300"><i class="ph ph-layout text-purple-400 shrink-0"></i> Layouts CNN & Premium</div>
-                        <div class="flex items-center gap-1.5 text-[10px] text-gray-300"><i class="ph ph-users text-blue-400 shrink-0"></i> Até 10 participantes</div>
-                        <div class="flex items-center gap-1.5 text-[10px] text-gray-300"><i class="ph ph-text-aa text-green-400 shrink-0"></i> Lower Thirds avançados</div>
-                    </div>
+                    <!-- Divider -->
+                    <div style="height:1px;background:rgba(255,255,255,0.05);margin-bottom:14px;"></div>
 
                     <!-- Seletor de moeda -->
-                    <div class="flex items-center gap-1 mb-3 bg-black/30 p-1 rounded-xl">
+                    <div style="display:flex;gap:4px;background:rgba(0,0,0,0.3);padding:4px;border-radius:10px;margin-bottom:12px;">
                         ${Object.entries(PRICING).map(([key, val]) => `
                             <button data-region-tab="${key}"
                                     onclick="window._lyncroSwitchRegion('${key}')"
-                                    class="${key === 'brl' ? 'px-3 py-1 rounded-lg text-[10px] font-bold bg-white/15 text-white transition-all' : 'px-3 py-1 rounded-lg text-[10px] font-bold text-gray-500 hover:text-white transition-all'}">
+                                    style="${key === 'brl'
+                                        ? 'flex:1;padding:5px 0;border-radius:7px;font-size:10px;font-weight:700;background:rgba(255,255,255,0.08);color:#efefef;border:1px solid rgba(255,255,255,0.1);cursor:pointer;transition:all .15s;'
+                                        : 'flex:1;padding:5px 0;border-radius:7px;font-size:10px;font-weight:700;background:transparent;color:#6b7280;border:1px solid transparent;cursor:pointer;transition:all .15s;'}">
                                 ${val.label}
                             </button>`).join('')}
                     </div>
 
                     <!-- Cards de preço -->
-                    <div id="upgrade-pricing-cards" class="grid grid-cols-3 gap-2 mb-3">
+                    <div id="upgrade-pricing-cards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
                         ${_renderPricingCards('brl')}
                     </div>
 
-                    <p class="text-center text-[9px] text-gray-600">
-                        Cancele a qualquer momento · Pagamento seguro via Stripe
+                    <p style="text-align:center;font-size:9px;color:#374151;letter-spacing:0.05em;">
+                        Cancele a qualquer momento &middot; Pagamento seguro via Stripe
                     </p>
                 </div>
-            </div>`;
+            </div>
+
+            <style>
+                #upgrade-modal-inner {
+                    position: relative;
+                    width: 100%;
+                    max-width: 460px;
+                    background: rgba(16, 26, 34, 0.92);
+                    backdrop-filter: blur(24px);
+                    -webkit-backdrop-filter: blur(24px);
+                    border: 1px solid rgba(255, 255, 255, 0.08);
+                    border-radius: 20px;
+                    box-shadow: 0 25px 60px rgba(0,0,0,0.7), inset 0 0 0 1px rgba(255,255,255,0.02);
+                    max-height: calc(100vh - 2rem);
+                    display: flex;
+                    flex-direction: column;
+                    overflow: hidden;
+                }
+                [data-theme="light"] #upgrade-modal-inner {
+                    background: rgba(255, 255, 255, 0.95);
+                    border-color: rgba(0,0,0,0.07);
+                    box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+                }
+                #upgrade-modal-inner .modal-title {
+                    font-size: 12px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: 0.15em;
+                    color: #efefef;
+                }
+                [data-theme="light"] #upgrade-modal-inner .modal-title { color: #111; }
+                [data-theme="light"] #upgrade-modal-inner p,
+                [data-theme="light"] #upgrade-modal-inner div { color: inherit; }
+                #upgrade-modal-inner .modal-close {
+                    background: rgba(255,255,255,0.05);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    color: #9ca3af;
+                    cursor: pointer;
+                    width: 30px;
+                    height: 30px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 9px;
+                    transition: all 0.15s;
+                    flex-shrink: 0;
+                }
+                #upgrade-modal-inner .modal-close:hover {
+                    background: rgba(255,255,255,0.1);
+                    color: #fff;
+                }
+                [data-theme="light"] #upgrade-modal-inner .modal-close {
+                    background: rgba(0,0,0,0.04);
+                    border-color: rgba(0,0,0,0.1);
+                    color: #6b7280;
+                }
+                .upgrade-feat {
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                    font-size: 10px;
+                    font-weight: 600;
+                    color: #d1d5db;
+                    background: rgba(255,255,255,0.03);
+                    border: 1px solid rgba(255,255,255,0.06);
+                    border-radius: 8px;
+                    padding: 6px 8px;
+                }
+                [data-theme="light"] .upgrade-feat {
+                    color: #374151;
+                    background: rgba(0,0,0,0.03);
+                    border-color: rgba(0,0,0,0.07);
+                }
+                .upgrade-plan-card {
+                    position: relative;
+                    display: flex;
+                    flex-direction: column;
+                    border-radius: 12px;
+                    border: 1px solid rgba(255,255,255,0.08);
+                    background: rgba(255,255,255,0.03);
+                    padding: 10px;
+                    cursor: pointer;
+                    transition: border-color .15s, background .15s;
+                }
+                .upgrade-plan-card:hover {
+                    border-color: rgba(0,120,212,0.35);
+                    background: rgba(0,120,212,0.05);
+                }
+                .upgrade-plan-card.featured {
+                    border-color: rgba(0,120,212,0.4);
+                    background: rgba(0,120,212,0.08);
+                }
+                [data-theme="light"] .upgrade-plan-card {
+                    border-color: rgba(0,0,0,0.08);
+                    background: rgba(0,0,0,0.02);
+                }
+                [data-theme="light"] .upgrade-plan-card.featured {
+                    border-color: rgba(0,120,212,0.35);
+                    background: rgba(0,120,212,0.06);
+                }
+                .upgrade-plan-card .plan-period {
+                    font-size: 9px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: 0.12em;
+                    color: #6b7280;
+                    margin-bottom: 4px;
+                }
+                .upgrade-plan-card .plan-price {
+                    font-size: 17px;
+                    font-weight: 900;
+                    color: #efefef;
+                    line-height: 1;
+                }
+                [data-theme="light"] .upgrade-plan-card .plan-price { color: #111; }
+                .upgrade-plan-card .plan-sub {
+                    font-size: 9px;
+                    color: #6b7280;
+                    margin-bottom: 8px;
+                }
+                .upgrade-plan-card .plan-savings {
+                    font-size: 8px;
+                    font-weight: 700;
+                    color: #34d399;
+                    background: rgba(52,211,153,0.1);
+                    border: 1px solid rgba(52,211,153,0.2);
+                    border-radius: 4px;
+                    padding: 1px 5px;
+                    display: inline-block;
+                    margin-bottom: 8px;
+                    letter-spacing: 0.04em;
+                }
+                .upgrade-plan-card .plan-badge {
+                    position: absolute;
+                    top: -8px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    font-size: 8px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    letter-spacing: 0.1em;
+                    color: #fff;
+                    background: #0078d4;
+                    border-radius: 4px;
+                    padding: 2px 6px;
+                    white-space: nowrap;
+                }
+                .plan-cta-btn {
+                    width: 100%;
+                    padding: 7px 0;
+                    border-radius: 8px;
+                    font-size: 10px;
+                    font-weight: 800;
+                    text-transform: uppercase;
+                    letter-spacing: 0.08em;
+                    color: #fff;
+                    background: rgba(255,255,255,0.07);
+                    border: 1px solid rgba(255,255,255,0.12);
+                    cursor: pointer;
+                    transition: all .15s;
+                    margin-top: auto;
+                }
+                .plan-cta-btn:hover { background: rgba(0,120,212,0.25); border-color: rgba(0,120,212,0.5); }
+                .plan-cta-btn.featured-btn {
+                    background: #0078d4;
+                    border-color: #0078d4;
+                }
+                .plan-cta-btn.featured-btn:hover { background: #0069bb; }
+                [data-theme="light"] .plan-cta-btn { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.12); color: #374151; }
+                [data-theme="light"] .plan-cta-btn.featured-btn { background: #0078d4; border-color: #0078d4; color: #fff; }
+            </style>`;
 
         // Fecha ao clicar no backdrop
         el.addEventListener('click', (e) => {
