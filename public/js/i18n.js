@@ -135,6 +135,7 @@
             // Session
             session_ended_host: 'O produtor encerrou a sessão.',
             session_ended_timeout: 'Conexão do produtor foi perdida.',
+            session_ended_time_limit: 'O limite de 20 minutos do plano gratuito foi atingido. Assine o PRO para sessões ilimitadas.',
             host_disconnected: 'Produtor desconectado. Aguardando reconexão...',
             join_title: 'ACESSAR ESTÚDIO',
             join_sub: 'Você foi convidado. Insira as credenciais para transmitir seu áudio e vídeo em alta qualidade.',
@@ -278,6 +279,7 @@
             // Session
             session_ended_host: 'The producer ended the session.',
             session_ended_timeout: "Producer's connection was lost.",
+            session_ended_time_limit: 'The 20-minute limit of the free plan was reached. Subscribe to PRO for unlimited sessions.',
             host_disconnected: 'Producer disconnected. Waiting for reconnection...',
             join_title: 'ACCESS STUDIO',
             join_sub: "You've been invited. Enter your credentials to stream your audio and video in high quality.",

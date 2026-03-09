@@ -9,32 +9,39 @@ const CACHE_TTL_MS = 60 * 1000;
 let iceCache = null;
 let iceCacheExpiresAt = 0;
 
-async function getIceServers() {
-    // Fallback padrão com STUN do Google (Sempre útil)
-    const defaultIce = [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' }
-    ];
+// STUN gratuito (disponível para todos os planos)
+const STUN_ONLY = [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' }
+];
 
-    if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
-        console.warn('[ICE] Twilio credentials NOT found. Using default STUN servers ONLY.');
-        return defaultIce;
+/**
+ * Retorna ICE servers para o cliente.
+ * @param {boolean} isPro - Se true, inclui TURN servers do Twilio (pago).
+ *                          Se false, retorna apenas STUN gratuito.
+ */
+async function getIceServers(isPro = false) {
+    // Plano FREE ou dev sem Twilio: apenas STUN gratuito
+    if (!isPro || !TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
+        if (!isPro) console.log('[ICE] Plano FREE — fornecendo apenas STUN (sem TURN Twilio).');
+        else console.warn('[ICE] Twilio credentials NOT found. Using default STUN servers ONLY.');
+        return STUN_ONLY;
     }
 
     // Retornar cache se ainda válido
     if (iceCache && Date.now() < iceCacheExpiresAt) {
-        console.log('[ICE] Returning cached ICE servers.');
+        console.log('[ICE] Returning cached TURN+STUN ICE servers (PRO).');
         return iceCache;
     }
 
     try {
-        console.log('[ICE] Fetching dynamic TURN credentials from Twilio...');
+        console.log('[ICE] Fetching dynamic TURN credentials from Twilio (PRO)...');
         const client = twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
         const token = await client.tokens.create();
 
         console.log(`[ICE] Successfully generated ${token.iceServers.length} ICE candidates from Twilio.`);
-        const servers = [...defaultIce, ...token.iceServers];
+        const servers = [...STUN_ONLY, ...token.iceServers];
 
         iceCache = servers;
         iceCacheExpiresAt = Date.now() + CACHE_TTL_MS;
@@ -47,7 +54,7 @@ async function getIceServers() {
             console.warn('[ICE] Using stale cache as fallback.');
             return iceCache;
         }
-        return defaultIce;
+        return STUN_ONLY;
     }
 }
 

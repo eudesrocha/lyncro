@@ -5,6 +5,7 @@ const cors = require('cors');
 const setupSignaling = require('./signaling');
 const roomManager = require('./rooms');
 const billingRouter = require('./billing');
+const { verifySupabaseToken, getUserPlan } = require('./auth');
 
 const app = express();
 const server = http.createServer(app);
@@ -62,7 +63,40 @@ app.get('/api/rooms/:id', (req, res) => {
     res.json(room);
 });
 
-app.post('/api/rooms', (req, res) => {
+app.post('/api/rooms', async (req, res) => {
+    // Se Supabase estiver configurado, exigir autenticação e plano
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        const auth = req.headers.authorization || '';
+        const token = auth.replace(/^Bearer\s+/i, '');
+        const supabaseUser = await verifySupabaseToken(token);
+
+        if (!supabaseUser) {
+            return res.status(401).json({ error: 'Autenticação necessária para criar uma sala.' });
+        }
+
+        // Verificar plano do usuário
+        const plan = await getUserPlan(supabaseUser.id);
+        if (plan !== 'pro') {
+            // Contar quantas salas o usuário FREE já tem ativas (limite: 1 simultânea)
+            const userRooms = Array.from(roomManager.rooms.values())
+                .filter(r => r.hostUserId === supabaseUser.id);
+            if (userRooms.length >= 1) {
+                return res.status(403).json({
+                    error: 'Plano FREE permite apenas 1 sala ativa por vez. Assine o plano PRO para criar mais.',
+                    upgrade: true
+                });
+            }
+        }
+
+        // Armazenar userId no metadata da sala para rastreamento
+        const { name, password } = req.body;
+        const roomId = roomManager.createRoom(name, password, supabaseUser.id);
+        console.log(`[ROOM CREATED] "${name}" por userId=${supabaseUser.id} (plano=${plan})`);
+        return res.json({ roomId, plan });
+    }
+
+    // Dev mode sem Supabase: criar sala sem restrição (com aviso)
+    console.warn('[ROOM CREATED] Dev mode — sem verificação de auth/plano.');
     const { name, password } = req.body;
     const roomId = roomManager.createRoom(name, password);
     res.json({ roomId });

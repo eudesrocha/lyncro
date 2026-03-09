@@ -31,4 +31,37 @@ async function verifySupabaseToken(token) {
     }
 }
 
-module.exports = { verifySupabaseToken };
+/**
+ * Retorna o plano ('free' | 'pro') de um usuário a partir do userId.
+ * Usa SUPABASE_SERVICE_ROLE_KEY (server-side only).
+ * Retorna 'free' em caso de erro ou variáveis não configuradas.
+ */
+async function getUserPlan(userId) {
+    if (!userId) return 'free';
+    const url = process.env.SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!url || !key) return 'free'; // dev mode: sem restrição
+
+    try {
+        const res = await fetch(`${url}/rest/v1/profiles?id=eq.${encodeURIComponent(userId)}&select=plan,plan_expires_at&limit=1`, {
+            headers: {
+                'apikey': key,
+                'Authorization': `Bearer ${key}`,
+                'Accept': 'application/json'
+            }
+        });
+        if (!res.ok) return 'free';
+        const rows = await res.json();
+        if (!rows || rows.length === 0) return 'free';
+        const { plan, plan_expires_at } = rows[0];
+        if (plan === 'pro' && plan_expires_at && new Date(plan_expires_at) < new Date()) {
+            return 'free'; // plano expirado
+        }
+        return plan === 'pro' ? 'pro' : 'free';
+    } catch (err) {
+        console.error('[Auth] getUserPlan error:', err.message);
+        return 'free';
+    }
+}
+
+module.exports = { verifySupabaseToken, getUserPlan };

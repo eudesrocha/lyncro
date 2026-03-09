@@ -1,20 +1,22 @@
 const WebSocket = require('ws');
 const roomManager = require('./rooms');
 const { getIceServers } = require('./ice');
-const { verifySupabaseToken } = require('./auth');
+const { verifySupabaseToken, getUserPlan } = require('./auth');
 
 // Rate limiting simples por IP: máx de conexões simultâneas e mensagens por segundo
 const MAX_CONNECTIONS_PER_IP = 10;
 const MAX_MESSAGES_PER_SECOND = 30;
 const connectionsByIp = new Map(); // ip -> count
 
-const HOST_GRACE_MS = 45_000; // 45s para o host reconectar antes de encerrar a sessão
-const GUEST_GRACE_MS = 30_000; // 30s para convidado aceito reconectar antes de ser removido
+const HOST_GRACE_MS = 45_000;          // 45s para o host reconectar antes de encerrar a sessão
+const GUEST_GRACE_MS = 30_000;         // 30s para convidado aceito reconectar antes de ser removido
+const FREE_SESSION_MS = 20 * 60 * 1000; // 20 minutos para sessões FREE
 
 function setupSignaling(server) {
     const wss = new WebSocket.Server({ server });
-    const hostGraceTimers = new Map(); // roomId       -> setTimeout handle
-    const guestGraceTimers = new Map(); // participantId -> setTimeout handle
+    const hostGraceTimers = new Map();   // roomId       -> setTimeout handle
+    const guestGraceTimers = new Map();  // participantId -> setTimeout handle
+    const freeSessionTimers = new Map(); // roomId       -> setTimeout handle (20min FREE)
 
     const interval = setInterval(() => {
         wss.clients.forEach((ws) => {
@@ -96,7 +98,8 @@ function setupSignaling(server) {
                                     participantId = reconnectId;
                                     console.log(`[RECONNECT] "${existing.name}" reconectou à sala "${normalizedRoomId}" (ID: ${reconnectId})`);
 
-                                    const iceServersRecon = await getIceServers();
+                                    const roomRecon = roomManager.rooms.get(normalizedRoomId);
+                                    const iceServersRecon = await getIceServers(roomRecon && roomRecon.hostPlan === 'pro');
                                     ws.send(JSON.stringify({ type: 'init-network', iceServers: iceServersRecon, yourId: reconnectId }));
                                     ws.send(JSON.stringify({ type: 'admission-result', status: 'accepted' }));
 
@@ -116,6 +119,7 @@ function setupSignaling(server) {
                         // Validar identidade do host via JWT do Supabase
                         // Só aplica se SUPABASE_URL e SUPABASE_ANON_KEY estiverem configurados.
                         // Sem essas variáveis (ex: dev local), a validação é pulada com aviso.
+                        let hostPlan = 'free'; // padrão conservador
                         if (data.participant && data.participant.role === 'host') {
                             if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
                                 const supabaseUser = await verifySupabaseToken(data.participant.token);
@@ -130,8 +134,12 @@ function setupSignaling(server) {
                                 }
                                 // Garantir que o userId usado para ownership seja o do Supabase
                                 data.participant.userId = supabaseUser.id;
+                                // Verificar plano do host (server-side, não bypassável)
+                                hostPlan = await getUserPlan(supabaseUser.id);
+                                console.log(`[PLAN] Host ${supabaseUser.id} plano=${hostPlan} sala="${normalizedRoomId}"`);
                             } else {
-                                console.warn('[Auth] SUPABASE_URL/ANON_KEY não configurados. Pulando validação JWT do host.');
+                                console.warn('[Auth] SUPABASE_URL/ANON_KEY não configurados. Pulando validação JWT e plano do host.');
+                                hostPlan = 'pro'; // dev mode: sem restrição
                             }
                         }
 
@@ -151,6 +159,7 @@ function setupSignaling(server) {
                             hostGraceTimers.delete(normalizedRoomId);
                             console.log(`[GRACE] Host reconectou à sala "${normalizedRoomId}". Sessão mantida.`);
                         }
+                        // O timer FREE não é cancelado na reconexão — o tempo continua correndo
 
                         const participant = roomManager.joinRoom(normalizedRoomId, { ...data.participant, ws });
 
@@ -169,8 +178,56 @@ function setupSignaling(server) {
 
                         console.log(`[JOIN] Room: "${normalizedRoomId}" | Participant: "${participant.name}" | Role: ${participant.role}`);
 
-                        // Buscar IceServers dinâmicos para o cliente
-                        const iceServers = await getIceServers();
+                        // ── Timer de 20 minutos para hosts FREE ──────────────────────────────
+                        if (participant.role === 'host' && hostPlan === 'free') {
+                            // Cancelar timer anterior caso o host esteja reconectando
+                            if (freeSessionTimers.has(normalizedRoomId)) {
+                                clearTimeout(freeSessionTimers.get(normalizedRoomId));
+                            }
+                            const freeTimer = setTimeout(() => {
+                                freeSessionTimers.delete(normalizedRoomId);
+                                console.log(`[FREE LIMIT] Sessão FREE da sala "${normalizedRoomId}" expirou após 20min.`);
+                                broadcastToRoom(normalizedRoomId, {
+                                    type: 'session-ended',
+                                    reason: 'time_limit'
+                                });
+                                // Fechar conexões após breve delay para garantia de entrega
+                                setTimeout(() => {
+                                    roomManager.getParticipants(normalizedRoomId).forEach(p => {
+                                        if (p.ws) try { p.ws.close(); } catch (_) { }
+                                    });
+                                }, 2000);
+                            }, FREE_SESSION_MS);
+                            freeSessionTimers.set(normalizedRoomId, freeTimer);
+                            console.log(`[FREE LIMIT] Timer de 20min iniciado para sala "${normalizedRoomId}".`);
+
+                            // Avisar o host sobre o limite (para a UI exibir contagem regressiva se necessário)
+                            ws.send(JSON.stringify({
+                                type: 'session-plan',
+                                plan: 'free',
+                                sessionLimitMs: FREE_SESSION_MS
+                            }));
+                        } else if (participant.role === 'host' && hostPlan === 'pro') {
+                            // PRO: cancelar qualquer timer FREE residual e confirmar plano
+                            if (freeSessionTimers.has(normalizedRoomId)) {
+                                clearTimeout(freeSessionTimers.get(normalizedRoomId));
+                                freeSessionTimers.delete(normalizedRoomId);
+                            }
+                            ws.send(JSON.stringify({ type: 'session-plan', plan: 'pro' }));
+                        }
+
+                        // ── ICE Servers: TURN Twilio apenas para PRO ─────────────────────────
+                        // Guests herdam o plano da sala (sala criada por PRO = todos com TURN)
+                        const roomForIce = roomManager.rooms.get(normalizedRoomId);
+                        const roomIsPro = participant.role === 'host'
+                            ? hostPlan === 'pro'
+                            : (roomForIce && roomForIce.hostPlan === 'pro');
+                        const iceServers = await getIceServers(roomIsPro);
+
+                        // Armazenar plano do host na sala para que guests herdem TURN
+                        if (participant.role === 'host') {
+                            if (roomForIce) roomForIce.hostPlan = hostPlan;
+                        }
 
                         // Enviar configuração de rede inicial apenas para o participante que entrou
                         ws.send(JSON.stringify({
@@ -218,10 +275,14 @@ function setupSignaling(server) {
                             console.log(`[SESSION-END] Host ${participantId} encerrou a sessão "${currentRoomId}" intencionalmente.`);
                             // Avisar todos os convidados antes de limpar
                             broadcastToRoom(currentRoomId, { type: 'session-ended', reason: 'host_ended' });
-                            // Cancelar grace timer se houver
+                            // Cancelar todos os timers da sala
                             if (hostGraceTimers.has(currentRoomId)) {
                                 clearTimeout(hostGraceTimers.get(currentRoomId));
                                 hostGraceTimers.delete(currentRoomId);
+                            }
+                            if (freeSessionTimers.has(currentRoomId)) {
+                                clearTimeout(freeSessionTimers.get(currentRoomId));
+                                freeSessionTimers.delete(currentRoomId);
                             }
                             // Fechar conexões dos convidados após breve delay
                             setTimeout(() => {
@@ -503,9 +564,22 @@ function setupSignaling(server) {
                 }
 
                 if (wasHost) {
-                    // Grace period: dá 30s para o host reconectar antes de encerrar a sessão
+                    // Pausar o timer FREE enquanto o host está offline (não penalizar por queda)
+                    // O timer recomeça quando o host reconectar
+                    if (freeSessionTimers.has(currentRoomId)) {
+                        clearTimeout(freeSessionTimers.get(currentRoomId));
+                        freeSessionTimers.delete(currentRoomId);
+                        console.log(`[FREE LIMIT] Timer FREE pausado durante desconexão do host na sala "${currentRoomId}".`);
+                    }
+
+                    // Grace period: dá 45s para o host reconectar antes de encerrar a sessão
                     const timer = setTimeout(() => {
                         hostGraceTimers.delete(currentRoomId);
+                        // Limpar timer FREE também se o host não voltou
+                        if (freeSessionTimers.has(currentRoomId)) {
+                            clearTimeout(freeSessionTimers.get(currentRoomId));
+                            freeSessionTimers.delete(currentRoomId);
+                        }
                         const room = roomManager.getRoom(currentRoomId);
                         const hasGuests = room && room.participants.some(p => p.role !== 'host');
 

@@ -1090,9 +1090,14 @@ async function setupWebSocket() {
                 if (localStream) localStream.getTracks().forEach(t => t.stop());
                 if (rtcClient) { rtcClient.peers.forEach(pc => { try { pc.close(); } catch (_) { } }); rtcClient.peers.clear(); }
                 if (speakerDetectionInterval) { clearInterval(speakerDetectionInterval); speakerDetectionInterval = null; }
-                const endReason = data.reason === 'host_timeout'
-                    ? (window.LYNCRO_I18N ? LYNCRO_I18N.t('session_ended_timeout') : 'Conexão do produtor foi perdida.')
-                    : (window.LYNCRO_I18N ? LYNCRO_I18N.t('session_ended_host') : 'O produtor encerrou a sessão.');
+                let endReason;
+                if (data.reason === 'host_timeout') {
+                    endReason = window.LYNCRO_I18N ? LYNCRO_I18N.t('session_ended_timeout') : 'Conexão do produtor foi perdida.';
+                } else if (data.reason === 'time_limit') {
+                    endReason = window.LYNCRO_I18N ? LYNCRO_I18N.t('session_ended_time_limit') : 'O limite de 20 minutos do plano gratuito foi atingido.';
+                } else {
+                    endReason = window.LYNCRO_I18N ? LYNCRO_I18N.t('session_ended_host') : 'O produtor encerrou a sessão.';
+                }
                 showSessionEndedScreen(endReason);
                 break;
             }

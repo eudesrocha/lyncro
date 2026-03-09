@@ -6,14 +6,15 @@ class RoomManager {
         this.rooms = new Map(); // roomId -> { participants: Map(participantId -> data), host: participantId, layout... }
     }
 
-    createRoom(roomId = uuidv4(), password = null) {
+    createRoom(roomId = uuidv4(), password = null, hostUserId = null) {
         if (!this.rooms.has(roomId)) {
             // Recuperar metadados persistidos (password, hostUserId, layout) se existirem
             const saved = persistentStore.getRoom(roomId);
+            const resolvedHostUserId = hostUserId || (saved ? saved.hostUserId : null);
             this.rooms.set(roomId, {
                 participants: new Map(),
                 host: null,
-                hostUserId: saved ? saved.hostUserId : null,
+                hostUserId: resolvedHostUserId,
                 password: saved ? saved.password : (password ? String(password).trim() : null),
                 layout: saved?.layout || 'auto-grid'
             });
@@ -22,7 +23,7 @@ class RoomManager {
             if (!saved) {
                 persistentStore.setRoom(roomId, {
                     password: password ? String(password).trim() : null,
-                    hostUserId: null,
+                    hostUserId: resolvedHostUserId,
                     layout: 'auto-grid'
                 });
             }
