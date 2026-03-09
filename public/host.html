@@ -82,6 +82,12 @@
             color: #374151 !important;
         }
 
+        /* Prevent layout names from wrapping — w-80 menu is wide enough */
+        #layout-picker-menu .layout-btn span {
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
         /* VIEW DASHBOARD — legível no tema claro */
         [data-theme="light"] button[onclick="openMasterGrid()"] {
             color: #5b21b6 !important;
@@ -490,15 +496,19 @@
                                     <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_cnn_vertical">CNN Vertical</span>
                                     <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
-                                <button onclick="changeLayout('portrait-cards'); closeLayoutPicker()" id="layout-portrait-cards"
+                                <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('Portrait Cards')) return; changeLayout('portrait-cards'); closeLayoutPicker()" id="layout-portrait-cards"
+                                    data-pro-feature="Portrait Cards"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-cards text-sm shrink-0"></i>
                                     <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_portrait_cards">Portrait Cards</span>
+                                    <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
-                                <button onclick="changeLayout('speaker-highlight'); closeLayoutPicker()" id="layout-speaker-highlight"
+                                <button onclick="if(window.LYNCRO_PLAN && !LYNCRO_PLAN.require('Speaker Highlight')) return; changeLayout('speaker-highlight'); closeLayoutPicker()" id="layout-speaker-highlight"
+                                    data-pro-feature="Speaker Highlight"
                                     class="layout-btn w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/20 hover:text-white transition-all text-gray-400 text-left">
                                     <i class="ph ph-presentation-chart text-sm shrink-0"></i>
                                     <span class="text-[10px] font-bold tracking-wide whitespace-nowrap" data-i18n="layout_highlight">Highlight</span>
+                                    <i class="ph ph-crown text-[9px] text-yellow-400 ml-auto" title="PRO"></i>
                                 </button>
                             </div>
                         </div>

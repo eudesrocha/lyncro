@@ -93,12 +93,8 @@
                 return computeAutoGrid(n);
             }
 
-            case 'cnn-vertical':
-            case 'portrait-cards': {
-                const gapPx = layoutId === 'portrait-cards' ? 16 : 2;
-                const padPx = layoutId === 'portrait-cards' ? 16 : 0;
-                const rounded = layoutId === 'portrait-cards' ? 16 : 0;
-
+            case 'cnn-vertical': {
+                const gapPx = 2;
                 let cols, rows;
                 if (n <= 5)      { cols = n; rows = 1; }
                 else if (n <= 6) { cols = 3; rows = 2; }
@@ -106,39 +102,81 @@
                 else if (n <= 9) { cols = 3; rows = 3; }
                 else             { cols = 5; rows = Math.ceil(n / 5); }
 
-                const availW = CANVAS_W - padPx * 2;
-                const availH = CANVAS_H - padPx * 2;
-
-                const cellW = (availW - (cols - 1) * gapPx) / cols;
-                let cellH = cellW * 16 / 9; // portrait 9:16
-                const maxCellH = (availH - (rows - 1) * gapPx) / rows;
-                if (cellH > maxCellH) cellH = maxCellH;
-
-                const totalW = cols * cellW + (cols - 1) * gapPx;
-                const totalH = rows * cellH + (rows - 1) * gapPx;
-                const startX = padPx + (availW - totalW) / 2;
-                const startY = padPx + (availH - totalH) / 2;
+                const cellW_v = (CANVAS_W - (cols - 1) * gapPx) / cols;
+                let cellH_v = cellW_v * 16 / 9;
+                const maxH_v = (CANVAS_H - (rows - 1) * gapPx) / rows;
+                if (cellH_v > maxH_v) cellH_v = maxH_v;
+                const startX_v = (CANVAS_W - (cols * cellW_v + (cols - 1) * gapPx)) / 2;
+                const startY_v = (CANVAS_H - (rows * cellH_v + (rows - 1) * gapPx)) / 2;
 
                 return Array.from({ length: n }, (_, i) => ({
-                    x: startX + (i % cols) * (cellW + gapPx),
-                    y: startY + Math.floor(i / cols) * (cellH + gapPx),
-                    w: cellW,
-                    h: cellH,
-                    rounded,
-                    cover: true,
+                    x: startX_v + (i % cols) * (cellW_v + gapPx),
+                    y: startY_v + Math.floor(i / cols) * (cellH_v + gapPx),
+                    w: cellW_v, h: cellH_v, cover: true,
+                }));
+            }
+
+            case 'portrait-cards': {
+                // Height-first: todos os cards cabem na tela; espaço lateral é livre
+                let cols, rows;
+                if (n <= 5)      { cols = n; rows = 1; }
+                else if (n <= 6) { cols = 3; rows = 2; }
+                else if (n <= 8) { cols = 4; rows = 2; }
+                else if (n <= 9) { cols = 3; rows = 3; }
+                else             { cols = 5; rows = Math.ceil(n / 5); }
+
+                const gapPx = 16;
+                const padPx = 16;
+                const availH_pc = CANVAS_H - padPx * 2 - (rows - 1) * gapPx;
+                const cellH_pc  = Math.round(availH_pc / rows);
+                const cellW_pc  = Math.round(cellH_pc * 9 / 16);
+                const totalW_pc = cols * cellW_pc + (cols - 1) * gapPx;
+                const startX_pc = Math.round((CANVAS_W - totalW_pc) / 2);
+
+                return Array.from({ length: n }, (_, i) => ({
+                    x: startX_pc + (i % cols) * (cellW_pc + gapPx),
+                    y: padPx      + Math.floor(i / cols) * (cellH_pc + gapPx),
+                    w: cellW_pc, h: cellH_pc, rounded: 16, cover: true,
                 }));
             }
 
             case 'speaker-highlight': {
-                const mainH = Math.round(CANVAS_H * 0.72);
-                const stripH = CANVAS_H - mainH - 2;
-                const stripCount = n - 1;
-                const cells = [{ x: 0, y: 0, w: CANVAS_W, h: mainH, cover: false }];
-                if (stripCount > 0) {
-                    const stripW = (CANVAS_W - (stripCount - 1) * 2) / stripCount;
-                    for (let i = 0; i < stripCount; i++) {
-                        cells.push({ x: i * (stripW + 2), y: mainH + 2, w: stripW, h: stripH, cover: true });
-                    }
+                // Destaque GRANDE na esquerda + miniaturas à direita.
+                // AR do destaque: wide(16:9) → square(1:1) → portrait(9:16) conforme colunas crescem.
+                if (n === 1) return [{ x: 0, y: 0, w: CANVAS_W, h: CANVAS_H, cover: true }];
+
+                const thumbCount = n - 1;
+                const padPx    = 8;
+                const gapMain  = 8;
+                const gapThumb = 8;
+
+                let thumbCols;
+                if (thumbCount <= 4)      thumbCols = 1;
+                else if (thumbCount <= 8) thumbCols = 2;
+                else                      thumbCols = 3;
+
+                let featuredAR;
+                if (thumbCols === 1)      featuredAR = 16 / 9;
+                else if (thumbCols === 2) featuredAR = 1;
+                else                      featuredAR = 9 / 16;
+
+                const contW    = CANVAS_W - padPx * 2;
+                const contH    = CANVAS_H - padPx * 2;
+                const featH    = contH;
+                const featW    = Math.round(featH * featuredAR);
+                const sideW    = contW - featW - gapMain;
+                const thumbW   = Math.max(80, Math.floor((sideW - gapThumb * (thumbCols - 1)) / thumbCols));
+                const thumbRows = Math.ceil(thumbCount / thumbCols);
+                const thumbH   = Math.max(60, Math.floor((contH - gapThumb * (thumbRows - 1)) / thumbRows));
+                const sideX    = padPx + featW + gapMain;
+
+                const cells = [{ x: padPx, y: padPx, w: featW, h: featH, cover: true, rounded: 12 }];
+                for (let i = 0; i < thumbCount; i++) {
+                    cells.push({
+                        x: sideX + (i % thumbCols) * (thumbW + gapThumb),
+                        y: padPx  + Math.floor(i / thumbCols) * (thumbH + gapThumb),
+                        w: thumbW, h: thumbH, cover: true, rounded: 10,
+                    });
                 }
                 return cells;
             }
