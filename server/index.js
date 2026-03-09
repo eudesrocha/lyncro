@@ -52,7 +52,15 @@ app.get('/api/config', (_req, res) => {
     res.json({ signalingUrl });
 });
 
-app.get('/api/rooms', (req, res) => {
+app.get('/api/rooms', async (req, res) => {
+    // Em produção (Supabase configurado), exigir autenticação para listar salas.
+    // Isso evita enumeração de IDs de sala por terceiros.
+    if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
+        const auth = req.headers.authorization || '';
+        const token = auth.replace(/^Bearer\s+/i, '');
+        const user = await verifySupabaseToken(token);
+        if (!user) return res.status(401).json({ error: 'Autenticação necessária.' });
+    }
     const rooms = Array.from(roomManager.rooms.keys()).map(id => roomManager.getRoom(id));
     res.json(rooms);
 });

@@ -3,10 +3,21 @@ const roomManager = require('./rooms');
 const { getIceServers } = require('./ice');
 const { verifySupabaseToken, getUserPlan } = require('./auth');
 
-// Rate limiting simples por IP: máx de conexões simultâneas e mensagens por segundo
-const MAX_CONNECTIONS_PER_IP = 10;
-const MAX_MESSAGES_PER_SECOND = 30;
-const connectionsByIp = new Map(); // ip -> count
+// Rate limiting: por IP (conexões simultâneas) e por userId autenticado (conexões + msg/s)
+const MAX_CONNECTIONS_PER_IP   = 10;
+const MAX_CONNECTIONS_PER_USER = 4;  // máx WS simultâneos por userId (previne abuso via VPN)
+const MAX_MESSAGES_PER_SECOND  = 30;
+const connectionsByIp   = new Map(); // ip     -> count
+const connectionsByUser = new Map(); // userId -> count
+
+// ── Audit log estruturado ──────────────────────────────────────────────────────
+function audit(event, data = {}) {
+    console.log(JSON.stringify({
+        ts: new Date().toISOString(),
+        event,
+        ...data
+    }));
+}
 
 const HOST_GRACE_MS = 45_000;          // 45s para o host reconectar antes de encerrar a sessão
 const GUEST_GRACE_MS = 30_000;         // 30s para convidado aceito reconectar antes de ser removido
@@ -46,14 +57,13 @@ function setupSignaling(server) {
         // Limitar conexões simultâneas por IP
         const ipCount = (connectionsByIp.get(ip) || 0) + 1;
         if (ipCount > MAX_CONNECTIONS_PER_IP) {
-            console.warn(`[Rate Limit] IP ${ip} excedeu limite de conexões (${MAX_CONNECTIONS_PER_IP}). Rejeitando.`);
+            audit('RATE_LIMIT_IP', { ip, count: ipCount });
             ws.close(1008, 'Muitas conexões do mesmo IP.');
             return;
         }
         connectionsByIp.set(ip, ipCount);
 
-        console.log(`\n[WS] Conexão de: ${ip} (${ipCount}/${MAX_CONNECTIONS_PER_IP})`);
-        console.log(`[WS] User-Agent: ${req.headers['user-agent']}`);
+        audit('WS_CONNECT', { ip, ipCount });
 
         // Contador de mensagens por segundo
         let msgCount = 0;
@@ -125,7 +135,7 @@ function setupSignaling(server) {
                             if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
                                 const supabaseUser = await verifySupabaseToken(data.participant.token);
                                 if (!supabaseUser) {
-                                    console.log(`[JOIN REJECTED] Room: "${normalizedRoomId}" | Motivo: Token de host inválido`);
+                                    audit('JOIN_REJECTED', { reason: 'invalid_token', room: normalizedRoomId, ip });
                                     ws.send(JSON.stringify({
                                         type: 'error',
                                         message: 'Acesso de host negado. Faça login novamente.'
@@ -135,9 +145,21 @@ function setupSignaling(server) {
                                 }
                                 // Garantir que o userId usado para ownership seja o do Supabase
                                 data.participant.userId = supabaseUser.id;
+
+                                // Rate limit por userId: previne abuso via múltiplas IPs/VPN
+                                const userWsCount = (connectionsByUser.get(supabaseUser.id) || 0) + 1;
+                                if (userWsCount > MAX_CONNECTIONS_PER_USER) {
+                                    audit('RATE_LIMIT_USER', { userId: supabaseUser.id, count: userWsCount, ip });
+                                    ws.send(JSON.stringify({ type: 'error', message: 'Muitas sessões ativas para este usuário.' }));
+                                    ws.close();
+                                    return;
+                                }
+                                connectionsByUser.set(supabaseUser.id, userWsCount);
+                                ws._userId = supabaseUser.id; // para cleanup no close
+
                                 // Verificar plano do host (server-side, não bypassável)
                                 hostPlan = await getUserPlan(supabaseUser.id);
-                                console.log(`[PLAN] Host ${supabaseUser.id} plano=${hostPlan} sala="${normalizedRoomId}"`);
+                                audit('HOST_JOIN', { userId: supabaseUser.id, plan: hostPlan, room: normalizedRoomId, ip });
                             } else {
                                 console.warn('[Auth] SUPABASE_URL/ANON_KEY não configurados. Pulando validação JWT e plano do host.');
                                 hostPlan = 'pro'; // dev mode: sem restrição
@@ -166,7 +188,7 @@ function setupSignaling(server) {
 
                         // Verificar se o join foi rejeitado por ownership
                         if (participant.rejected) {
-                            console.log(`[JOIN REJECTED] Room: "${normalizedRoomId}" | Motivo: ${participant.reason}`);
+                            audit('JOIN_REJECTED', { reason: 'ownership_conflict', room: normalizedRoomId, ip });
                             ws.send(JSON.stringify({
                                 type: 'error',
                                 message: participant.reason
@@ -185,7 +207,7 @@ function setupSignaling(server) {
                                 const guestCount = roomManager.getParticipants(normalizedRoomId)
                                     .filter(p => p.role === 'guest' && p.id !== participant.id).length;
                                 if (guestCount >= FREE_MAX_GUESTS) {
-                                    console.log(`[JOIN REJECTED] Sala "${normalizedRoomId}" atingiu limite FREE de ${FREE_MAX_GUESTS} convidados.`);
+                                    audit('JOIN_REJECTED', { reason: 'free_guest_limit', room: normalizedRoomId, guestCount, ip });
                                     ws.send(JSON.stringify({
                                         type: 'error',
                                         message: `Esta sessão gratuita atingiu o limite de ${FREE_MAX_GUESTS} convidados. O produtor precisa do plano PRO para mais convidados.`
@@ -293,7 +315,7 @@ function setupSignaling(server) {
                     case 'session-ended':
                         // Host encerrou a sessão intencionalmente
                         if (currentRoomId && participantId) {
-                            console.log(`[SESSION-END] Host ${participantId} encerrou a sessão "${currentRoomId}" intencionalmente.`);
+                            audit('SESSION_ENDED', { reason: 'host_ended', room: currentRoomId, participantId, ip });
                             // Avisar todos os convidados antes de limpar
                             broadcastToRoom(currentRoomId, { type: 'session-ended', reason: 'host_ended' });
                             // Cancelar todos os timers da sala
@@ -349,6 +371,7 @@ function setupSignaling(server) {
                         // PRO-only feature: rejeitar no server se plano FREE
                         const prompterRoom = roomManager.rooms.get(normalizedRoomId);
                         if (prompterRoom && prompterRoom.hostPlan !== 'pro') {
+                            audit('PRO_FEATURE_BLOCKED', { feature: 'prompter-sync', room: normalizedRoomId, participantId, ip });
                             ws.send(JSON.stringify({ type: 'error', message: 'Teleprompter requer plano PRO.' }));
                             break;
                         }
@@ -467,7 +490,7 @@ function setupSignaling(server) {
                                 participants: roomManager.getRoom(normalizedRoomId)?.participants || []
                             });
 
-                            console.log(`[KICK] ${data.targetId} removido da sala ${normalizedRoomId} pelo host`);
+                            audit('KICK', { room: normalizedRoomId, targetId: data.targetId, byHost: participantId, ip });
                         }
                         break;
 
@@ -504,6 +527,7 @@ function setupSignaling(server) {
                         // PRO-only feature: rejeitar no server se plano FREE
                         const overlayRoomRaw = roomManager.rooms.get(normalizedRoomId);
                         if (overlayRoomRaw && overlayRoomRaw.hostPlan !== 'pro') {
+                            audit('PRO_FEATURE_BLOCKED', { feature: 'overlay-control', room: normalizedRoomId, participantId, ip });
                             ws.send(JSON.stringify({ type: 'error', message: 'Lower Thirds requer plano PRO.' }));
                             break;
                         }
@@ -565,9 +589,16 @@ function setupSignaling(server) {
 
         ws.on('close', () => {
             clearInterval(msgReset);
+            // Liberar contador de conexões por IP
             const remaining = (connectionsByIp.get(ip) || 1) - 1;
             if (remaining <= 0) connectionsByIp.delete(ip);
             else connectionsByIp.set(ip, remaining);
+            // Liberar contador de conexões por userId (host autenticado)
+            if (ws._userId) {
+                const userRemaining = (connectionsByUser.get(ws._userId) || 1) - 1;
+                if (userRemaining <= 0) connectionsByUser.delete(ws._userId);
+                else connectionsByUser.set(ws._userId, userRemaining);
+            }
 
             if (currentRoomId && participantId) {
                 const roomBeforeLeave = roomManager.getRoom(currentRoomId);
