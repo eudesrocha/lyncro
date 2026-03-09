@@ -49,10 +49,10 @@
             err_checkout: 'Erro ao iniciar pagamento: ',
             err_portal: 'Erro ao abrir portal: ',
             // ── Landing Page ──────────────────────────────────────────────────────
-            tagline: 'O Futuro da Produção Remota',
-            hero_line1: 'Sua Live.',
-            hero_line2: 'Sem Limites.',
-            hero_sub: 'Conecte-se com quem importa através de uma plataforma desenhada para fluidez e impacto. Abandone a complexidade, foque na sua mensagem e entregue uma transmissão excepcional com a estabilidade e qualidade que a sua audiência merece.',
+            tagline: 'Design Minimalista. Performance Máxima',
+            hero_line1: 'CONECTE.',
+            hero_line2: 'CAPTURE. TRANSMITA.',
+            hero_sub: 'Conecte-se com convidados em qualquer lugar do planeta através de uma rede de baixa latência. O LYNCRO é a ponte invisível entre a sua mensagem e o resto do mundo.',
             // Feature slides
             s1_title: 'Mobile First, Sempre',
             s1_desc: 'Convide pessoas de qualquer lugar. Eles entram pelo celular e você recebe áudio e vídeo em altíssima qualidade — sem burocracias.',
@@ -217,10 +217,10 @@
             err_checkout: 'Payment error: ',
             err_portal: 'Portal error: ',
             // ── Landing Page ──────────────────────────────────────────────────────
-            tagline: 'The Future of Remote Production',
-            hero_line1: 'Your Live.',
-            hero_line2: 'No Limits.',
-            hero_sub: 'Connect with who matters through a platform designed for fluidity and impact. Leave complexity behind, focus on your message and deliver an exceptional broadcast with the stability and quality your audience deserves.',
+            tagline: 'Minimalist Design. Maximum Performance',
+            hero_line1: 'CONNECT.',
+            hero_line2: 'CAPTURE. BROADCAST.',
+            hero_sub: 'Connect with guests anywhere on the planet through a low-latency network. LYNCRO is the invisible bridge between your message and the rest of the world.',
             // Feature slides
             s1_title: 'Mobile First, Always',
             s1_desc: 'Invite people from anywhere. They join from their phone and you receive high-quality audio and video — no hassle.',

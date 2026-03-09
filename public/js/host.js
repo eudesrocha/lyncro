@@ -1,37 +1,3 @@
-// Lógica de Controle NDI via Electron IPC
-async function handleNDIToggle(participantId, name) {
-    const checkbox = document.getElementById(`ndi-switch-${participantId}`);
-    if (!checkbox) return;
-    const isEnabled = checkbox.checked;
-
-    try {
-        if (window.lyncroAPI && window.lyncroAPI.sendNDIControl) {
-            const result = await window.lyncroAPI.sendNDIControl({
-                participantId: participantId,
-                streamName: `Lyncro - ${name}`,
-                isActive: isEnabled,
-                roomName: roomName
-            });
-
-            if (result.status === 'active') {
-                showToast(`Fonte NDI "${name}" ativa no OBS`, "success");
-            } else {
-                showToast(`Fonte NDI "${name}" desativada`, "info");
-            }
-
-            // Sincronizar com o onAir do servidor de sinalização
-            toggleOnAir(participantId, isEnabled);
-        } else {
-            showToast(`NDI ${isEnabled ? 'Ativado' : 'Desativado'} (Preview)`, "info");
-            toggleOnAir(participantId, isEnabled);
-        }
-    } catch (error) {
-        console.error("Erro ao ativar NDI:", error);
-        showToast("Erro ao comunicar com driver NDI", "error");
-        checkbox.checked = !isEnabled;
-    }
-}
-
 // ── Presets de Qualidade de Vídeo ────────────────────────────────────────────
 const VIDEO_QUALITY_PRESETS = {
     '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
@@ -1108,10 +1074,6 @@ function handleIceCandidate(targetId, candidate) {
 
 window.handleTallyChange = (pId, state, name) => {
     ws.send(JSON.stringify({ type: 'tally-change', roomId: roomName, participantId: pId, tallyState: state }));
-    if (window.lyncroAPI) {
-        if (state === 'program') window.lyncroAPI.sendNDIControl({ action: 'start', participantId: pId, name: name });
-        else window.lyncroAPI.sendNDIControl({ action: 'stop', participantId: pId });
-    }
 };
 
 function getLTStyle() {
