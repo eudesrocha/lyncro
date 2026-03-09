@@ -314,12 +314,33 @@
                 <!-- Body -->
                 <div style="padding:18px 22px;overflow-y:auto;flex:1;">
 
-                    <!-- Benefícios -->
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;">
-                        <div class="upgrade-feat"><i class="ph ph-record" style="color:#f87171;"></i> Gravação</div>
-                        <div class="upgrade-feat"><i class="ph ph-layout" style="color:#0078d4;"></i> Layouts Premium</div>
-                        <div class="upgrade-feat"><i class="ph ph-users" style="color:#34d399;"></i> Até 10 participantes</div>
-                        <div class="upgrade-feat"><i class="ph ph-text-aa" style="color:#a78bfa;"></i> Lower Thirds</div>
+                    <!-- Comparativo FREE vs PRO -->
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+
+                        <!-- Coluna FREE -->
+                        <div class="upgrade-tier-col">
+                            <div class="upgrade-tier-header free-header">FREE</div>
+                            <div class="upgrade-tier-row tier-dim"><i class="ph ph-x-circle" style="color:#6b7280;"></i> Marca d'água Lyncro</div>
+                            <div class="upgrade-tier-row tier-dim"><i class="ph ph-x-circle" style="color:#6b7280;"></i> Até 720p</div>
+                            <div class="upgrade-tier-row tier-dim"><i class="ph ph-x-circle" style="color:#6b7280;"></i> Chamadas até 20 min</div>
+                            <div class="upgrade-tier-row tier-dim"><i class="ph ph-x-circle" style="color:#6b7280;"></i> Sem gravação</div>
+                            <div class="upgrade-tier-row tier-dim"><i class="ph ph-x-circle" style="color:#6b7280;"></i> Sem teleprompter</div>
+                            <div class="upgrade-tier-row tier-dim"><i class="ph ph-x-circle" style="color:#6b7280;"></i> Sem lower thirds</div>
+                            <div class="upgrade-tier-row tier-dim"><i class="ph ph-x-circle" style="color:#6b7280;"></i> Sem arquivos no chat</div>
+                        </div>
+
+                        <!-- Coluna PRO -->
+                        <div class="upgrade-tier-col pro-col">
+                            <div class="upgrade-tier-header pro-header">PRO</div>
+                            <div class="upgrade-tier-row"><i class="ph ph-check-circle" style="color:#34d399;"></i> Sem marca d'água</div>
+                            <div class="upgrade-tier-row"><i class="ph ph-check-circle" style="color:#34d399;"></i> 1080p Full HD</div>
+                            <div class="upgrade-tier-row"><i class="ph ph-check-circle" style="color:#34d399;"></i> Chamadas ilimitadas</div>
+                            <div class="upgrade-tier-row"><i class="ph ph-check-circle" style="color:#34d399;"></i> Gravação de transmissão</div>
+                            <div class="upgrade-tier-row"><i class="ph ph-check-circle" style="color:#34d399;"></i> Teleprompter</div>
+                            <div class="upgrade-tier-row"><i class="ph ph-check-circle" style="color:#34d399;"></i> Lower thirds & letreiros</div>
+                            <div class="upgrade-tier-row"><i class="ph ph-check-circle" style="color:#34d399;"></i> Arquivos no chat</div>
+                        </div>
+
                     </div>
 
                     <!-- Divider -->
@@ -402,23 +423,45 @@
                     border-color: rgba(0,0,0,0.1);
                     color: #6b7280;
                 }
-                .upgrade-feat {
+                .upgrade-tier-col {
+                    border-radius: 10px;
+                    border: 1px solid rgba(255,255,255,0.07);
+                    background: rgba(255,255,255,0.02);
+                    overflow: hidden;
+                }
+                .upgrade-tier-col.pro-col {
+                    border-color: rgba(0,120,212,0.3);
+                    background: rgba(0,120,212,0.05);
+                }
+                [data-theme="light"] .upgrade-tier-col { border-color: rgba(0,0,0,0.08); background: rgba(0,0,0,0.02); }
+                [data-theme="light"] .upgrade-tier-col.pro-col { border-color: rgba(0,120,212,0.25); background: rgba(0,120,212,0.04); }
+                .upgrade-tier-header {
+                    font-size: 9px;
+                    font-weight: 900;
+                    text-transform: uppercase;
+                    letter-spacing: 0.15em;
+                    text-align: center;
+                    padding: 6px 4px;
+                    border-bottom: 1px solid rgba(255,255,255,0.06);
+                }
+                .free-header { color: #6b7280; background: rgba(255,255,255,0.02); }
+                .pro-header  { color: #0078d4; background: rgba(0,120,212,0.08); border-color: rgba(0,120,212,0.15); }
+                [data-theme="light"] .free-header { color: #9ca3af; }
+                [data-theme="light"] .pro-header  { color: #0078d4; background: rgba(0,120,212,0.06); }
+                .upgrade-tier-row {
                     display: flex;
                     align-items: center;
-                    gap: 6px;
+                    gap: 5px;
                     font-size: 10px;
-                    font-weight: 600;
+                    font-weight: 500;
                     color: #d1d5db;
-                    background: rgba(255,255,255,0.03);
-                    border: 1px solid rgba(255,255,255,0.06);
-                    border-radius: 8px;
-                    padding: 6px 8px;
+                    padding: 5px 8px;
+                    border-bottom: 1px solid rgba(255,255,255,0.03);
                 }
-                [data-theme="light"] .upgrade-feat {
-                    color: #374151;
-                    background: rgba(0,0,0,0.03);
-                    border-color: rgba(0,0,0,0.07);
-                }
+                .upgrade-tier-row:last-child { border-bottom: none; }
+                .upgrade-tier-row.tier-dim { color: #4b5563; }
+                [data-theme="light"] .upgrade-tier-row { color: #374151; }
+                [data-theme="light"] .upgrade-tier-row.tier-dim { color: #9ca3af; }
                 .upgrade-plan-card {
                     position: relative;
                     display: flex;
