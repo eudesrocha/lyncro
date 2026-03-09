@@ -432,6 +432,13 @@ async function setupWebSocket() {
                     await rtcClient.handleCandidate(data.from, data.candidate);
                 }
                 break;
+            case 'waiting-room':
+                if (data.action === 'start') {
+                    showWaitingRoom(data.seconds, data.bgType, data.bgData);
+                } else {
+                    hideWaitingRoom();
+                }
+                break;
             case 'video-adjust': {
                 const cell = document.getElementById(`grid-cell-${data.targetId}`);
                 if (cell) {
@@ -463,3 +470,78 @@ async function setupWebSocket() {
 
 // Iniciar ao carregar a janela
 window.addEventListener('DOMContentLoaded', init);
+
+// ── Waiting Room Countdown ────────────────────────────────────────────────────
+let countdownInterval = null;
+let countdownSeconds  = 0;
+
+function updateCountdownDisplay(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    const el = document.getElementById('countdown-timer');
+    if (el) el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function showWaitingRoom(totalSeconds, bgType, bgData) {
+    const overlay   = document.getElementById('waiting-overlay');
+    const bg        = document.getElementById('waiting-bg');
+    const container = document.getElementById('grid-container');
+    if (!overlay || !bg) return;
+
+    // Set background
+    bg.className = '';
+    bg.style.backgroundImage  = '';
+    bg.style.backgroundSize   = '';
+    bg.style.backgroundPosition = '';
+    if (bgType === 'image' && bgData) {
+        bg.style.backgroundImage    = `url(${bgData})`;
+        bg.style.backgroundSize     = 'cover';
+        bg.style.backgroundPosition = 'center';
+    } else {
+        bg.classList.add(`waiting-bg-${bgType || 'cosmic'}`);
+    }
+
+    // Blur grid behind overlay
+    if (container) container.classList.add('wr-active');
+
+    // Fade in
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '0';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+        overlay.style.opacity = '1';
+    }));
+
+    // Start countdown
+    countdownSeconds = totalSeconds;
+    updateCountdownDisplay(countdownSeconds);
+    clearInterval(countdownInterval);
+    countdownInterval = setInterval(() => {
+        countdownSeconds--;
+        if (countdownSeconds <= 0) {
+            clearInterval(countdownInterval);
+            updateCountdownDisplay(0);
+            hideWaitingRoom();
+        } else {
+            updateCountdownDisplay(countdownSeconds);
+        }
+    }, 1000);
+}
+
+function hideWaitingRoom() {
+    clearInterval(countdownInterval);
+    const overlay   = document.getElementById('waiting-overlay');
+    const container = document.getElementById('grid-container');
+    if (!overlay) return;
+
+    // Fade out overlay + un-blur grid simultaneously
+    overlay.style.opacity = '0';
+    if (container) container.style.filter = 'blur(0)';
+
+    setTimeout(() => {
+        overlay.style.display = 'none';
+        if (container) {
+            container.classList.remove('wr-active');
+            container.style.filter = '';
+        }
+    }, 1000);
+}

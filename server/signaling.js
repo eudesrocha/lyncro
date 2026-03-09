@@ -575,6 +575,20 @@ function setupSignaling(server) {
                         }
                         break;
 
+                    case 'waiting-room': {
+                        const rmWr = roomManager.getRoom(normalizedRoomId);
+                        if (rmWr && rmWr.host === participantId) {
+                            broadcastToRoom(normalizedRoomId, {
+                                type: 'waiting-room',
+                                action: data.action,
+                                seconds: data.seconds || 0,
+                                bgType: data.bgType || 'cosmic',
+                                bgData: data.bgData || null
+                            });
+                        }
+                        break;
+                    }
+
                     case 'video-adjust': {
                         const rmAdj = roomManager.getRoom(normalizedRoomId);
                         if (rmAdj && rmAdj.host === participantId) {

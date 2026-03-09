@@ -1926,6 +1926,139 @@ document.addEventListener('click', (e) => {
     if (wrap && !wrap.contains(e.target)) closeLayoutPicker();
 });
 
+// ── Sala de Espera ────────────────────────────────────────────────────────────
+let waitingRoomActive = false;
+let waitingRoomCountdown = 0;
+let waitingRoomInterval = null;
+let selectedWaitingBg = 'cosmic';
+let waitingRoomImageData = null;
+
+window.toggleWaitingRoomPanel = () => {
+    const menu = document.getElementById('waiting-room-menu');
+    if (!menu) return;
+    closeLayoutPicker();
+    closeSettingsPicker();
+    menu.classList.toggle('hidden');
+};
+
+window.closeWaitingRoomPanel = () => {
+    const menu = document.getElementById('waiting-room-menu');
+    if (menu) menu.classList.add('hidden');
+};
+
+document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('waiting-room-wrap');
+    if (wrap && !wrap.contains(e.target)) closeWaitingRoomPanel();
+});
+
+window.selectWaitingBg = (bg, btn) => {
+    selectedWaitingBg = bg;
+    waitingRoomImageData = null;
+    document.querySelectorAll('.wrbg-btn').forEach(b => {
+        b.classList.remove('border-2', 'border-win-accent');
+        b.classList.add('border', 'border-white/10');
+    });
+    btn.classList.add('border-2', 'border-win-accent');
+    btn.classList.remove('border', 'border-white/10');
+};
+
+window.handleWrImageUpload = (input) => {
+    const file = input.files[0];
+    if (!file) return;
+    if (file.size > 800 * 1024) {
+        lyncroToast.warning('Imagem muito grande. Use uma com menos de 800KB.');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        waitingRoomImageData = e.target.result;
+        selectedWaitingBg = 'image';
+        document.querySelectorAll('.wrbg-btn').forEach(b => {
+            b.classList.remove('border-2', 'border-win-accent');
+            b.classList.add('border', 'border-white/10');
+        });
+        const imgBtn = document.getElementById('wrbg-image');
+        if (imgBtn) {
+            imgBtn.classList.add('border-2', 'border-win-accent');
+            imgBtn.classList.remove('border', 'border-white/10');
+            imgBtn.innerHTML = '<i class="ph ph-check text-green-400 text-sm"></i><span class="text-[7px]">OK</span>';
+        }
+        lyncroToast.success('Imagem carregada. Clique em Iniciar Contagem.');
+    };
+    reader.readAsDataURL(file);
+};
+
+function updateWrHostCountdown(secs) {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    const el = document.getElementById('wr-host-countdown');
+    if (el) el.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function updateWaitingRoomUI(isActive) {
+    const btnStart = document.getElementById('wr-btn-start');
+    const btnStop  = document.getElementById('wr-btn-stop');
+    const btnWr    = document.getElementById('btn-waiting-room');
+    if (btnStart) btnStart.classList.toggle('hidden', isActive);
+    if (btnStop)  btnStop.classList.toggle('hidden', !isActive);
+    if (btnWr) {
+        if (isActive) {
+            btnWr.classList.add('bg-orange-500/20', 'text-orange-400', 'border-orange-500/40');
+            btnWr.classList.remove('bg-white/5', 'text-gray-300', 'border-white/10');
+        } else {
+            btnWr.classList.remove('bg-orange-500/20', 'text-orange-400', 'border-orange-500/40');
+            btnWr.classList.add('bg-white/5', 'text-gray-300', 'border-white/10');
+        }
+    }
+}
+
+window.startWaitingRoom = () => {
+    const minutes = parseInt(document.getElementById('wr-minutes').value) || 0;
+    const seconds = parseInt(document.getElementById('wr-seconds').value) || 0;
+    const totalSeconds = minutes * 60 + seconds;
+    if (totalSeconds <= 0) { lyncroToast.warning('Defina um tempo maior que zero.'); return; }
+    if (!ws || ws.readyState !== WebSocket.OPEN) { lyncroToast.error('Sem conexão com a sala.'); return; }
+
+    ws.send(JSON.stringify({
+        type: 'waiting-room',
+        roomId: roomName,
+        action: 'start',
+        seconds: totalSeconds,
+        bgType: selectedWaitingBg,
+        bgData: waitingRoomImageData
+    }));
+
+    waitingRoomActive = true;
+    waitingRoomCountdown = totalSeconds;
+    clearInterval(waitingRoomInterval);
+    updateWrHostCountdown(waitingRoomCountdown);
+    waitingRoomInterval = setInterval(() => {
+        waitingRoomCountdown--;
+        if (waitingRoomCountdown <= 0) {
+            waitingRoomCountdown = 0;
+            clearInterval(waitingRoomInterval);
+            updateWrHostCountdown(0);
+            waitingRoomActive = false;
+            updateWaitingRoomUI(false);
+        } else {
+            updateWrHostCountdown(waitingRoomCountdown);
+        }
+    }, 1000);
+
+    updateWaitingRoomUI(true);
+    lyncroToast.success('Sala de espera ativada no OBS.');
+};
+
+window.stopWaitingRoom = () => {
+    clearInterval(waitingRoomInterval);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'waiting-room', roomId: roomName, action: 'stop' }));
+    }
+    waitingRoomActive = false;
+    updateWaitingRoomUI(false);
+    lyncroToast.info('Sala de espera encerrada.');
+};
+
 let prompterState = {
     targetId: 'all',
     text: '',
