@@ -11,6 +11,7 @@ const connectionsByIp = new Map(); // ip -> count
 const HOST_GRACE_MS = 45_000;          // 45s para o host reconectar antes de encerrar a sessão
 const GUEST_GRACE_MS = 30_000;         // 30s para convidado aceito reconectar antes de ser removido
 const FREE_SESSION_MS = 20 * 60 * 1000; // 20 minutos para sessões FREE
+const FREE_MAX_GUESTS = 3;             // Máximo de convidados simultâneos em sessões FREE
 
 function setupSignaling(server) {
     const wss = new WebSocket.Server({ server });
@@ -176,6 +177,26 @@ function setupSignaling(server) {
 
                         participantId = participant.id;
 
+                        // Limitar convidados em sessões FREE
+                        if (participant.role === 'guest') {
+                            const roomForLimit = roomManager.rooms.get(normalizedRoomId);
+                            const isPlanFree = !roomForLimit || roomForLimit.hostPlan !== 'pro';
+                            if (isPlanFree) {
+                                const guestCount = roomManager.getParticipants(normalizedRoomId)
+                                    .filter(p => p.role === 'guest' && p.id !== participant.id).length;
+                                if (guestCount >= FREE_MAX_GUESTS) {
+                                    console.log(`[JOIN REJECTED] Sala "${normalizedRoomId}" atingiu limite FREE de ${FREE_MAX_GUESTS} convidados.`);
+                                    ws.send(JSON.stringify({
+                                        type: 'error',
+                                        message: `Esta sessão gratuita atingiu o limite de ${FREE_MAX_GUESTS} convidados. O produtor precisa do plano PRO para mais convidados.`
+                                    }));
+                                    roomManager.leaveRoom(normalizedRoomId, participantId);
+                                    ws.close();
+                                    return;
+                                }
+                            }
+                        }
+
                         console.log(`[JOIN] Room: "${normalizedRoomId}" | Participant: "${participant.name}" | Role: ${participant.role}`);
 
                         // ── Timer de 20 minutos para hosts FREE ──────────────────────────────
@@ -324,13 +345,20 @@ function setupSignaling(server) {
                         });
                         break;
 
-                    case 'prompter-sync':
+                    case 'prompter-sync': {
+                        // PRO-only feature: rejeitar no server se plano FREE
+                        const prompterRoom = roomManager.rooms.get(normalizedRoomId);
+                        if (prompterRoom && prompterRoom.hostPlan !== 'pro') {
+                            ws.send(JSON.stringify({ type: 'error', message: 'Teleprompter requer plano PRO.' }));
+                            break;
+                        }
                         // Mirror the teleprompter state (text, speed, playback, etc) verbatim to everyone in the room
                         broadcastToRoom(normalizedRoomId, {
                             type: 'prompter-sync',
                             payload: data.payload
                         });
                         break;
+                    }
 
                     case 'prompter-finished':
                         // Guest avisando o Host que a rolagem dele acabou
@@ -472,7 +500,13 @@ function setupSignaling(server) {
                         });
                         break;
 
-                    case 'overlay-control':
+                    case 'overlay-control': {
+                        // PRO-only feature: rejeitar no server se plano FREE
+                        const overlayRoomRaw = roomManager.rooms.get(normalizedRoomId);
+                        if (overlayRoomRaw && overlayRoomRaw.hostPlan !== 'pro') {
+                            ws.send(JSON.stringify({ type: 'error', message: 'Lower Thirds requer plano PRO.' }));
+                            break;
+                        }
                         const rmOverlay = roomManager.getRoom(normalizedRoomId);
                         if (rmOverlay && rmOverlay.host === participantId) {
                             // Persistir o estado do overlay no participante alvo
@@ -500,6 +534,7 @@ function setupSignaling(server) {
                             });
                         }
                         break;
+                    }
 
                     case 'layout-change':
                         const rmLayout = roomManager.getRoom(normalizedRoomId);

@@ -249,6 +249,21 @@
 
             if (labelsOn && item.name) drawBadge(item.name, item.role, x, y, w, h);
         });
+
+        // Marca d'água em gravações do plano FREE (não removível via DevTools)
+        const planIsFree = !window.LYNCRO_PLAN || !window.LYNCRO_PLAN.isPro();
+        if (planIsFree) {
+            const wText = 'LYNCRO FREE';
+            const wFontSize = Math.round(CANVAS_H * 0.055);
+            ctx.save();
+            ctx.globalAlpha = 0.22;
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${wFontSize}px Inter, system-ui, sans-serif`;
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            ctx.fillText(wText, CANVAS_W - 28, CANVAS_H - 22);
+            ctx.restore();
+        }
     }
 
     function startCompositor(items) {
