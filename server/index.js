@@ -84,6 +84,25 @@ app.get('/api/rooms/:id', (req, res) => {
     res.json(room);
 });
 
+app.get('/api/rooms/mine', async (req, res) => {
+    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_ANON_KEY) return res.json(null);
+    const auth = req.headers.authorization || '';
+    const token = auth.replace(/^Bearer\s+/i, '');
+    const supabaseUser = await verifySupabaseToken(token);
+    if (!supabaseUser) return res.status(401).json({ error: 'Autenticação necessária.' });
+
+    const entry = Array.from(roomManager.rooms.entries())
+        .find(([, r]) => r.hostUserId === supabaseUser.id);
+    if (!entry) return res.json(null);
+
+    const [roomId, room] = entry;
+    res.json({
+        roomId,
+        participantCount: room.participants.size,
+        hostConnected: room.host !== null
+    });
+});
+
 app.post('/api/rooms', async (req, res) => {
     // Se Supabase estiver configurado, exigir autenticação e plano
     if (process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY) {
@@ -95,13 +114,18 @@ app.post('/api/rooms', async (req, res) => {
             return res.status(401).json({ error: 'Autenticação necessária para criar uma sala.' });
         }
 
+        const { password } = req.body;
+        const name = slugifyRoomName(req.body.name);
+        if (!name) return res.status(400).json({ error: 'Nome da sala inválido.' });
+
         // Verificar plano do usuário
         const plan = await getUserPlan(supabaseUser.id);
         if (plan !== 'pro') {
-            // Contar quantas salas o usuário FREE já tem ativas (limite: 1 simultânea)
-            const userRooms = Array.from(roomManager.rooms.values())
-                .filter(r => r.hostUserId === supabaseUser.id);
-            if (userRooms.length >= 1) {
+            // Bloqueia apenas se houver outra sala (não a mesma) com host WS ativo.
+            // Salas órfãs (host === null) ou a própria sala sendo reconectada não contam.
+            const blockingRooms = Array.from(roomManager.rooms.entries())
+                .filter(([rid, r]) => r.hostUserId === supabaseUser.id && r.host !== null && rid !== name);
+            if (blockingRooms.length >= 1) {
                 return res.status(403).json({
                     error: 'Plano FREE permite apenas 1 sala ativa por vez. Assine o plano PRO para criar mais.',
                     upgrade: true
@@ -109,10 +133,6 @@ app.post('/api/rooms', async (req, res) => {
             }
         }
 
-        // Armazenar userId no metadata da sala para rastreamento
-        const { password } = req.body;
-        const name = slugifyRoomName(req.body.name);
-        if (!name) return res.status(400).json({ error: 'Nome da sala inválido.' });
         const roomId = roomManager.createRoom(name, password, supabaseUser.id);
         console.log(`[ROOM CREATED] "${name}" por userId=${supabaseUser.id} (plano=${plan})`);
         return res.json({ roomId, plan });

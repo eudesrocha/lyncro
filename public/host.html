@@ -319,16 +319,16 @@
     <nav
         class="flex items-center justify-between px-4 py-3 md:px-6 glass-panel sticky top-0 z-50 border-b-0 border-x-0 border-t-0 shadow-md">
         <!-- Esquerda: Logo + Controles -->
-        <div class="flex items-center gap-4">
-            <h1 class="text-2xl font-logo font-black italic tracking-tight text-white leading-none flex items-center gap-2">
+        <div class="flex items-center gap-2 md:gap-4 shrink-0">
+            <h1 class="text-xl md:text-2xl font-logo font-black italic tracking-tight text-white leading-none flex items-center gap-1.5">
                 Lyncro
                 <span id="plan-badge" class="text-[9px] font-black px-1.5 py-0.5 rounded bg-white/10 tracking-widest" style="color: #9ca3af;">FREE</span>
                 <!-- color updated by plan.js _applyGates() -->
             </h1>
 
-            <div class="w-px h-6 bg-white/10 mx-2 hidden md:block"></div>
+            <div class="w-px h-6 bg-white/10 mx-1 hidden md:block"></div>
 
-            <div class="flex items-center gap-1.5 bg-black/20 p-1.5 rounded-xl border border-white/5">
+            <div class="flex items-center gap-1 md:gap-1.5 bg-black/20 p-1 md:p-1.5 rounded-xl border border-white/5">
                 <button id="openMobileCam"
                     class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-win-accent hover:text-white transition-all text-gray-400 group"
                     title="Lyncro Câmera (Add Celular)">
@@ -350,13 +350,13 @@
         </div>
 
         <!-- Centro: ID da Sala + Invite -->
-        <div class="flex flex-col items-center gap-1">
-            <div class="flex items-center gap-2">
-                <div id="room-id-display" class="text-white text-base font-black tracking-widest">
+        <div class="flex flex-col items-center gap-1 min-w-0 flex-1 mx-2">
+            <div class="flex items-center gap-2 w-full justify-center">
+                <div id="room-id-display" class="text-white text-sm md:text-base font-black tracking-widest truncate max-w-[100px] md:max-w-none">
                     <!-- Injetado via JS -->
                 </div>
                 <button onclick="copyInviteLink()" data-i18n-title="btn_invite_tooltip"
-                    class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-win-accent/20 border border-win-accent/40 text-win-accent hover:bg-win-accent hover:text-white transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm">
+                    class="flex items-center gap-1.5 px-2 md:px-3 py-1 rounded-lg bg-win-accent/20 border border-win-accent/40 text-win-accent hover:bg-win-accent hover:text-white transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm shrink-0">
                     <i class="ph ph-link text-sm"></i>
                     <span class="hidden md:inline" data-i18n="btn_invite">Convidar</span>
                 </button>
@@ -437,6 +437,18 @@
                                 <option value="720" selected>720p HD</option>
                                 <option value="480">480p SD</option>
                             </select>
+                        </div>
+                        <!-- Idioma — visível apenas no mobile -->
+                        <div class="md:hidden my-0.5 border-t border-white/5"></div>
+                        <div class="md:hidden px-3 pt-1 pb-1.5">
+                            <span class="text-[9px] font-black uppercase tracking-[0.18em] text-gray-500">Idioma</span>
+                        </div>
+                        <div class="md:hidden flex items-center gap-1.5 px-3 py-1.5">
+                            <i class="ph ph-translate text-sm text-gray-500"></i>
+                            <button data-lang-btn-sm="pt" onclick="window.LYNCRO_I18N.setLang('pt'); closeSettingsPicker()"
+                                class="flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-win-accent/20 text-win-accent border border-win-accent/30 transition-all">🇧🇷 PT</button>
+                            <button data-lang-btn-sm="en" onclick="window.LYNCRO_I18N.setLang('en'); closeSettingsPicker()"
+                                class="flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 transition-all">🇺🇸 EN</button>
                         </div>
                     </div>
                 </div>
@@ -559,13 +571,14 @@
             <!-- Logout / End -->
             <button
                 onclick="if(ws && ws.readyState === WebSocket.OPEN){ ws.send(JSON.stringify({type: 'session-ended', roomId: roomName})); ws.close(); wsIntentionalClose = true; } window.location.href='index.html'"
-                class="flex size-9 items-center justify-center rounded-xl bg-red-600/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 transition-colors text-red-500 hover:text-white"
+                class="flex items-center justify-center gap-1.5 px-2 md:px-2 h-9 rounded-xl bg-red-600/10 hover:bg-red-600 border border-red-500/20 hover:border-red-500 transition-colors text-red-500 hover:text-white"
                 data-i18n-title="title_end_session" title="Encerrar Sessão">
                 <i class="ph ph-power text-lg"></i>
+                <span class="text-[10px] font-black uppercase tracking-wider md:hidden">Sair</span>
             </button>
 
-            <!-- Language Switcher -->
-            <div style="display:flex;align-items:center;gap:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:3px;margin-left:4px;">
+            <!-- Language Switcher — hidden on mobile to avoid overflow -->
+            <div class="hidden md:flex" style="align-items:center;gap:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:3px;margin-left:4px;">
                 <button data-lang-btn="pt" onclick="window.LYNCRO_I18N.setLang('pt')" aria-pressed="true"
                     style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:800;background:rgba(0,120,212,0.2);color:#0078d4;border:1px solid rgba(0,120,212,0.3);cursor:pointer;transition:all .15s;">🇧🇷 PT</button>
                 <button data-lang-btn="en" onclick="window.LYNCRO_I18N.setLang('en')" aria-pressed="false"
@@ -579,18 +592,18 @@
         </div>
     </nav>
 
-    <div class="flex-1 flex flex-col xl:flex-row gap-4 min-h-0 p-4 pt-4 h-full">
+    <div class="flex-1 flex flex-col xl:flex-row gap-4 min-h-0 p-2 md:p-4 pt-2 md:pt-4 h-full">
         <!-- Main Workspace (Vídeos) -->
         <main id="video-grid"
-            class="flex-1 grid grid-auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto custom-scrollbar pr-1"
+            class="flex-1 grid grid-auto-rows-min grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-4 overflow-y-auto custom-scrollbar pr-1"
             style="grid-auto-rows: min-content;">
 
-            <!-- Cards de WebRTC são dinamicamente injetados aqui. 
+            <!-- Cards de WebRTC são dinamicamente injetados aqui.
                  A injeção usa o visual original do webrtc.js porém amparada pela redefinição global do glass-panel. -->
         </main>
 
         <!-- Right Side Panel (Switchboard) -->
-        <aside class="w-full xl:w-[340px] flex flex-col gap-4 flex-shrink-0 min-h-0 h-[60vh] xl:h-auto">
+        <aside class="w-full xl:w-[340px] flex flex-col gap-3 md:gap-4 flex-shrink-0 min-h-0 max-h-[55vh] md:max-h-[65vh] xl:max-h-none xl:h-auto overflow-y-auto xl:overflow-visible custom-scrollbar">
 
             <!-- Dashboard Block -->
             <!-- invite-link-input kept hidden for JS compatibility -->
