@@ -121,11 +121,19 @@ app.post('/api/rooms', async (req, res) => {
         // Verificar plano do usuário
         const plan = await getUserPlan(supabaseUser.id);
         if (plan !== 'pro') {
-            // Bloqueia apenas se houver outra sala (não a mesma) com host WS ativo.
-            // Salas órfãs (host === null) ou a própria sala sendo reconectada não contam.
-            const blockingRooms = Array.from(roomManager.rooms.entries())
-                .filter(([rid, r]) => r.hostUserId === supabaseUser.id && r.host !== null && rid !== name);
-            if (blockingRooms.length >= 1) {
+            // Bloqueia se houver qualquer sala com host WS ativo pertencente a este usuário.
+            // Salas órfãs (host === null) não contam — apenas conexões WS reais.
+            const activeEntry = Array.from(roomManager.rooms.entries())
+                .find(([, r]) => r.hostUserId === supabaseUser.id && r.host !== null);
+            if (activeEntry) {
+                const [activeRoomId] = activeEntry;
+                if (activeRoomId === name) {
+                    // Mesmo nome: sala já está ativa em outro lugar — não mostra modal de upgrade
+                    return res.status(409).json({
+                        error: 'Esta sala já está ativa em outra aba ou dispositivo. Use "Retomar Sessão" na página inicial.'
+                    });
+                }
+                // Sala diferente: limite do plano FREE
                 return res.status(403).json({
                     error: 'Plano FREE permite apenas 1 sala ativa por vez. Assine o plano PRO para criar mais.',
                     upgrade: true

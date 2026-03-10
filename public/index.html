@@ -1138,7 +1138,22 @@
                             stateActiveSession.classList.remove('hidden');
                             stateAuth.classList.add('hidden');
                             stateNoAuth.classList.add('hidden');
-                            setTimeout(updateCardHeight, 50);
+
+                            // Destacar o card: ocultar narrativa e centralizar na tela
+                            const narrative = document.getElementById('narrative-section');
+                            const footer = document.getElementById('main-footer');
+                            if (narrative) narrative.classList.add('hidden');
+                            if (footer) footer.classList.add('hidden');
+                            const mainContent = document.querySelector('main');
+                            if (mainContent) {
+                                mainContent.className = 'min-h-screen flex items-center justify-center p-6 relative z-10';
+                                mainContent.style.paddingTop = 'env(safe-area-inset-top)';
+                            }
+                            setTimeout(() => {
+                                const card = document.getElementById('card-lobby');
+                                if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                updateCardHeight();
+                            }, 100);
                             return;
                         }
                     }

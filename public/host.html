@@ -329,11 +329,6 @@
             <div class="w-px h-6 bg-white/10 mx-1 hidden md:block"></div>
 
             <div class="flex items-center gap-1 md:gap-1.5 bg-black/20 p-1 md:p-1.5 rounded-xl border border-white/5">
-                <button id="openMobileCam"
-                    class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-win-accent hover:text-white transition-all text-gray-400 group"
-                    title="Lyncro Câmera (Add Celular)">
-                    <i class="ph ph-camera text-base group-hover:text-white transition-colors"></i>
-                </button>
                 <button id="btn-share-screen" onclick="toggleScreenShare()"
                     class="flex items-center justify-center w-8 h-8 rounded-lg hover:bg-win-accent hover:text-white transition-all text-gray-400 group"
                     title="Compartilhar Tela">
@@ -400,6 +395,13 @@
                 <div id="settings-picker-menu"
                     class="hidden absolute top-full right-0 mt-2 w-80 bg-[#13131f] border border-white/10 rounded-xl shadow-2xl z-[999]">
                     <div class="p-1.5 flex flex-col gap-0.5">
+                        <button id="openMobileCam"
+                            class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-win-accent/10 hover:text-win-accent transition-all text-left text-gray-300">
+                            <i class="ph ph-camera text-sm text-win-accent"></i>
+                            <span class="text-[10px] font-bold tracking-wide">Lyncro Camera</span>
+                            <span class="ml-auto text-[8px] font-bold uppercase tracking-wider text-gray-600">Cel como câmera</span>
+                        </button>
+                        <div class="my-0.5 border-t border-white/5"></div>
                         <button onclick="openSettingsModal(); closeSettingsPicker()"
                             class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-white/5 transition-all text-left">
                             <i class="ph ph-text-aa text-sm text-win-accent"></i>
