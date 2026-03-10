@@ -287,6 +287,28 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.2);
         }
+
+        /* Position picker dots */
+        .pos-dot {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            cursor: pointer;
+            transition: all 0.12s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .pos-dot::after {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transition: all 0.12s;
+        }
+        .pos-dot:hover { background: rgba(0,120,212,0.25); border-color: rgba(0,120,212,0.5); }
+        .pos-dot:hover::after { background: rgba(255,255,255,0.7); }
+        .pos-dot.active { background: #0078d4; border-color: #0078d4; box-shadow: 0 0 8px rgba(0,120,212,0.6); }
+        .pos-dot.active::after { background: #fff; }
     </style>
 </head>
 
@@ -416,6 +438,120 @@
                                 <option value="480">480p SD</option>
                             </select>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overlays Button -->
+            <div class="relative" id="overlay-menu-wrap">
+                <button onclick="toggleOverlayMenu()" id="btn-overlay-menu"
+                    class="flex size-9 items-center justify-center rounded-xl hover:bg-white/10 border border-white/5 transition-colors text-gray-400 hover:text-white"
+                    title="Overlays — Logo & QR Code">
+                    <i class="ph ph-stack text-lg"></i>
+                </button>
+                <div id="overlay-menu"
+                    class="hidden absolute top-full right-0 mt-2 w-64 bg-[#0d0d1a]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl z-[999] overflow-hidden"
+                    style="box-shadow:0 8px 40px -8px rgba(0,0,0,0.75),0 0 0 1px rgba(255,255,255,0.06)">
+
+                    <!-- Tabs -->
+                    <div class="flex border-b border-white/8">
+                        <button onclick="switchOverlayTab('logo')" id="ov-tab-logo"
+                            class="ov-tab flex-1 py-2.5 text-[9px] font-bold uppercase tracking-widest transition-colors text-win-accent border-b-2 border-win-accent flex items-center justify-center gap-1">
+                            <i class="ph ph-image text-xs"></i> Logo
+                        </button>
+                        <button onclick="switchOverlayTab('qr')" id="ov-tab-qr"
+                            class="ov-tab flex-1 py-2.5 text-[9px] font-bold uppercase tracking-widest transition-colors text-gray-500 border-b-2 border-transparent hover:text-gray-300 flex items-center justify-center gap-1">
+                            <i class="ph ph-qr-code text-xs"></i> QR Code
+                        </button>
+                    </div>
+
+                    <!-- Logo Panel -->
+                    <div id="ov-panel-logo" class="p-3 flex flex-col gap-3">
+                        <!-- Toggle + Upload -->
+                        <div class="flex items-center gap-2">
+                            <label class="flex items-center cursor-pointer shrink-0" title="Exibir Logo">
+                                <div class="relative w-7 h-3.5">
+                                    <input type="checkbox" id="logo-toggle" class="sr-only peer" onchange="handleLogoToggle(this.checked)">
+                                    <div class="w-7 h-3.5 bg-white/10 peer-checked:bg-win-accent rounded-full transition-colors"></div>
+                                    <div class="absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-white rounded-full transition-transform peer-checked:translate-x-3.5 shadow"></div>
+                                </div>
+                            </label>
+                            <button onclick="document.getElementById('logo-file-input').click()"
+                                class="flex-1 h-7 rounded-lg border border-dashed border-white/20 bg-black/20 flex items-center justify-center gap-1 text-[9px] font-bold text-gray-400 hover:border-win-accent/50 hover:text-win-accent transition-all truncate px-2">
+                                <i class="ph ph-upload-simple text-xs shrink-0"></i>
+                                <span id="logo-file-label" class="truncate">Carregar Logo</span>
+                            </button>
+                            <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden" onchange="handleLogoFileUpload(this)">
+                        </div>
+                        <!-- Position grid + Scale -->
+                        <div class="flex items-start gap-3">
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <span class="text-[8px] font-bold text-gray-600 uppercase tracking-widest">Posição</span>
+                                <div id="logo-pos-grid" class="grid grid-cols-3 gap-1"></div>
+                            </div>
+                            <div class="flex-1 flex flex-col gap-1 pt-4">
+                                <input type="range" id="logo-scale" min="50" max="300" value="100" class="lyncro-slider w-full" oninput="updateLogoSliders()">
+                                <span id="logo-scale-val" class="text-[9px] text-gray-500 text-center">1.0×</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- QR Panel (hidden) -->
+                    <div id="ov-panel-qr" class="hidden p-3 flex flex-col gap-3">
+                        <!-- Toggles row -->
+                        <div class="flex items-center justify-between">
+                            <label class="flex items-center gap-1.5 cursor-pointer" title="Exibir QR">
+                                <div class="relative w-7 h-3.5">
+                                    <input type="checkbox" id="qr-toggle" class="sr-only peer" onchange="handleQrToggle(this.checked)">
+                                    <div class="w-7 h-3.5 bg-white/10 peer-checked:bg-win-accent rounded-full transition-colors"></div>
+                                    <div class="absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-white rounded-full transition-transform peer-checked:translate-x-3.5 shadow"></div>
+                                </div>
+                                <span class="text-[9px] text-gray-400">Exibir</span>
+                            </label>
+                            <label class="flex items-center gap-1.5 cursor-pointer" title="Exibir para Convidados">
+                                <i class="ph ph-users text-[10px] text-gray-500"></i>
+                                <div class="relative w-7 h-3.5">
+                                    <input type="checkbox" id="qr-show-guests" class="sr-only peer" onchange="sendQrUpdate()">
+                                    <div class="w-7 h-3.5 bg-white/10 peer-checked:bg-win-accent rounded-full transition-colors"></div>
+                                    <div class="absolute top-0.5 left-0.5 w-2.5 h-2.5 bg-white rounded-full transition-transform peer-checked:translate-x-3.5 shadow"></div>
+                                </div>
+                            </label>
+                        </div>
+                        <!-- URL -->
+                        <div class="flex gap-1">
+                            <input type="url" id="qr-url" placeholder="https://..."
+                                class="flex-1 bg-black/40 border border-white/10 rounded-lg px-2.5 py-1.5 text-[11px] text-white outline-none focus:border-win-accent transition-colors placeholder:text-gray-600"
+                                oninput="scheduleQrDebounce()">
+                            <button onclick="applyQrNow()"
+                                class="w-8 h-8 bg-win-accent/20 border border-win-accent/30 text-win-accent rounded-lg flex items-center justify-center hover:bg-win-accent hover:text-white transition-all shrink-0">
+                                <i class="ph ph-check text-xs"></i>
+                            </button>
+                        </div>
+                        <!-- QR preview -->
+                        <div id="qr-host-preview" class="hidden justify-center">
+                            <div class="bg-white p-2 rounded-xl inline-block shadow-lg">
+                                <div id="qr-host-canvas"></div>
+                            </div>
+                        </div>
+                        <!-- Position grid + Scale -->
+                        <div class="flex items-start gap-3">
+                            <div class="flex flex-col gap-1 shrink-0">
+                                <span class="text-[8px] font-bold text-gray-600 uppercase tracking-widest">Posição</span>
+                                <div id="qr-pos-grid" class="grid grid-cols-3 gap-1"></div>
+                            </div>
+                            <div class="flex-1 flex flex-col gap-1 pt-4">
+                                <input type="range" id="qr-scale" min="50" max="300" value="100" class="lyncro-slider w-full" oninput="updateQrSliders()">
+                                <span id="qr-scale-val" class="text-[9px] text-gray-500 text-center">1.0×</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Reset -->
+                    <div class="px-3 pb-3 pt-0">
+                        <button onclick="resetAllOverlays()"
+                            class="w-full flex items-center justify-center gap-1.5 py-2 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/30 text-[9px] font-bold uppercase tracking-widest transition-all">
+                            <i class="ph ph-arrows-counter-clockwise text-xs"></i> Reset Global
+                        </button>
                     </div>
                 </div>
             </div>
@@ -710,134 +846,6 @@
                     </div>
                 </div>
             </section>
-            <!-- Overlay Manager Section -->
-            <section id="overlays-section" class="glass-panel rounded-2xl flex flex-col shrink-0 overflow-hidden">
-                <header class="px-5 py-3 border-b border-white/5 flex items-center justify-between bg-white/5 cursor-pointer" onclick="toggleOverlaysUI()">
-                    <h2 class="text-[10px] font-bold flex items-center gap-2 uppercase tracking-[0.2em] text-gray-400">
-                        <i class="ph ph-image-square text-win-accent text-sm"></i> Overlays
-                    </h2>
-                    <i class="ph ph-caret-down text-gray-400 transition-transform hover:text-white" id="overlays-caret"></i>
-                </header>
-                <div id="overlays-body" class="flex flex-col gap-4 overflow-hidden" style="max-height:0;padding:0 1rem;transition:max-height .35s ease,padding .35s ease">
-
-                    <!-- Logo -->
-                    <div class="flex flex-col gap-3 pt-4">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><i class="ph ph-image"></i> Logo</span>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <div class="relative w-8 h-4">
-                                    <input type="checkbox" id="logo-toggle" class="sr-only peer" onchange="handleLogoToggle(this.checked)">
-                                    <div class="w-8 h-4 bg-white/10 peer-checked:bg-win-accent rounded-full transition-colors"></div>
-                                    <div class="absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4 shadow"></div>
-                                </div>
-                                <span class="text-[9px] text-gray-400">Exibir</span>
-                            </label>
-                        </div>
-                        <button onclick="document.getElementById('logo-file-input').click()"
-                            class="w-full h-11 rounded-xl border border-dashed border-white/20 bg-black/20 flex items-center justify-center gap-2 text-[10px] font-bold text-gray-400 hover:border-win-accent/50 hover:text-win-accent transition-all">
-                            <i class="ph ph-upload-simple text-sm"></i>
-                            <span id="logo-file-label">Carregar Logo (PNG/JPG)</span>
-                        </button>
-                        <input type="file" id="logo-file-input" accept="image/png,image/jpeg,image/webp,image/gif" class="hidden" onchange="handleLogoFileUpload(this)">
-                        <!-- Position presets -->
-                        <div class="grid grid-cols-2 gap-1">
-                            <button onclick="setLogoPosition('tl',this)" id="lp-tl" class="lp-btn h-8 rounded-lg bg-white/5 border border-white/10 text-[9px] font-bold text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 transition-all flex items-center justify-center gap-1"><i class="ph ph-arrow-up-left text-xs"></i> Superior Esq.</button>
-                            <button onclick="setLogoPosition('tr',this)" id="lp-tr" class="lp-btn h-8 rounded-lg bg-white/5 border border-white/10 text-[9px] font-bold text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 transition-all flex items-center justify-center gap-1"><i class="ph ph-arrow-up-right text-xs"></i> Superior Dir.</button>
-                            <button onclick="setLogoPosition('bl',this)" id="lp-bl" class="lp-btn h-8 rounded-lg bg-white/5 border border-white/10 text-[9px] font-bold text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 transition-all flex items-center justify-center gap-1"><i class="ph ph-arrow-down-left text-xs"></i> Inferior Esq.</button>
-                            <button onclick="setLogoPosition('br',this)" id="lp-br" class="lp-btn h-8 rounded-lg bg-white/5 border border-white/10 text-[9px] font-bold text-gray-400 hover:bg-win-accent/20 hover:text-win-accent hover:border-win-accent/30 transition-all flex items-center justify-center gap-1"><i class="ph ph-arrow-down-right text-xs"></i> Inferior Dir.</button>
-                        </div>
-                        <!-- Fine-tune + scale sliders -->
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-bold text-gray-500 w-4">X</label>
-                                <input type="range" id="logo-x" min="0" max="100" value="4" class="lyncro-slider flex-1" oninput="updateLogoSliders()">
-                                <span id="logo-x-val" class="text-[9px] text-gray-400 w-6 text-right">4%</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-bold text-gray-500 w-4">Y</label>
-                                <input type="range" id="logo-y" min="0" max="100" value="4" class="lyncro-slider flex-1" oninput="updateLogoSliders()">
-                                <span id="logo-y-val" class="text-[9px] text-gray-400 w-6 text-right">4%</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-bold text-gray-500 w-4"><i class="ph ph-arrows-out-simple text-xs"></i></label>
-                                <input type="range" id="logo-scale" min="50" max="300" value="100" class="lyncro-slider flex-1" oninput="updateLogoSliders()">
-                                <span id="logo-scale-val" class="text-[9px] text-gray-400 w-8 text-right">1.0×</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-white/5"></div>
-
-                    <!-- QR Code -->
-                    <div class="flex flex-col gap-3">
-                        <div class="flex items-center justify-between">
-                            <span class="text-[9px] font-bold text-gray-500 uppercase tracking-widest flex items-center gap-1.5"><i class="ph ph-qr-code"></i> QR Code</span>
-                            <label class="flex items-center gap-2 cursor-pointer">
-                                <div class="relative w-8 h-4">
-                                    <input type="checkbox" id="qr-toggle" class="sr-only peer" onchange="handleQrToggle(this.checked)">
-                                    <div class="w-8 h-4 bg-white/10 peer-checked:bg-win-accent rounded-full transition-colors"></div>
-                                    <div class="absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4 shadow"></div>
-                                </div>
-                                <span class="text-[9px] text-gray-400">Exibir</span>
-                            </label>
-                        </div>
-                        <!-- URL + preview button -->
-                        <div class="flex gap-1.5">
-                            <input type="url" id="qr-url" placeholder="https://..."
-                                class="flex-1 bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-win-accent transition-colors placeholder:text-gray-600"
-                                oninput="scheduleQrDebounce()">
-                            <button onclick="applyQrNow()"
-                                class="w-9 h-9 bg-win-accent/20 border border-win-accent/30 text-win-accent rounded-lg flex items-center justify-center hover:bg-win-accent hover:text-white transition-all shrink-0" title="Aplicar agora">
-                                <i class="ph ph-check text-sm"></i>
-                            </button>
-                        </div>
-                        <!-- Host-side preview -->
-                        <div id="qr-host-preview" class="hidden justify-center">
-                            <div class="bg-white p-2 rounded-xl inline-block shadow-lg">
-                                <div id="qr-host-canvas"></div>
-                            </div>
-                        </div>
-                        <!-- Show to guests toggle -->
-                        <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-black/30 border border-white/10">
-                            <span class="text-[9px] font-bold text-gray-400 flex items-center gap-1.5"><i class="ph ph-users text-xs"></i> Exibir p/ Convidados</span>
-                            <label class="flex items-center cursor-pointer">
-                                <div class="relative w-8 h-4">
-                                    <input type="checkbox" id="qr-show-guests" class="sr-only peer" onchange="sendQrUpdate()">
-                                    <div class="w-8 h-4 bg-white/10 peer-checked:bg-win-accent rounded-full transition-colors"></div>
-                                    <div class="absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4 shadow"></div>
-                                </div>
-                            </label>
-                        </div>
-                        <!-- QR Position + Scale -->
-                        <div class="flex flex-col gap-2">
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-bold text-gray-500 w-4">X</label>
-                                <input type="range" id="qr-x" min="0" max="100" value="96" class="lyncro-slider flex-1" oninput="updateQrSliders()">
-                                <span id="qr-x-val" class="text-[9px] text-gray-400 w-6 text-right">96%</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-bold text-gray-500 w-4">Y</label>
-                                <input type="range" id="qr-y" min="0" max="100" value="96" class="lyncro-slider flex-1" oninput="updateQrSliders()">
-                                <span id="qr-y-val" class="text-[9px] text-gray-400 w-6 text-right">96%</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-[9px] font-bold text-gray-500 w-4"><i class="ph ph-arrows-out-simple text-xs"></i></label>
-                                <input type="range" id="qr-scale" min="50" max="300" value="100" class="lyncro-slider flex-1" oninput="updateQrSliders()">
-                                <span id="qr-scale-val" class="text-[9px] text-gray-400 w-8 text-right">1.0×</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border-t border-white/5"></div>
-
-                    <!-- Reset Global -->
-                    <button onclick="resetAllOverlays()"
-                        class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 hover:bg-red-500/20 hover:border-red-500/40 text-[10px] font-bold uppercase tracking-widest transition-all mb-1">
-                        <i class="ph ph-arrows-counter-clockwise text-sm"></i> Reset Global
-                    </button>
-                </div>
-            </section>
-
         </aside>
     </div>
 

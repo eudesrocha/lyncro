@@ -2163,15 +2163,89 @@ const overlayState = {
 let _qrHostInstance = null;
 let _qrDebounceTimer = null;
 
-window.toggleOverlaysUI = function() {
-    const body  = document.getElementById('overlays-body');
-    const caret = document.getElementById('overlays-caret');
-    if (!body) return;
-    const open = body.style.maxHeight && body.style.maxHeight !== '0px';
-    body.style.maxHeight    = open ? '0' : '1000px';
-    body.style.padding      = open ? '0 1rem' : '1rem';
-    if (caret) caret.style.transform = open ? '' : 'rotate(180deg)';
+// ── Overlay Menu (navbar dropdown) ───────────────────────────────────────────
+const _POS_MAP = [
+    [[4,4],[50,4],[96,4]],
+    [[4,50],[50,50],[96,50]],
+    [[4,96],[50,96],[96,96]],
+];
+
+function _buildPosGrid(gridId, type) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.innerHTML = '';
+    for (let r = 0; r < 3; r++) {
+        for (let c = 0; c < 3; c++) {
+            const btn = document.createElement('button');
+            btn.className = 'pos-dot';
+            btn.dataset.r = r; btn.dataset.c = c;
+            btn.onclick = () => setPosGrid(type, r, c);
+            grid.appendChild(btn);
+        }
+    }
+}
+
+function _markPosGrid(gridId, x, y) {
+    const grid = document.getElementById(gridId);
+    if (!grid) return;
+    grid.querySelectorAll('.pos-dot').forEach(btn => {
+        const [px, py] = _POS_MAP[btn.dataset.r][btn.dataset.c];
+        btn.classList.toggle('active', px === x && py === y);
+    });
+}
+
+window.setPosGrid = function(type, r, c) {
+    const [x, y] = _POS_MAP[r][c];
+    if (type === 'logo') {
+        overlayState.logo.x = x; overlayState.logo.y = y;
+        _markPosGrid('logo-pos-grid', x, y);
+        sendLogoUpdate();
+    } else {
+        overlayState.qr.x = x; overlayState.qr.y = y;
+        _markPosGrid('qr-pos-grid', x, y);
+        sendQrUpdate();
+    }
 };
+
+window.toggleOverlayMenu = function() {
+    const menu = document.getElementById('overlay-menu');
+    if (!menu) return;
+    const isHidden = menu.classList.contains('hidden');
+    // Close other menus
+    document.getElementById('settings-picker-menu')?.classList.add('hidden');
+    document.getElementById('layout-picker-menu')?.classList.add('hidden');
+    menu.classList.toggle('hidden', !isHidden);
+    if (isHidden) {
+        // Init grids on first open
+        if (!document.querySelector('#logo-pos-grid .pos-dot')) {
+            _buildPosGrid('logo-pos-grid', 'logo');
+            _buildPosGrid('qr-pos-grid', 'qr');
+        }
+        _markPosGrid('logo-pos-grid', overlayState.logo.x, overlayState.logo.y);
+        _markPosGrid('qr-pos-grid', overlayState.qr.x, overlayState.qr.y);
+    }
+};
+
+window.switchOverlayTab = function(tab) {
+    document.getElementById('ov-panel-logo')?.classList.toggle('hidden', tab !== 'logo');
+    document.getElementById('ov-panel-qr')?.classList.toggle('hidden', tab !== 'qr');
+    ['logo','qr'].forEach(t => {
+        const btn = document.getElementById(`ov-tab-${t}`);
+        if (!btn) return;
+        const active = t === tab;
+        btn.classList.toggle('text-win-accent', active);
+        btn.classList.toggle('border-win-accent', active);
+        btn.classList.toggle('text-gray-500', !active);
+        btn.classList.toggle('border-transparent', !active);
+    });
+};
+
+document.addEventListener('click', (e) => {
+    const wrap = document.getElementById('overlay-menu-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+        document.getElementById('overlay-menu')?.classList.add('hidden');
+    }
+});
 
 window.handleLogoFileUpload = function(input) {
     const file = input.files[0];
@@ -2180,8 +2254,7 @@ window.handleLogoFileUpload = function(input) {
     reader.onload = (e) => {
         overlayState.logo.data = e.target.result;
         const lbl = document.getElementById('logo-file-label');
-        if (lbl) lbl.textContent = file.name.length > 22 ? file.name.slice(0,20) + '…' : file.name;
-        // Auto-enable if toggle is on
+        if (lbl) lbl.textContent = file.name.length > 18 ? file.name.slice(0,16) + '…' : file.name;
         if (document.getElementById('logo-toggle')?.checked) sendLogoUpdate();
     };
     reader.readAsDataURL(file);
@@ -2192,33 +2265,10 @@ window.handleLogoToggle = function(checked) {
     sendLogoUpdate();
 };
 
-window.setLogoPosition = function(pos, btn) {
-    const presets = { tl: [4,4], tr: [96,4], bl: [4,96], br: [96,96] };
-    const [x, y] = presets[pos] || [4,4];
-    overlayState.logo.x = x;
-    overlayState.logo.y = y;
-    const xEl = document.getElementById('logo-x');
-    const yEl = document.getElementById('logo-y');
-    if (xEl) { xEl.value = x; document.getElementById('logo-x-val').textContent = x + '%'; }
-    if (yEl) { yEl.value = y; document.getElementById('logo-y-val').textContent = y + '%'; }
-    // Highlight active button
-    document.querySelectorAll('.lp-btn').forEach(b => b.classList.remove('bg-win-accent/20','text-win-accent','border-win-accent/30'));
-    if (btn) btn.classList.add('bg-win-accent/20','text-win-accent','border-win-accent/30');
-    sendLogoUpdate();
-};
-
 window.updateLogoSliders = function() {
-    const x = Number(document.getElementById('logo-x')?.value ?? 4);
-    const y = Number(document.getElementById('logo-y')?.value ?? 4);
     const s = Number(document.getElementById('logo-scale')?.value ?? 100) / 100;
-    overlayState.logo.x = x;
-    overlayState.logo.y = y;
     overlayState.logo.scale = s;
-    const xv = document.getElementById('logo-x-val');
-    const yv = document.getElementById('logo-y-val');
     const sv = document.getElementById('logo-scale-val');
-    if (xv) xv.textContent = x + '%';
-    if (yv) yv.textContent = y + '%';
     if (sv) sv.textContent = s.toFixed(1) + '×';
     sendLogoUpdate();
 };
@@ -2251,35 +2301,24 @@ window.applyQrNow = function() {
     clearTimeout(_qrDebounceTimer);
     const url = document.getElementById('qr-url')?.value.trim() || '';
     overlayState.qr.url = url;
-    // Rebuild host preview
     const container = document.getElementById('qr-host-canvas');
     const preview   = document.getElementById('qr-host-preview');
     if (container && url) {
         container.innerHTML = '';
         if (typeof QRCode !== 'undefined') {
-            _qrHostInstance = new QRCode(container, { text: url, width: 80, height: 80, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
+            new QRCode(container, { text: url, width: 72, height: 72, colorDark: '#000', colorLight: '#fff', correctLevel: QRCode.CorrectLevel.M });
         }
-        if (preview) preview.classList.remove('hidden');
-        preview.classList.add('flex');
+        if (preview) { preview.classList.remove('hidden'); preview.classList.add('flex'); }
     } else if (preview) {
-        preview.classList.add('hidden');
-        preview.classList.remove('flex');
+        preview.classList.add('hidden'); preview.classList.remove('flex');
     }
     if (document.getElementById('qr-toggle')?.checked) sendQrUpdate();
 };
 
 window.updateQrSliders = function() {
-    const x = Number(document.getElementById('qr-x')?.value ?? 96);
-    const y = Number(document.getElementById('qr-y')?.value ?? 96);
     const s = Number(document.getElementById('qr-scale')?.value ?? 100) / 100;
-    overlayState.qr.x = x;
-    overlayState.qr.y = y;
     overlayState.qr.scale = s;
-    const xv = document.getElementById('qr-x-val');
-    const yv = document.getElementById('qr-y-val');
     const sv = document.getElementById('qr-scale-val');
-    if (xv) xv.textContent = x + '%';
-    if (yv) yv.textContent = y + '%';
     if (sv) sv.textContent = s.toFixed(1) + '×';
     sendQrUpdate();
 };
