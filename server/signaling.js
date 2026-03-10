@@ -120,7 +120,8 @@ function setupSignaling(server) {
                                     broadcastToRoom(normalizedRoomId, {
                                         type: 'participant-update',
                                         layout: existingRoom.layout,
-                                        participants: roomManager.getRoom(normalizedRoomId).participants
+                                        participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                                     });
                                     break;
                                 }
@@ -289,7 +290,8 @@ function setupSignaling(server) {
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
                             layout: roomManager.getRoom(normalizedRoomId).layout,
-                            participants: roomManager.getRoom(normalizedRoomId).participants
+                            participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                         });
                         break;
 
@@ -351,7 +353,8 @@ function setupSignaling(server) {
                                 broadcastToRoom(currentRoomId, {
                                     type: 'participant-update',
                                     layout: roomNow.layout,
-                                    participants: roomNow.participants
+                                    participants: roomNow.participants,
+                                    hostPlan: roomNow.hostPlan || 'free'
                                 });
                                 // Sinaliza pra limpar webRTC imediatamente no Grid e Host
                                 broadcastToRoom(currentRoomId, { type: 'participant-left', participantId: participantId });
@@ -398,7 +401,8 @@ function setupSignaling(server) {
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
                                 layout: room.layout,
-                                participants: roomManager.getRoom(normalizedRoomId).participants
+                                participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                             });
                         }
                         break;
@@ -442,7 +446,8 @@ function setupSignaling(server) {
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
                             layout: rm.layout,
-                            participants: roomManager.getRoom(normalizedRoomId).participants
+                            participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                         });
                         break;
 
@@ -459,7 +464,8 @@ function setupSignaling(server) {
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
                                 layout: rmAdm.layout,
-                                participants: roomManager.getRoom(normalizedRoomId).participants
+                                participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                             });
                         }
                         break;
@@ -487,7 +493,8 @@ function setupSignaling(server) {
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
                                 layout: rmKick.layout,
-                                participants: roomManager.getRoom(normalizedRoomId)?.participants || []
+                                participants: roomManager.getRoom(normalizedRoomId)?.participants || [],
+                                hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                             });
 
                             audit('KICK', { room: normalizedRoomId, targetId: data.targetId, byHost: participantId, ip });
@@ -508,7 +515,8 @@ function setupSignaling(server) {
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
                             layout: roomManager.getRoom(normalizedRoomId).layout,
-                            participants: roomManager.getRoom(normalizedRoomId).participants
+                            participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                         });
                         break;
 
@@ -519,7 +527,8 @@ function setupSignaling(server) {
                         broadcastToRoom(normalizedRoomId, {
                             type: 'participant-update',
                             layout: roomManager.getRoom(normalizedRoomId).layout,
-                            participants: roomManager.getRoom(normalizedRoomId).participants
+                            participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                         });
                         break;
 
@@ -554,7 +563,8 @@ function setupSignaling(server) {
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
                                 layout: rmOverlay.layout,
-                                participants: roomManager.getRoom(normalizedRoomId).participants
+                                participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                             });
                         }
                         break;
@@ -570,7 +580,8 @@ function setupSignaling(server) {
                             broadcastToRoom(normalizedRoomId, {
                                 type: 'participant-update',
                                 layout: data.layout,
-                                participants: roomManager.getRoom(normalizedRoomId).participants
+                                participants: roomManager.getRoom(normalizedRoomId).participants,
+                            hostPlan: roomManager.getRoom(normalizedRoomId)?.hostPlan || 'free'
                             });
                         }
                         break;
@@ -675,7 +686,7 @@ function setupSignaling(server) {
                         console.log(`[GRACE] Convidado "${participantSnap.name}" não reconectou. Removido da sala "${currentRoomId}".`);
                         const roomAfter = roomManager.getRoom(currentRoomId);
                         if (roomAfter) {
-                            broadcastToRoom(currentRoomId, { type: 'participant-update', participants: roomAfter.participants });
+                            broadcastToRoom(currentRoomId, { type: 'participant-update', participants: roomAfter.participants, hostPlan: roomAfter.hostPlan || 'free' });
                         }
                     }, GUEST_GRACE_MS);
 
@@ -730,7 +741,8 @@ function setupSignaling(server) {
                     broadcastToRoom(currentRoomId, {
                         type: 'participant-update',
                         layout: room.layout,
-                        participants: room.participants
+                        participants: room.participants,
+                        hostPlan: room.hostPlan || 'free'
                     });
                 }
             }

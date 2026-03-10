@@ -415,6 +415,8 @@ async function setupWebSocket() {
                         }
                     }
                 });
+                // Show/hide FREE watermark
+                setFreeWatermark(data.hostPlan !== 'pro');
                 break;
             case 'offer':
                 if (rtcClient) {
@@ -601,5 +603,18 @@ function handleGraphicOverlay(data) {
         }
         _goSetPosition(qr, data.qrX ?? 96, data.qrY ?? 96, 1, null);
         _goShowEl(qr);
+    }
+}
+
+// ── FREE Watermark ────────────────────────────────────────────────────────────
+function setFreeWatermark(show) {
+    const wm = document.getElementById('free-watermark');
+    if (!wm) return;
+    if (show) {
+        wm.style.display = 'block';
+        requestAnimationFrame(() => { wm.style.opacity = '1'; });
+    } else {
+        wm.style.opacity = '0';
+        setTimeout(() => { wm.style.display = 'none'; }, 620);
     }
 }

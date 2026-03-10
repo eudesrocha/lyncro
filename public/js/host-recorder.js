@@ -306,18 +306,25 @@
             if (labelsOn && item.name) drawBadge(item.name, item.role, x, y, w, h);
         });
 
-        // Marca d'água em gravações do plano FREE (não removível via DevTools)
+        // Marca d'água em gravações do plano FREE — "Lyncro.LIVE"
         const planIsFree = !window.LYNCRO_PLAN || !window.LYNCRO_PLAN.isPro();
         if (planIsFree) {
-            const wText = 'LYNCRO FREE';
-            const wFontSize = Math.round(CANVAS_H * 0.055);
+            const mainSize  = Math.round(CANVAS_H * 0.048);
+            const liveSize  = Math.round(mainSize * 0.52);
+            const x = CANVAS_W - 28;
+            const y = CANVAS_H - 22;
             ctx.save();
-            ctx.globalAlpha = 0.22;
-            ctx.fillStyle = '#ffffff';
-            ctx.font = `bold ${wFontSize}px Inter, system-ui, sans-serif`;
-            ctx.textAlign = 'right';
+            ctx.globalAlpha = 0.24;
+            ctx.textAlign    = 'right';
             ctx.textBaseline = 'bottom';
-            ctx.fillText(wText, CANVAS_W - 28, CANVAS_H - 22);
+            // Draw ".LIVE" first (smaller, measured to offset main text)
+            ctx.font = `900 ${liveSize}px Inter, system-ui, sans-serif`;
+            const liveW = ctx.measureText('.LIVE').width;
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText('.LIVE', x, y - Math.round(mainSize * 0.28));
+            // Draw "Lyncro" (larger, italic, to the left of .LIVE)
+            ctx.font = `900 italic ${mainSize}px Inter, system-ui, sans-serif`;
+            ctx.fillText('Lyncro', x - liveW, y);
             ctx.restore();
         }
     }
