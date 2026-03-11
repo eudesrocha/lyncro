@@ -51,7 +51,8 @@
             // ── Landing Page ──────────────────────────────────────────────────────
             tagline: 'Design Minimalista. Performance Máxima',
             hero_line1: 'CONECTE.',
-            hero_line2: 'CAPTURE. TRANSMITA.',
+            hero_line2: 'CAPTURE.',
+            hero_line3: 'TRANSMITA.',
             hero_sub: 'Conecte-se com convidados em qualquer lugar do planeta através de uma rede de baixa latência. O LYNCRO é a ponte invisível entre a sua mensagem e o resto do mundo.',
             // Feature slides
             s1_title: 'Mobile First, Sempre',
@@ -226,7 +227,8 @@
             // ── Landing Page ──────────────────────────────────────────────────────
             tagline: 'Minimalist Design. Maximum Performance',
             hero_line1: 'CONNECT.',
-            hero_line2: 'CAPTURE. BROADCAST.',
+            hero_line2: 'CAPTURE.',
+            hero_line3: 'BROADCAST.',
             hero_sub: 'Connect with guests anywhere on the planet through a low-latency network. LYNCRO is the invisible bridge between your message and the rest of the world.',
             // Feature slides
             s1_title: 'Mobile First, Always',

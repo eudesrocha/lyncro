@@ -357,6 +357,33 @@
             filter: grayscale(0) opacity(1);
         }
 
+        /* Animação Staircase Premium */
+        .hero-line {
+            display: block;
+            opacity: 0;
+            transform: translateX(-30px);
+            animation: heroStaircase 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .hero-line-1 { animation-delay: 0.2s; --indent: 0; }
+        .hero-line-2 { animation-delay: 0.4s; --indent: 2rem; }
+        .hero-line-3 { animation-delay: 0.6s; --indent: 4rem; }
+
+        @keyframes heroStaircase {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            30% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(var(--indent));
+            }
+        }
+
         /* Scroll Smooth */
         html { scroll-behavior: smooth; }
     </style>
@@ -456,9 +483,10 @@
                     Design Minimalista. Performance Máxima
                 </span>
                 <h1
-                    class="font-sync text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[0.95] mb-6 uppercase theme-text italic">
-                    <span data-i18n="hero_line1">CONECTE.</span><br>
-                    <span data-i18n="hero_line2" class="text-win-accent not-italic">CAPTURE. TRANSMITA.</span>
+                    class="font-sync text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[0.95] mb-8 uppercase theme-text italic">
+                    <span class="hero-line hero-line-1" data-i18n="hero_line1">CONECTE.</span>
+                    <span class="hero-line hero-line-2 text-win-accent not-italic" data-i18n="hero_line2">CAPTURE.</span>
+                    <span class="hero-line hero-line-3 text-win-accent not-italic" data-i18n="hero_line3">TRANSMITA.</span>
                 </h1>
                 <p data-i18n="hero_sub"
                     class="text-base md:text-lg lg:text-xl theme-text-secondary mb-8 max-w-xl leading-relaxed font-segoe mx-auto lg:mx-0">
