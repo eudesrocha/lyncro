@@ -653,6 +653,13 @@ function renderParticipantCard(participant, isLocal = false) {
           <i class="ph ph-sliders-horizontal text-sm"></i>
         </button>
 
+        <!-- Botão 4b: Compartilhar Tela (somente host local) -->
+        ${isLocal ? `
+        <button id="btn-share-screen" onclick="toggleScreenShare()" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-win-accent hover:bg-win-accent/5 transition-all flex items-center gap-1 text-[10px] font-bold" title="Compartilhar Tela">
+          <i class="ph ph-screencast text-sm text-win-accent"></i> Tela
+        </button>
+        ` : ''}
+
         <!-- Botão 5: VB (Host) / Tally (Guest) -->
         ${isLocal ? `
         <button onclick="toggleCardPanel('vb-panel-${participant.id}')" class="p-1.5 border border-win-border rounded-win text-gray-400 hover:text-purple-400 hover:bg-purple-500/5 transition-all" title="Fundo Virtual">
