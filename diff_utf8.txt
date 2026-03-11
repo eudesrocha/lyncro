@@ -1,0 +1,158 @@
+﻿commit 5d271d42234b692482d81af47d855036708cc9b1
+Author: eudesrocha <eudesrocha@msn.com>
+Date:   Sat Mar 7 22:42:24 2026 -0300
+
+    fix: remove 1080p60 e robustez no 1080p30
+    
+    - Remove a op├º├úo 1080p 60fps (causava falhas em c├ómeras n├úo compat├¡veis)
+    - buildVideoConstraints: remove max: frameRate para aceitar c├ómeras que
+      reportam 29.97fps; adiciona max: width/height como teto seguro
+    - Fallback autom├ítico para 720p no host e no convidado: se getUserMedia
+      falhar com 1080p30, tenta 720p silenciosamente e atualiza o seletor
+    
+    Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+
+diff --git a/public/guest.html b/public/guest.html
+index 2c9d415..a1d6dc6 100644
+--- a/public/guest.html
++++ b/public/guest.html
+@@ -428,8 +428,6 @@
+                                 <i class="ph ph-caret-down text-gray-400 text-[10px]"></i>
+                             </div>
+                             <div id="quality-select-menu" class="custom-select-menu !w-[150%] !right-0 !left-auto">
+-                                <div class="custom-select-option" onclick="selectQuality('1080_60', '1080p 60fps')">
+-                                    1080p 60fps ÔÜí</div>
+                                 <div class="custom-select-option" onclick="selectQuality('1080_30', '1080p 30fps')">
+                                     1080p 30fps</div>
+                                 <div class="custom-select-option" onclick="selectQuality('720', '720p HD')">720p HD
+@@ -440,7 +438,6 @@
+                                 </div>
+                             </div>
+                             <select id="video-quality" class="hidden">
+-                                <option value="1080_60">1080p 60fps</option>
+                                 <option value="1080_30">1080p 30fps</option>
+                                 <option value="720" selected>720p HD</option>
+                                 <option value="480">480p SD</option>
+diff --git a/public/host.html b/public/host.html
+index e08cb03..4ecd33e 100644
+--- a/public/host.html
++++ b/public/host.html
+@@ -301,7 +301,6 @@
+                 <select id="host-quality-select" onchange="changeHostQuality(this.value)"
+                     class="bg-transparent border-none text-[10px] font-bold text-gray-400 outline-none cursor-pointer uppercase tracking-tight"
+                     title="Qualidade da sua c├ómera local">
+-                    <option value="1080_60">1080p60</option>
+                     <option value="1080_30">1080p30</option>
+                     <option value="720" selected>720pHD</option>
+                     <option value="480">480p</option>
+diff --git a/public/js/guest.js b/public/js/guest.js
+index b2f5778..56788d4 100644
+--- a/public/js/guest.js
++++ b/public/js/guest.js
+@@ -1,6 +1,5 @@
+ // ÔöÇÔöÇ Presets de Qualidade de V├¡deo ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ const VIDEO_QUALITY_PRESETS = {
+-    '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
+     '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
+     '720': { label: '720p HD', width: 1280, height: 720, frameRate: 30 },
+     '480': { label: '480p SD', width: 854, height: 480, frameRate: 30 },
+@@ -10,9 +9,9 @@ const VIDEO_QUALITY_PRESETS = {
+ function buildVideoConstraints(qualityKey, extras = {}) {
+     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
+     return {
+-        width: { ideal: p.width },
+-        height: { ideal: p.height },
+-        frameRate: { ideal: p.frameRate, max: p.frameRate },
++        width:     { ideal: p.width,  max: p.width  },
++        height:    { ideal: p.height, max: p.height },
++        frameRate: { ideal: p.frameRate },   // sem max ÔÇö evita rejei├º├úo em c├ómeras com 29.97 fps
+         ...extras
+     };
+ }
+@@ -118,14 +117,24 @@ async function startPreCall() {
+         }
+ 
+         const qualityKey = qualitySelect ? qualitySelect.value : '720';
+-        localStream = await navigator.mediaDevices.getUserMedia({
+-            video: buildVideoConstraints(qualityKey, { facingMode: companionOf ? 'environment' : 'user' }),
+-            audio: {
+-                echoCancellation: true,
+-                noiseSuppression: true,
+-                autoGainControl: true
++        const facingExtras = { facingMode: companionOf ? 'environment' : 'user' };
++        try {
++            localStream = await navigator.mediaDevices.getUserMedia({
++                video: buildVideoConstraints(qualityKey, facingExtras),
++                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
++            });
++        } catch (constraintErr) {
++            // Se a c├ómera n├úo suporta a resolu├º├úo pedida, tentar 720p como fallback
++            console.warn(`[Media] Falha com ${qualityKey}, tentando 720p:`, constraintErr.message);
++            if (qualityKey !== '720') {
++                if (qualitySelect) qualitySelect.value = '720';
++                localStorage.setItem('lyncro_video_quality', '720');
+             }
+-        });
++            localStream = await navigator.mediaDevices.getUserMedia({
++                video: buildVideoConstraints('720', facingExtras),
++                audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
++            });
++        }
+ 
+         if (!isMicOn && localStream.getAudioTracks().length > 0) {
+             localStream.getAudioTracks()[0].enabled = false;
+diff --git a/public/js/host.js b/public/js/host.js
+index 6d7c1b2..0671d05 100644
+--- a/public/js/host.js
++++ b/public/js/host.js
+@@ -34,7 +34,6 @@ async function handleNDIToggle(participantId, name) {
+ 
+ // ÔöÇÔöÇ Presets de Qualidade de V├¡deo ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ
+ const VIDEO_QUALITY_PRESETS = {
+-    '1080_60': { label: '1080p 60fps', width: 1920, height: 1080, frameRate: 60 },
+     '1080_30': { label: '1080p 30fps', width: 1920, height: 1080, frameRate: 30 },
+     '720': { label: '720p HD', width: 1280, height: 720, frameRate: 30 },
+     '480': { label: '480p SD', width: 854, height: 480, frameRate: 30 },
+@@ -44,9 +43,9 @@ const VIDEO_QUALITY_PRESETS = {
+ function buildVideoConstraints(qualityKey, extras = {}) {
+     const p = VIDEO_QUALITY_PRESETS[qualityKey] || VIDEO_QUALITY_PRESETS['720'];
+     return {
+-        width: { ideal: p.width },
+-        height: { ideal: p.height },
+-        frameRate: { ideal: p.frameRate, max: p.frameRate },
++        width:     { ideal: p.width,  max: p.width  },
++        height:    { ideal: p.height, max: p.height },
++        frameRate: { ideal: p.frameRate },   // sem max ÔÇö evita rejei├º├úo em c├ómeras com 29.97 fps
+         ...extras
+     };
+ }
+@@ -103,10 +102,25 @@ async function init() {
+ 
+     // 3. Solicitar m├¡dias em background
+     try {
+-        localStream = await navigator.mediaDevices.getUserMedia({
+-            video: buildVideoConstraints(getHostQuality()),
+-            audio: true
+-        });
++        const hostQuality = getHostQuality();
++        try {
++            localStream = await navigator.mediaDevices.getUserMedia({
++                video: buildVideoConstraints(hostQuality),
++                audio: true
++            });
++        } catch (constraintErr) {
++            // C├ómera n├úo suporta a qualidade pedida ÔÇö fallback autom├ítico para 720p
++            console.warn(`[Media] Falha com ${hostQuality}, tentando 720p:`, constraintErr.message);
++            if (hostQuality !== '720') {
++                localStorage.setItem('lyncro_host_quality', '720');
++                const sel = document.getElementById('host-quality-select');
++                if (sel) sel.value = '720';
++            }
++            localStream = await navigator.mediaDevices.getUserMedia({
++                video: buildVideoConstraints('720'),
++                audio: true
++            });
++        }
+ 
+         // Aplicar processamento de Fundo Virtual (se ativo)
+         if (currentVbMode !== 'none') {

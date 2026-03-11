@@ -300,6 +300,65 @@
             pointer-events: auto;
             transform: translateY(0);
         }
+
+        /* Novos Estilos Premium */
+        .premium-nav-link {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            position: relative;
+        }
+        .premium-nav-link:hover { color: var(--text); }
+        .premium-nav-link.active { color: var(--win-accent); }
+        .premium-nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--win-accent);
+            transition: width 0.3s;
+        }
+        .premium-nav-link:hover::after { width: 100%; }
+
+        #main-header.scrolled {
+            background: var(--mica);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 0;
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            font-style: italic;
+            letter-spacing: -0.02em;
+        }
+
+        .pricing-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--win-accent);
+            box-shadow: 0 20px 40px rgba(0, 120, 212, 0.15);
+        }
+
+        .social-logo {
+            filter: grayscale(1) opacity(0.5);
+            transition: all 0.3s;
+        }
+        .social-logo:hover {
+            filter: grayscale(0) opacity(1);
+        }
+
+        /* Scroll Smooth */
+        html { scroll-behavior: smooth; }
     </style>
 
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -338,36 +397,49 @@
     </div>
 
     <!-- Header -->
-    <header id="main-header" class="fixed top-0 left-0 w-full px-4 py-4 md:px-8 z-50 animate-reveal delay-1">
-        <div class="max-w-7xl mx-auto flex flex-nowrap items-center justify-between gap-2 min-w-0">
-            <h2 class="text-2xl md:text-3xl font-logo font-black italic tracking-tight select-none leading-none shrink-0"
-                style="color:var(--text)">
-                Lyncro
-            </h2>
+    <header id="main-header" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 animate-reveal delay-1">
+        <div class="max-w-7xl mx-auto px-6 md:px-12 py-5 flex items-center justify-between gap-4">
+            <!-- Logo -->
+            <a href="/" class="flex items-center gap-2 group shrink-0">
+                <h2 class="text-2xl md:text-3xl font-logo font-black italic tracking-tighter transition-transform group-hover:scale-105"
+                    style="color:var(--text)">
+                    Lyncro<span class="text-win-accent not-italic">.</span>
+                </h2>
+            </a>
 
-            <div class="flex items-center gap-4 flex-nowrap justify-end min-w-0">
-                <div id="host-profile" style="display:none;"
-                    class="flex items-center gap-2 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-xl min-w-0 shrink transition-colors hover:bg-win-accent/20">
-                    <i class="ph ph-user-circle text-lg text-win-accent shrink-0"></i>
-                    <div class="flex flex-col min-w-0 pt-0.5">
-                        <span id="user-email"
-                            class="text-[10px] font-bold theme-text truncate max-w-[120px] leading-tight">...</span>
-                        <button onclick="window.LYNCRO_AUTH.logout()" data-i18n="btn_logout"
-                            class="text-[9px] font-bold text-win-accent uppercase tracking-widest hover:text-white transition-colors text-left leading-none mt-0.5">Sair</button>
+            <!-- Navigation Desktop -->
+            <nav class="hidden lg:flex items-center gap-8">
+                <a href="#features" class="premium-nav-link" data-i18n="nav_features">Funcionalidades</a>
+                <a href="#pricing" class="premium-nav-link" data-i18n="nav_pricing">Preços</a>
+                <a href="https://docs.lyncro.live" target="_blank" class="premium-nav-link" data-i18n="nav_docs">Documentação</a>
+                <a href="#cases" class="premium-nav-link" data-i18n="nav_cases">Casos de Uso</a>
+            </nav>
+
+            <!-- Actions -->
+            <div class="flex items-center gap-3 md:gap-5">
+                <div id="host-profile" style="display:none;" 
+                    class="flex items-center gap-2 bg-win-accent/10 border border-win-accent/20 px-3 py-1.5 rounded-xl min-w-0 transition-all hover:bg-win-accent/20">
+                    <i class="ph ph-user-circle text-lg text-win-accent"></i>
+                    <div class="flex flex-col min-w-0">
+                        <span id="user-email" class="text-[10px] font-bold theme-text truncate max-w-[100px] leading-tight">...</span>
+                        <button onclick="window.LYNCRO_AUTH.logout()" class="text-[9px] font-bold text-win-accent uppercase tracking-widest text-left leading-none mt-0.5">Sair</button>
                     </div>
                 </div>
 
-                <!-- Language Switcher -->
-                <div style="display:flex;align-items:center;gap:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:3px;" class="shrink-0">
-                    <button data-lang-btn="pt" onclick="window.LYNCRO_I18N.setLang('pt')" aria-pressed="true"
-                        style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:800;background:rgba(0,120,212,0.2);color:#0078d4;border:1px solid rgba(0,120,212,0.3);cursor:pointer;transition:all .15s;">🇧🇷 PT</button>
-                    <button data-lang-btn="en" onclick="window.LYNCRO_I18N.setLang('en')" aria-pressed="false"
-                        style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:700;background:transparent;color:#6b7280;border:1px solid transparent;cursor:pointer;transition:all .15s;">🇺🇸 EN</button>
+                <!-- Language & Theme -->
+                <div class="hidden sm:flex items-center gap-1 bg-black/10 dark:bg-white/5 border border-white/10 rounded-xl p-1 shrink-0">
+                    <button data-lang-btn="pt" onclick="window.LYNCRO_I18N.setLang('pt')" class="px-2 py-1.5 rounded-lg text-[10px] font-extrabold transition-all hover:bg-win-accent/20">PT</button>
+                    <button data-lang-btn="en" onclick="window.LYNCRO_I18N.setLang('en')" class="px-2 py-1.5 rounded-lg text-[10px] font-extrabold transition-all hover:bg-win-accent/20">EN</button>
                 </div>
 
-                <button data-action="toggle-theme" data-theme-icon="dark" title="Alternar tema"
-                    class="theme-toggle-btn shrink-0 rounded-xl" aria-label="Alternar tema claro/escuro">
+                <button data-action="toggle-theme" class="theme-toggle-btn !w-10 !h-10 !rounded-xl">
                     <i class="ph ph-moon"></i>
+                </button>
+
+                <!-- CTA Mobile/Always -->
+                <button onclick="document.getElementById('card-lobby').scrollIntoView({behavior:'smooth'})" 
+                    class="bg-win-accent text-white px-5 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all shadow-lg shadow-win-accent/20">
+                    Começar
                 </button>
             </div>
         </div>
@@ -744,19 +816,196 @@
         </section>
     </main>
 
-    <footer id="main-footer" class="fixed bottom-0 left-0 w-full p-6 lg:p-8 hidden md:block z-10 pointer-events-none">
-        <div class="max-w-7xl mx-auto flex items-center justify-between opacity-40">
-            <div class="flex gap-8 pointer-events-auto">
-                <div class="flex items-center gap-2 text-gray-400">
-                    <i class="ph ph-device-mobile"></i>
-                    <span class="text-[9px] font-bold uppercase tracking-widest">Mobile Ready</span>
+    <!-- Social Proof Section -->
+    <section id="cases" class="py-12 border-y border-white/5 bg-black/5 dark:bg-white/5">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <p class="text-[10px] font-black uppercase tracking-[0.3em] theme-text-secondary mb-8 opacity-60">Utilizado por Criadores e Estúdios de todo o mundo</p>
+            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-40">
+                <i class="ph ph-youtube-logo text-4xl social-logo"></i>
+                <i class="ph ph-twitch-logo text-4xl social-logo"></i>
+                <i class="ph ph-instagram-logo text-4xl social-logo"></i>
+                <i class="ph ph-tiktok-logo text-4xl social-logo"></i>
+                <h3 class="font-logo text-2xl font-black italic social-logo">LIVEHUB</h3>
+                <h3 class="font-logo text-2xl font-black italic social-logo">STREAMPRO</h3>
+            </div>
+        </div>
+    </section>
+
+    <!-- Detailed Features Section -->
+    <section id="features" class="py-24 px-6 md:px-12 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto space-y-32">
+            
+            <!-- Feature 1 -->
+            <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
+                <div class="flex-1 space-y-6">
+                    <div class="w-14 h-14 bg-win-accent/20 rounded-2xl flex items-center justify-center border border-win-accent/30">
+                        <i class="ph ph-broadcast text-3xl text-win-accent"></i>
+                    </div>
+                    <h2 class="section-title text-3xl md:text-5xl theme-text">
+                        A Ponte Invisível para seu <span class="text-win-accent">OBS/vMix</span>
+                    </h2>
+                    <p class="text-lg theme-text-secondary leading-relaxed">
+                        Esqueça capturas de janela desorganizadas. O Lyncro fornece feeds limpos (Clean Feed) que você injeta diretamente em sua mesa de corte virtual. Sem interface, sem popups, apenas vídeo puro.
+                    </p>
+                    <ul class="space-y-4 pt-4">
+                        <li class="flex items-start gap-3">
+                            <i class="ph ph-check-circle text-win-accent text-xl"></i>
+                            <span class="theme-text-secondary font-bold">Resolução até 4K dependendo da largura de banda</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="ph ph-check-circle text-win-accent text-xl"></i>
+                            <span class="theme-text-secondary font-bold">Latência ultra-baixa via WebRTC Peer-to-Peer</span>
+                        </li>
+                    </ul>
                 </div>
-                <div class="flex items-center gap-2 text-gray-400">
-                    <i class="ph ph-monitor-play"></i>
-                    <span class="text-[9px] font-bold uppercase tracking-widest">OBS Optimized</span>
+                <div class="flex-1 relative group">
+                    <div class="absolute -inset-4 bg-win-accent/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-video relative z-10 p-1">
+                        <img src="https://images.unsplash.com/photo-1593642702821-c8da6771f0c6?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover rounded-[20px]" alt="Produção Lyncro">
+                    </div>
                 </div>
             </div>
-            <span class="text-[9px] font-black uppercase font-sync tracking-[0.3em] theme-text">LYNCRO CORE v3.1</span>
+
+            <!-- Feature 2 -->
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24 text-right lg:text-left">
+                <div class="flex-1 space-y-6 lg:text-left">
+                    <div class="w-14 h-14 bg-win-accent/20 rounded-2xl flex items-center justify-center border border-win-accent/30 lg:ml-0 mx-auto lg:mr-0">
+                        <i class="ph ph-device-mobile text-3xl text-win-accent"></i>
+                    </div>
+                    <h2 class="section-title text-3xl md:text-5xl theme-text">
+                        Convidados entram pelo <span class="text-win-accent">Celular</span>
+                    </h2>
+                    <p class="text-lg theme-text-secondary leading-relaxed">
+                        Sua pauta não pode esperar. Seus convidados acessam a sala com um clique, direto do navegador do celular. Sem downloads, sem registros frustrantes.
+                    </p>
+                    <div class="bg-black/10 dark:bg-white/5 border border-white/10 p-6 rounded-2xl inline-block mt-4 text-left">
+                        <div class="flex items-center gap-4 text-win-accent font-black text-xs uppercase tracking-widest">
+                            <i class="ph ph-qr-code text-2xl"></i>
+                            Gere um QR Code e pronto.
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 relative group">
+                    <div class="absolute -inset-4 bg-win-accent/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
+                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-[9/16] max-w-[300px] mx-auto relative z-10 p-1">
+                        <img src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover rounded-[20px]" alt="Interface Mobile">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-24 px-6 md:px-12 bg-black/10 dark:bg-white/5 border-y border-white/5">
+        <div class="max-w-7xl mx-auto text-center mb-16 space-y-4">
+            <h2 class="section-title text-4xl md:text-6xl theme-text uppercase italic font-black">Investindo na <span class="text-win-accent">Excelência</span></h2>
+            <p class="text-lg theme-text-secondary max-w-2xl mx-auto">Escolha o plano ideal para a escala da sua produção.</p>
+        </div>
+
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Free -->
+            <div class="pricing-card glass-card-premium p-8 rounded-3xl flex flex-col items-center text-center space-y-6">
+                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Hobby</div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-4xl font-black theme-text">R$ 0</span>
+                    <span class="text-xs theme-text-secondary">/mês</span>
+                </div>
+                <p class="text-[13px] theme-text-secondary leading-relaxed">Ideal para quem está começando e quer testar a tecnologia.</p>
+                <ul class="w-full space-y-4 text-left py-6">
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> 1 Sala Ativa</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> 2 Convidados Simultâneos</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Áudio Standard</li>
+                </ul>
+                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[10px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text">Começar Grátis</button>
+            </div>
+
+            <!-- Pro -->
+            <div class="pricing-card glass-card-premium p-8 rounded-3xl border-2 border-win-accent/50 flex flex-col items-center text-center space-y-6 relative">
+                <div class="absolute -top-4 bg-win-accent text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">Mais Popular</div>
+                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Professional</div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-4xl font-black theme-text">R$ 49</span>
+                    <span class="text-xs theme-text-secondary">/mês</span>
+                </div>
+                <p class="text-[13px] theme-text-secondary leading-relaxed">Para criadores que exigem o máximo de performance e controle.</p>
+                <ul class="w-full space-y-4 text-left py-6">
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Salas Ilimitadas</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> 8 Convidados Simultâneos</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Áudio High Dynamic</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Clean Feed em 4K</li>
+                </ul>
+                <button class="w-full py-4 rounded-xl bg-win-accent text-white text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-win-accent/20">Assinar Agora</button>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="pricing-card glass-card-premium p-8 rounded-3xl flex flex-col items-center text-center space-y-6">
+                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Enterprise</div>
+                <div class="flex items-baseline gap-1">
+                    <span class="text-3xl font-black theme-text">Sob Consulta</span>
+                </div>
+                <p class="text-[13px] theme-text-secondary leading-relaxed">Soluções customizadas para redes de TV e produtoras de grande porte.</p>
+                <ul class="w-full space-y-4 text-left py-6">
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> SLAs Garantidos</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> White-label / Custom UI</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Suporte Dedicado 24/7</li>
+                </ul>
+                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[10px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text">Falar com Consultor</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Professional Footer -->
+    <footer class="bg-black/20 dark:bg-white/5 pt-24 pb-12 px-6 md:px-12">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-24 mb-16">
+            <div class="col-span-1 md:col-span-1 space-y-6">
+                <h3 class="font-logo text-3xl font-black italic theme-text">LYNCRO.</h3>
+                <p class="text-xs theme-text-secondary leading-relaxed opacity-60">
+                    Construindo o futuro da radiodifusão descentralizada. Qualidade de estúdio, onde quer que você esteja.
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-win-accent/20 transition-all"><i class="ph ph-twitter-logo text-xl"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-win-accent/20 transition-all"><i class="ph ph-linkedin-logo text-xl"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-win-accent/20 transition-all"><i class="ph ph-github-logo text-xl"></i></a>
+                </div>
+            </div>
+            
+            <div class="space-y-6">
+                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-win-accent">Produto</h4>
+                <ul class="space-y-4">
+                    <li><a href="#features" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Funcionalidades</a></li>
+                    <li><a href="#pricing" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Preços</a></li>
+                    <li><a href="https://docs.lyncro.live" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Documentação</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-6">
+                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-win-accent">Empresa</h4>
+                <ul class="space-y-4">
+                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Sobre Nós</a></li>
+                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Blog</a></li>
+                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Carreiras</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-6">
+                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-win-accent">Suporte</h4>
+                <ul class="space-y-4">
+                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Central de Ajuda</a></li>
+                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Status do Sistema</a></li>
+                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Contato</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="max-w-7xl mx-auto pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-[10px] font-bold theme-text-secondary opacity-40 uppercase tracking-widest">
+                © 2026 LYNCRO TECHNOLOGIES. TODOS OS DIREITOS RESERVADOS.
+            </div>
+            <div class="flex gap-8 text-[9px] font-black uppercase tracking-widest opacity-40">
+                <a href="#" class="hover:text-win-accent transition-all">Termos</a>
+                <a href="#" class="hover:text-win-accent transition-all">Privacidade</a>
+                <a href="#" class="hover:text-win-accent transition-all">Cookies</a>
+            </div>
         </div>
     </footer>
 
@@ -1175,6 +1424,33 @@
             document.getElementById('userNameHost').value = lastName;
             document.getElementById('userNameGuest').value = lastName;
         }
+
+        // Lógica de Scroll Premium
+        window.addEventListener('scroll', () => {
+            const header = document.getElementById('main-header');
+            const navLinks = document.querySelectorAll('.premium-nav-link');
+            const sections = document.querySelectorAll('section[id]');
+            
+            // Sticky Header
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+
+            // Scroll Spy (Active Links)
+            let currentSectionId = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop - 100;
+                if (window.scrollY >= sectionTop) {
+                    currentSectionId = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === `#${currentSectionId}`);
+            });
+        });
 
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(regs => {
