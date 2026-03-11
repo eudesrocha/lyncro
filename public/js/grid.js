@@ -128,18 +128,52 @@ function calculateGrid() {
         return;
     }
 
-    // Usamos regras flexíveis baseadas na contagem de pessoas
-    let basis = '100%';
-    if (count === 1) basis = '100%';
-    else if (count >= 2 && count <= 4) basis = 'calc(50% - 8px)'; // (gap de 16px dividido)
-    else if (count >= 5 && count <= 9) basis = 'calc(33.333% - 11px)';
-    else if (count >= 10) basis = 'calc(25% - 12px)';
+    // Auto Grid: 16:9 enforced — encontra o arranjo que maximiza o tamanho das células
+    const c = count || 1;
+    const gapPx  = 12;
+    const padPx  = 12;
+    const availW = container.clientWidth  - padPx * 2;
+    const availH = container.clientHeight - padPx * 2;
 
-    const cells = document.querySelectorAll('.grid-cell');
-    cells.forEach(cell => {
-        cell.style.flex = `0 1 ${basis}`;
-        cell.style.maxWidth = basis;
-        cell.style.height = '';
+    let bestCardW = 0, bestCardH = 0;
+
+    for (let cols = 1; cols <= c; cols++) {
+        const rows       = Math.ceil(c / cols);
+        const totalGapW  = gapPx * (cols - 1);
+        const totalGapH  = gapPx * (rows  - 1);
+
+        // Tenta encaixar pela largura
+        const wByW = Math.floor((availW - totalGapW) / cols);
+        const hByW = Math.floor(wByW * 9 / 16);
+
+        // Tenta encaixar pela altura
+        const hByH = Math.floor((availH - totalGapH) / rows);
+        const wByH = Math.floor(hByH * 16 / 9);
+
+        let cardW, cardH;
+        if (hByW * rows + totalGapH <= availH) {
+            // Largura é o limite e a altura cabe — usar dimensão pela largura
+            cardW = wByW; cardH = hByW;
+        } else {
+            // Altura é o limite
+            cardH = hByH; cardW = wByH;
+            if (cardW * cols + totalGapW > availW) continue; // não cabe
+        }
+
+        if (cardW * cardH > bestCardW * bestCardH) {
+            bestCardW = cardW; bestCardH = cardH;
+        }
+    }
+
+    // Fallback seguro
+    if (bestCardW === 0) { bestCardW = availW; bestCardH = Math.floor(availW * 9 / 16); }
+
+    document.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.style.flex      = `0 0 ${bestCardW}px`;
+        cell.style.width     = `${bestCardW}px`;
+        cell.style.maxWidth  = `${bestCardW}px`;
+        cell.style.height    = `${bestCardH}px`;
+        cell.style.maxHeight = `${bestCardH}px`;
     });
 }
 
