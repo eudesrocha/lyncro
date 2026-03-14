@@ -864,58 +864,58 @@
         <div class="max-w-7xl mx-auto space-y-32">
             
             <!-- Feature 1 -->
-            <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-24">
-                <div class="flex-1 space-y-6">
+            <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-32">
+                <div class="flex-1 space-y-8">
                     <div class="w-14 h-14 bg-win-accent/20 rounded-2xl flex items-center justify-center border border-win-accent/30">
                         <i class="ph ph-broadcast text-3xl text-win-accent"></i>
                     </div>
-                    <h2 class="section-title text-3xl md:text-5xl theme-text">
+                    <h2 class="section-title text-4xl md:text-5xl leading-tight theme-text">
                         A Ponte Invisível para seu <span class="text-win-accent">OBS/vMix</span>
                     </h2>
-                    <p class="text-lg theme-text-secondary leading-relaxed">
+                    <p class="text-lg md:text-xl theme-text-secondary leading-[1.8]">
                         Esqueça capturas de janela desorganizadas. O Lyncro fornece feeds limpos (Clean Feed) que você injeta diretamente em sua mesa de corte virtual. Sem interface, sem popups, apenas vídeo puro.
                     </p>
-                    <ul class="space-y-4 pt-4">
-                        <li class="flex items-start gap-3">
-                            <i class="ph ph-check-circle text-win-accent text-xl"></i>
-                            <span class="theme-text-secondary font-bold">Resolução até 1080p dependendo da largura de banda</span>
+                    <ul class="space-y-6 pt-6">
+                        <li class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 mt-0.5"><i class="ph ph-check text-win-accent font-bold"></i></div>
+                            <span class="theme-text-secondary text-lg">Resolução até 1080p dependendo da largura de banda</span>
                         </li>
-                        <li class="flex items-start gap-3">
-                            <i class="ph ph-check-circle text-win-accent text-xl"></i>
-                            <span class="theme-text-secondary font-bold">Latência ultra-baixa via WebRTC Peer-to-Peer</span>
+                        <li class="flex items-start gap-4">
+                            <div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 mt-0.5"><i class="ph ph-check text-win-accent font-bold"></i></div>
+                            <span class="theme-text-secondary text-lg">Latência ultra-baixa via WebRTC Peer-to-Peer</span>
                         </li>
                     </ul>
                 </div>
-                <div class="flex-1 relative group">
+                <div class="flex-1 relative group w-full">
                     <div class="absolute -inset-4 bg-win-accent/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
-                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-video relative z-10 p-0">
+                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-video relative z-10 p-0 shadow-2xl">
                         <img src="/img/studio_setup.png" class="w-full h-full object-cover rounded-3xl" alt="Produção Lyncro">
                     </div>
                 </div>
             </div>
 
             <!-- Feature 2 -->
-            <div class="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-24 text-right lg:text-left">
-                <div class="flex-1 space-y-6 lg:text-left">
+            <div class="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-32 text-right lg:text-left">
+                <div class="flex-1 space-y-8 lg:text-left">
                     <div class="w-14 h-14 bg-win-accent/20 rounded-2xl flex items-center justify-center border border-win-accent/30 lg:ml-0 mx-auto lg:mr-0">
                         <i class="ph ph-device-mobile text-3xl text-win-accent"></i>
                     </div>
-                    <h2 class="section-title text-3xl md:text-5xl theme-text">
+                    <h2 class="section-title text-4xl md:text-5xl leading-tight theme-text">
                         Convidados entram pelo <span class="text-win-accent">Celular</span>
                     </h2>
-                    <p class="text-lg theme-text-secondary leading-relaxed">
+                    <p class="text-lg md:text-xl theme-text-secondary leading-[1.8]">
                         Sua pauta não pode esperar. Seus convidados acessam a sala com um clique, direto do navegador do celular. Sem downloads, sem registros frustrantes.
                     </p>
-                    <div class="bg-black/10 dark:bg-white/5 border border-white/10 p-6 rounded-2xl inline-block mt-4 text-left">
-                        <div class="flex items-center gap-4 text-win-accent font-black text-xs uppercase tracking-widest">
-                            <i class="ph ph-qr-code text-2xl"></i>
+                    <div class="bg-black/10 dark:bg-white/5 border border-white/10 p-8 rounded-2xl inline-block mt-6 text-left shadow-lg">
+                        <div class="flex items-center gap-4 text-win-accent font-black text-sm uppercase tracking-widest">
+                            <i class="ph ph-qr-code text-3xl"></i>
                             Gere um QR Code e pronto.
                         </div>
                     </div>
                 </div>
-                <div class="flex-1 relative group">
+                <div class="flex-1 relative group w-full flex justify-center lg:justify-start">
                     <div class="absolute -inset-4 bg-win-accent/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
-                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-[9/16] max-w-[300px] mx-auto relative z-10 p-0">
+                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-[9/16] w-[280px] md:w-[320px] relative z-10 p-0 shadow-2xl">
                         <img src="/img/mobile_guest.png" class="w-full h-full object-cover rounded-3xl" alt="Interface Mobile">
                     </div>
                 </div>
@@ -924,134 +924,153 @@
     </section>
 
     <!-- Pricing Section -->
-    <section id="pricing" class="py-24 px-6 md:px-12 bg-black/10 dark:bg-white/5 border-y border-white/5">
-        <div class="max-w-7xl mx-auto text-center mb-16 space-y-4">
-            <h2 class="section-title text-4xl md:text-6xl theme-text uppercase italic font-black">Investindo na <span class="text-win-accent">Excelência</span></h2>
-            <p class="text-lg theme-text-secondary max-w-2xl mx-auto">Escolha o plano ideal para a escala da sua produção.</p>
+    <section id="pricing" class="py-24 px-6 md:px-12 bg-black/5 dark:bg-white/5 border-y border-white/5">
+        <div class="max-w-5xl mx-auto text-center mb-16 space-y-6">
+            <h2 class="section-title text-4xl md:text-6xl theme-text uppercase italic font-black">Planos e <span class="text-win-accent">Preços</span></h2>
+            <p class="text-lg md:text-xl theme-text-secondary max-w-2xl mx-auto leading-relaxed">Escolha o plano ideal para a escala da sua produção, sem surpresas.</p>
+            
+            <!-- Toggle Switch -->
+            <div class="flex items-center justify-center gap-4 mt-8">
+                <span class="text-sm font-bold theme-text-secondary cursor-pointer hover:theme-text transition-colors" onclick="togglePricing('semiannual')" id="label-semiannual">Semestral</span>
+                
+                <button id="pricing-toggle" onclick="togglePricing()" class="relative w-16 h-8 rounded-full bg-win-accent/30 border border-win-accent/50 p-1 transition-all duration-300 shadow-inner">
+                    <!-- Pill Indicator -->
+                    <div id="pricing-pill" class="w-6 h-6 rounded-full bg-win-accent shadow-lg transform translate-x-8 transition-transform duration-300"></div>
+                </button>
+                
+                <div class="flex items-center gap-2 cursor-pointer" onclick="togglePricing('annual')">
+                    <span class="text-sm font-bold theme-text transition-colors" id="label-annual">Anual</span>
+                    <span class="px-2 py-0.5 rounded-full bg-green-500/20 text-green-500 text-[10px] font-black uppercase tracking-widest border border-green-500/30">-40%</span>
+                </div>
+            </div>
         </div>
 
-        <div class="max-w-[1400px] w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch justify-center px-4">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch justify-center">
             
             <!-- Grátis -->
-            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl flex flex-col text-center space-y-6">
+            <div class="pricing-card w-full glass-card-premium p-8 rounded-3xl flex flex-col text-center space-y-8">
                 <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Gratuito</div>
                 <div class="flex items-baseline justify-center gap-1">
-                    <span class="text-4xl font-black theme-text">R$ 0</span>
+                    <span class="text-5xl font-black theme-text">R$ 0</span>
                 </div>
-                <p class="text-[13px] theme-text-secondary leading-relaxed">Para testar a plataforma e começar sua jornada.</p>
-                <ul class="w-full space-y-4 text-left py-6 flex-1">
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> 1 Sala Curta (Ativa)</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> 2 Convidados Simultâneos</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Áudio Standard</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> SD Video Feed</li>
+                <p class="text-sm theme-text-secondary leading-relaxed px-4">Para testar a plataforma e começar sua jornada.</p>
+                
+                <div class="h-px w-full bg-white/10 my-2"></div>
+                
+                <ul class="w-full space-y-5 text-left flex-1">
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> 1 Sala Ativa</li>
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> 2 Convidados Simultâneos</li>
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Áudio Standard (Opus)</li>
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> SD Video Feed</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[10px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text mt-auto">Começar Grátis</button>
+                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[11px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text mt-8">Começar Grátis</button>
             </div>
 
             <!-- Mensal -->
-            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl flex flex-col text-center space-y-6">
+            <div class="pricing-card w-full glass-card-premium p-8 rounded-3xl flex flex-col text-center space-y-8">
                 <div class="text-gray-400 font-black text-xs uppercase tracking-[0.3em]">Mensal</div>
                 <div class="flex items-baseline justify-center gap-1">
-                    <span class="text-4xl font-black theme-text">R$ 59,90</span>
+                    <span class="text-5xl font-black theme-text">R$ 59<span class="text-3xl">,90</span></span>
                     <span class="text-xs theme-text-secondary">/mês</span>
                 </div>
-                <p class="text-[13px] theme-text-secondary leading-relaxed">Flexibilidade total para seus projetos mensais.</p>
-                <ul class="w-full space-y-4 text-left py-6 flex-1">
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Salas Ilimitadas</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> 8 Convidados Simultâneos</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Áudio High Dynamic</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Clean Feed em Alta Qualidade</li>
+                <p class="text-sm theme-text-secondary leading-relaxed px-4">Flexibilidade total para projetos pontuais e mensais.</p>
+                
+                <div class="h-px w-full bg-white/10 my-2"></div>
+
+                <ul class="w-full space-y-5 text-left flex-1">
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Salas Ilimitadas</li>
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> 8 Convidados Simultâneos</li>
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Áudio High Dynamic</li>
+                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Clean Feed HD</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl bg-white/10 text-white text-[10px] border border-white/20 font-black uppercase tracking-widest hover:bg-white/20 transition-all mt-auto">Assinar Mensal</button>
+                <button class="w-full py-4 rounded-xl bg-white/5 text-white text-[11px] border border-white/10 font-black uppercase tracking-widest hover:bg-white/10 transition-all mt-8">Assinar Mensal</button>
             </div>
 
-            <!-- Semestral -->
-            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl flex flex-col text-center space-y-6">
-                <div class="text-gray-400 font-black text-xs uppercase tracking-[0.3em]">Semestral</div>
-                <div class="flex items-baseline justify-center gap-1">
-                    <span class="text-4xl font-black theme-text">R$ 299,90</span>
-                    <span class="text-xs theme-text-secondary">/semestre</span>
+            <!-- Premium (Dinâmico: Semestral/Anual) -->
+            <div class="pricing-card w-full glass-card-premium p-8 rounded-3xl border border-win-accent/80 flex flex-col text-center space-y-8 relative transform scale-100 md:scale-105 z-10 shadow-[0_0_40px_rgba(0,120,212,0.2)] bg-gradient-to-b from-win-accent/10 to-transparent">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-win-accent text-white px-6 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(0,120,212,0.5)] border border-white/20 whitespace-nowrap">A Escolha Profissional</div>
+                <div id="premium-title" class="text-win-accent font-black text-xs uppercase tracking-[0.3em] mt-2">Plano Anual</div>
+                
+                <div class="flex flex-col items-center justify-center gap-1">
+                    <div class="flex items-baseline justify-center gap-1">
+                        <span id="premium-price" class="text-5xl font-black theme-text">R$ 499<span class="text-3xl">,90</span></span>
+                        <span id="premium-period" class="text-xs theme-text-secondary">/ano</span>
+                    </div>
                 </div>
-                <p class="text-[13px] theme-text-secondary leading-relaxed">Compromisso de médio prazo com desconto embutido.</p>
-                <ul class="w-full space-y-4 text-left py-6 flex-1">
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Tudo do plano mensal</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Suporte Prioritário</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Múltiplas Câmeras Ativas</li>
-                </ul>
-                <button class="w-full py-4 rounded-xl bg-white/10 text-white text-[10px] border border-white/20 font-black uppercase tracking-widest hover:bg-white/20 transition-all mt-auto">Assinar Semestral</button>
-            </div>
 
-            <!-- Anual (Destaque Total) -->
-            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl border border-win-accent/80 flex flex-col text-center space-y-6 relative transform scale-100 lg:scale-105 z-10 shadow-[0_0_40px_rgba(0,120,212,0.3)] bg-gradient-to-b from-win-accent/5 to-transparent">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-win-accent text-white px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(0,120,212,0.6)] border border-white/20 whitespace-nowrap">A Melhor Escolha</div>
-                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em] mt-2">Anual</div>
-                <div class="flex items-baseline justify-center gap-1">
-                    <span class="text-4xl lg:text-5xl font-black theme-text">R$ 499,90</span>
-                    <span class="text-xs theme-text-secondary">/ano</span>
-                </div>
-                <p class="text-[13px] theme-text-secondary leading-relaxed font-semibold">O maior custo-benefício. Leve sua produção profissional adiante.</p>
-                <ul class="w-full space-y-4 text-left py-6 flex-1">
-                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Fundo Virtual Borrado (IA)</li>
-                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Rotas P2P Criptografadas</li>
-                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Lower Thirds (GCs) Ilimitados</li>
-                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Suporte Técnico VIP 24/7</li>
+                <p id="premium-desc" class="text-sm theme-text-secondary leading-relaxed font-semibold px-4">O maior custo-benefício. Leve sua produção adiante.</p>
+                
+                <div class="h-px w-full bg-white/10 my-2"></div>
+
+                <ul class="w-full space-y-5 text-left flex-1">
+                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Tudo do plano mensal</li>
+                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Fundo Virtual Borrado (IA)</li>
+                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Rotas P2P Criptografadas</li>
+                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Lower Thirds (GCs) Ilimitados</li>
+                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Suporte Técnico VIP 24/7</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl bg-win-accent text-white text-[11px] font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-[0_0_20px_rgba(0,120,212,0.4)] border border-white/10 mt-auto">Assinar Anual</button>
+                <button class="w-full py-4 rounded-xl bg-win-accent text-white text-[11px] font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all shadow-[0_0_20px_rgba(0,120,212,0.3)] border border-white/10 mt-8">Assinar Premium</button>
             </div>
         </div>
     </section>
 
     <!-- Professional Footer -->
-    <footer class="bg-black/20 dark:bg-white/5 pt-24 pb-12 px-6 md:px-12">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-24 mb-16">
-            <div class="col-span-1 md:col-span-1 space-y-6">
-                <h3 class="font-logo text-3xl font-black italic theme-text">LYNCRO.</h3>
-                <p class="text-xs theme-text-secondary leading-relaxed opacity-60">
-                    Construindo o futuro da radiodifusão descentralizada. Qualidade de estúdio, onde quer que você esteja.
+    <footer id="main-footer" class="bg-black/20 dark:bg-[#03060a] border-t border-white/5 pt-20 pb-10 px-6 md:px-12 mt-20">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16">
+            
+            <!-- Brand Column -->
+            <div class="md:col-span-5 space-y-6">
+                <a href="/" class="inline-block">
+                    <h3 class="font-logo text-3xl font-black italic theme-text">Lyncro<span class="text-win-accent">.</span></h3>
+                </a>
+                <p class="text-sm theme-text-secondary leading-[1.8] max-w-sm opacity-80">
+                    Construindo o futuro da radiodifusão descentralizada. A ponte flexível entre você, seus convidados e sua plataforma de streaming.
                 </p>
-                <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-win-accent/20 transition-all"><i class="ph ph-twitter-logo text-xl"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-win-accent/20 transition-all"><i class="ph ph-linkedin-logo text-xl"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center hover:bg-win-accent/20 transition-all"><i class="ph ph-github-logo text-xl"></i></a>
+                <div class="flex gap-3 pt-2">
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-win-accent/20 hover:border-win-accent/50 hover:text-win-accent transition-all"><i class="ph ph-twitter-logo text-lg"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-win-accent/20 hover:border-win-accent/50 hover:text-win-accent transition-all"><i class="ph ph-linkedin-logo text-lg"></i></a>
+                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-win-accent/20 hover:border-win-accent/50 hover:text-win-accent transition-all"><i class="ph ph-youtube-logo text-lg"></i></a>
                 </div>
             </div>
             
-            <div class="space-y-6">
-                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-win-accent">Produto</h4>
+            <!-- Links Columns -->
+            <div class="md:col-span-2 space-y-5">
+                <h4 class="text-[11px] font-black uppercase tracking-[0.25em] text-win-accent">Produto</h4>
                 <ul class="space-y-4">
-                    <li><a href="#features" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Funcionalidades</a></li>
-                    <li><a href="#pricing" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Preços</a></li>
-                    <li><a href="https://docs.lyncro.live" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Documentação</a></li>
+                    <li><a href="#features" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Funcionalidades</a></li>
+                    <li><a href="#pricing" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Preços e Planos</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Casos de Uso</a></li>
+                    <li><a href="https://docs.lyncro.live" target="_blank" class="text-[13px] theme-text-secondary hover:text-white transition-colors flex items-center gap-1">Docs <i class="ph ph-arrow-up-right text-xs opacity-50"></i></a></li>
                 </ul>
             </div>
 
-            <div class="space-y-6">
-                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-win-accent">Empresa</h4>
+            <div class="md:col-span-2 space-y-5">
+                <h4 class="text-[11px] font-black uppercase tracking-[0.25em] text-win-accent">Empresa</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Sobre Nós</a></li>
-                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Blog</a></li>
-                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Carreiras</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Nossa História</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Blog</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Carreiras</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Contato Comercial</a></li>
                 </ul>
             </div>
 
-            <div class="space-y-6">
-                <h4 class="text-[10px] font-black uppercase tracking-[0.3em] text-win-accent">Suporte</h4>
+            <div class="md:col-span-3 space-y-5">
+                <h4 class="text-[11px] font-black uppercase tracking-[0.25em] text-win-accent">Suporte</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Central de Ajuda</a></li>
-                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Status do Sistema</a></li>
-                    <li><a href="#" class="text-xs theme-text-secondary hover:text-win-accent transition-all">Contato</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Central de Ajuda</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Comunidade Discord</a></li>
+                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors flex items-center gap-2">Status do Sistema <span class="w-2 h-2 rounded-full bg-green-500 block"></span></a></li>
                 </ul>
             </div>
         </div>
         
-        <div class="max-w-7xl mx-auto pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-[10px] font-bold theme-text-secondary opacity-40 uppercase tracking-widest">
-                © 2026 LYNCRO TECHNOLOGIES. TODOS OS DIREITOS RESERVADOS.
+        <div class="max-w-6xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-[11px] font-semibold theme-text-secondary opacity-60 uppercase tracking-widest">
+                © 2026 LYNCRO. Todos os Direitos Reservados.
             </div>
-            <div class="flex gap-8 text-[9px] font-black uppercase tracking-widest opacity-40">
-                <a href="#" class="hover:text-win-accent transition-all">Termos</a>
-                <a href="#" class="hover:text-win-accent transition-all">Privacidade</a>
-                <a href="#" class="hover:text-win-accent transition-all">Cookies</a>
+            <div class="flex flex-wrap justify-center gap-6 text-[11px] font-bold uppercase tracking-widest opacity-60">
+                <a href="#" class="hover:text-white transition-colors">Aviso de Privacidade</a>
+                <a href="#" class="hover:text-white transition-colors">Termos de Serviço</a>
             </div>
         </div>
     </footer>
@@ -1497,6 +1516,59 @@
             navLinks.forEach(link => {
                 link.classList.toggle('active', link.getAttribute('href') === `#${currentSectionId}`);
             });
+        });
+
+        // Pricing Toggle Logic (Semestral <-> Anual)
+        let isAnnual = true; // Padrão
+        
+        function togglePricing(forcePeriod) {
+            if (forcePeriod === 'annual') isAnnual = true;
+            else if (forcePeriod === 'semiannual') isAnnual = false;
+            else isAnnual = !isAnnual;
+
+            const pill = document.getElementById('pricing-pill');
+            const lblSemi = document.getElementById('label-semiannual');
+            const lblAnnual = document.getElementById('label-annual');
+
+            const pTitle = document.getElementById('premium-title');
+            const pPrice = document.getElementById('premium-price');
+            const pPeriod = document.getElementById('premium-period');
+            const pDesc = document.getElementById('premium-desc');
+
+            if (isAnnual) {
+                // UI do Toggle
+                pill.style.transform = 'translateX(32px)'; // approx 2rem 
+                lblAnnual.classList.add('theme-text');
+                lblAnnual.classList.remove('theme-text-secondary');
+                lblSemi.classList.add('theme-text-secondary');
+                lblSemi.classList.remove('theme-text');
+
+                // Atualizar dados do card
+                pTitle.textContent = 'Plano Anual';
+                pPrice.innerHTML = 'R$ 499<span class="text-3xl">,90</span>';
+                pPeriod.textContent = '/ano';
+                pDesc.textContent = 'O maior custo-benefício. Leve sua produção adiante.';
+            } else {
+                // UI do Toggle
+                pill.style.transform = 'translateX(0px)';
+                lblSemi.classList.add('theme-text');
+                lblSemi.classList.remove('theme-text-secondary');
+                lblAnnual.classList.add('theme-text-secondary');
+                lblAnnual.classList.remove('theme-text');
+
+                // Atualizar dados do card
+                pTitle.textContent = 'Plano Semestral';
+                pPrice.innerHTML = 'R$ 299<span class="text-3xl">,90</span>';
+                pPeriod.textContent = '/semestre';
+                pDesc.textContent = 'Compromisso flexível. Cobertura completa por 6 meses.';
+            }
+        }
+
+        // Setup inicial
+        document.addEventListener('DOMContentLoaded', () => {
+             // Força o estado padrão manual
+             const pill = document.getElementById('pricing-pill');
+             if(pill) pill.style.transform = 'translateX(32px)';
         });
 
         if ('serviceWorker' in navigator) {
