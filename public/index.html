@@ -930,54 +930,73 @@
             <p class="text-lg theme-text-secondary max-w-2xl mx-auto">Escolha o plano ideal para a escala da sua produção.</p>
         </div>
 
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 items-stretch justify-center">
-            <!-- Free -->
-            <div class="pricing-card flex-1 glass-card-premium p-8 rounded-3xl flex flex-col items-center text-center space-y-6">
-                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Hobby</div>
-                <div class="flex items-baseline gap-1">
+        <div class="max-w-[1400px] w-full mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch justify-center px-4">
+            
+            <!-- Grátis -->
+            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl flex flex-col text-center space-y-6">
+                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Gratuito</div>
+                <div class="flex items-baseline justify-center gap-1">
                     <span class="text-4xl font-black theme-text">R$ 0</span>
-                    <span class="text-xs theme-text-secondary">/mês</span>
                 </div>
-                <p class="text-[13px] theme-text-secondary leading-relaxed">Ideal para quem está começando e quer testar a tecnologia.</p>
-                <ul class="w-full space-y-4 text-left py-6">
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> 1 Sala Ativa</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> 2 Convidados Simultâneos</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Áudio Standard</li>
+                <p class="text-[13px] theme-text-secondary leading-relaxed">Para testar a plataforma e começar sua jornada.</p>
+                <ul class="w-full space-y-4 text-left py-6 flex-1">
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> 1 Sala Curta (Ativa)</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> 2 Convidados Simultâneos</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Áudio Standard</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> SD Video Feed</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[10px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text">Começar Grátis</button>
+                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[10px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text mt-auto">Começar Grátis</button>
             </div>
 
-            <!-- Pro -->
-            <div class="pricing-card flex-1 glass-card-premium p-8 rounded-3xl border-2 border-win-accent/50 flex flex-col items-center text-center space-y-6 relative">
-                <div class="absolute -top-4 bg-win-accent text-white px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-xl">Mais Popular</div>
-                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Professional</div>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-4xl font-black theme-text">R$ 49</span>
+            <!-- Mensal -->
+            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl flex flex-col text-center space-y-6">
+                <div class="text-gray-400 font-black text-xs uppercase tracking-[0.3em]">Mensal</div>
+                <div class="flex items-baseline justify-center gap-1">
+                    <span class="text-4xl font-black theme-text">R$ 59,90</span>
                     <span class="text-xs theme-text-secondary">/mês</span>
                 </div>
-                <p class="text-[13px] theme-text-secondary leading-relaxed">Para criadores que exigem o máximo de performance e controle.</p>
-                <ul class="w-full space-y-4 text-left py-6">
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Salas Ilimitadas</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> 8 Convidados Simultâneos</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Áudio High Dynamic</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Clean Feed em 1080p</li>
+                <p class="text-[13px] theme-text-secondary leading-relaxed">Flexibilidade total para seus projetos mensais.</p>
+                <ul class="w-full space-y-4 text-left py-6 flex-1">
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Salas Ilimitadas</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> 8 Convidados Simultâneos</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Áudio High Dynamic</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Clean Feed em Alta Qualidade</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl bg-win-accent text-white text-[10px] font-black uppercase tracking-widest hover:brightness-110 transition-all shadow-xl shadow-win-accent/20">Assinar Agora</button>
+                <button class="w-full py-4 rounded-xl bg-white/10 text-white text-[10px] border border-white/20 font-black uppercase tracking-widest hover:bg-white/20 transition-all mt-auto">Assinar Mensal</button>
             </div>
 
-            <!-- Enterprise -->
-            <div class="pricing-card flex-1 glass-card-premium p-8 rounded-3xl flex flex-col items-center text-center space-y-6">
-                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Enterprise</div>
-                <div class="flex items-baseline gap-1">
-                    <span class="text-3xl font-black theme-text">Sob Consulta</span>
+            <!-- Semestral -->
+            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl flex flex-col text-center space-y-6">
+                <div class="text-gray-400 font-black text-xs uppercase tracking-[0.3em]">Semestral</div>
+                <div class="flex items-baseline justify-center gap-1">
+                    <span class="text-4xl font-black theme-text">R$ 299,90</span>
+                    <span class="text-xs theme-text-secondary">/semestre</span>
                 </div>
-                <p class="text-[13px] theme-text-secondary leading-relaxed">Soluções customizadas para redes de TV e produtoras de grande porte.</p>
-                <ul class="w-full space-y-4 text-left py-6">
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> SLAs Garantidos</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> White-label / Custom UI</li>
-                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent"></i> Suporte Dedicado 24/7</li>
+                <p class="text-[13px] theme-text-secondary leading-relaxed">Compromisso de médio prazo com desconto embutido.</p>
+                <ul class="w-full space-y-4 text-left py-6 flex-1">
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Tudo do plano mensal</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Suporte Prioritário</li>
+                    <li class="flex items-center gap-3 text-xs theme-text-secondary"><i class="ph ph-check text-win-accent tracking-normal"></i> Múltiplas Câmeras Ativas</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[10px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text">Falar com Consultor</button>
+                <button class="w-full py-4 rounded-xl bg-white/10 text-white text-[10px] border border-white/20 font-black uppercase tracking-widest hover:bg-white/20 transition-all mt-auto">Assinar Semestral</button>
+            </div>
+
+            <!-- Anual (Destaque Total) -->
+            <div class="pricing-card w-full glass-card-premium p-6 md:p-8 rounded-3xl border border-win-accent/80 flex flex-col text-center space-y-6 relative transform scale-100 lg:scale-105 z-10 shadow-[0_0_40px_rgba(0,120,212,0.3)] bg-gradient-to-b from-win-accent/5 to-transparent">
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-win-accent text-white px-5 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(0,120,212,0.6)] border border-white/20 whitespace-nowrap">A Melhor Escolha</div>
+                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em] mt-2">Anual</div>
+                <div class="flex items-baseline justify-center gap-1">
+                    <span class="text-4xl lg:text-5xl font-black theme-text">R$ 499,90</span>
+                    <span class="text-xs theme-text-secondary">/ano</span>
+                </div>
+                <p class="text-[13px] theme-text-secondary leading-relaxed font-semibold">O maior custo-benefício. Leve sua produção profissional adiante.</p>
+                <ul class="w-full space-y-4 text-left py-6 flex-1">
+                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Fundo Virtual Borrado (IA)</li>
+                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Rotas P2P Criptografadas</li>
+                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Lower Thirds (GCs) Ilimitados</li>
+                    <li class="flex items-center gap-3 text-xs font-semibold theme-text"><i class="ph ph-check-circle text-win-accent tracking-normal text-lg drop-shadow-md"></i> Suporte Técnico VIP 24/7</li>
+                </ul>
+                <button class="w-full py-4 rounded-xl bg-win-accent text-white text-[11px] font-black uppercase tracking-[0.2em] hover:brightness-125 transition-all shadow-[0_0_20px_rgba(0,120,212,0.4)] border border-white/10 mt-auto">Assinar Anual</button>
             </div>
         </div>
     </section>
