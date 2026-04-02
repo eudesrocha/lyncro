@@ -19,7 +19,7 @@
     --text-muted:    rgba(255, 255, 255, 0.3);
     --input-bg:      rgba(0, 0, 0, 0.35);
     --input-border:  rgba(255, 255, 255, 0.08);
-    --input-focus:   #0078d4;
+    --input-focus:   var(--color-live);
     --shadow:        0 8px 40px rgba(0, 0, 0, 0.6);
     --shadow-sm:     0 2px 12px rgba(0, 0, 0, 0.4);
     --mica:          rgba(28, 28, 32, 0.55);
@@ -107,7 +107,7 @@ input[class*="bg-white"]::placeholder {
 }
 
 /* ── Tabs ── */
-.tab-active   { color: var(--tab-active-color);   border-bottom: 2px solid #0078d4; }
+.tab-active   { color: var(--tab-active-color);   border-bottom: 2px solid var(--color-live); }
 .tab-inactive { color: var(--tab-inactive-color); border-bottom: 2px solid transparent; }
 
 /* ── Cards / Superfícies ── */
@@ -208,3 +208,43 @@ input[class*="bg-white"]::placeholder {
 .delay-2 { animation-delay: 0.2s; }
 .delay-3 { animation-delay: 0.35s; }
 .delay-4 { animation-delay: 0.5s; }
+
+/* ── Override Global: win-accent (azul) → color-live (vermelho) ── */
+/* Sobrescreve TODAS as classes Tailwind que usam win-accent em todas as páginas */
+.bg-win-accent { background-color: var(--color-live) !important; }
+.bg-win-accent\/10 { background-color: rgba(232,48,42,0.1) !important; }
+.bg-win-accent\/20 { background-color: rgba(232,48,42,0.2) !important; }
+.bg-win-accent\/90 { background-color: rgba(232,48,42,0.9) !important; }
+.text-win-accent { color: var(--color-live) !important; }
+.border-win-accent { border-color: var(--color-live) !important; }
+.border-win-accent\/20 { border-color: rgba(232,48,42,0.2) !important; }
+.border-win-accent\/30 { border-color: rgba(232,48,42,0.3) !important; }
+.border-win-accent\/50 { border-color: rgba(232,48,42,0.5) !important; }
+.shadow-win-accent\/10 { --tw-shadow-color: rgba(232,48,42,0.1) !important; }
+.shadow-win-accent\/20 { --tw-shadow-color: rgba(232,48,42,0.2) !important; }
+.shadow-win-accent\/30 { --tw-shadow-color: rgba(232,48,42,0.3) !important; }
+.hover\:bg-win-accent:hover { background-color: var(--color-live) !important; }
+.hover\:bg-win-accent\/5:hover { background-color: rgba(232,48,42,0.05) !important; }
+.hover\:bg-win-accent\/20:hover { background-color: rgba(232,48,42,0.2) !important; }
+.hover\:bg-win-accent\/40:hover { background-color: rgba(232,48,42,0.4) !important; }
+.hover\:bg-win-accent\/80:hover { background-color: rgba(232,48,42,0.8) !important; }
+.hover\:bg-win-accent\/90:hover { background-color: rgba(232,48,42,0.9) !important; }
+.hover\:border-win-accent:hover { border-color: var(--color-live) !important; }
+.hover\:border-win-accent\/50:hover { border-color: rgba(232,48,42,0.5) !important; }
+.hover\:text-win-accent:hover { color: var(--color-live) !important; }
+.focus\:ring-win-accent\/50:focus { --tw-ring-color: rgba(232,48,42,0.5) !important; }
+.focus\:border-win-accent:focus { border-color: var(--color-live) !important; }
+.accent-win-accent { accent-color: var(--color-live) !important; }
+.bg-\[\#0078d4\] { background-color: var(--color-live) !important; }
+.bg-\[\#0078d4\]\/20 { background-color: rgba(232,48,42,0.2) !important; }
+.text-\[\#0078d4\] { color: var(--color-live) !important; }
+.hover\:to-win-accent:hover { --tw-gradient-to: var(--color-live) !important; }
+.to-win-accent\/30 { --tw-gradient-to: rgba(232,48,42,0.3) !important; }
+.hover\:shadow-\[0_0_15px_rgba\(0\2c120\2c212\2c0\.4\)\]:hover { --tw-shadow: 0 0 15px rgba(232,48,42,0.4) !important; }
+.hover\:shadow-\[0_0_30px_rgba\(0\2c120\2c212\2c0\.15\)\]:hover { --tw-shadow: 0 0 30px rgba(232,48,42,0.15) !important; }
+.shadow-\[0_0_10px_rgba\(0\2c120\2c212\2c0\.8\)\] { --tw-shadow: 0 0 10px rgba(232,48,42,0.8) !important; }
+.shadow-\[0_0_8px_rgba\(0\2c120\2c212\2c0\.5\)\] { --tw-shadow: 0 0 8px rgba(232,48,42,0.5) !important; }
+.shadow-\[0_10px_30px_-5px_rgba\(0\2c120\2c212\2c0\.6\)\] { --tw-shadow: 0 10px 30px -5px rgba(232,48,42,0.6) !important; }
+.selection\:bg-win-accent ::selection { background-color: rgba(232,48,42,0.8) !important; }
+.selection\:bg-win-accent::-moz-selection { background-color: rgba(232,48,42,0.8) !important; }
+.selection\:bg-win-accent::selection { background-color: rgba(232,48,42,0.8) !important; }

@@ -67,8 +67,8 @@
 
         [data-theme="light"] #settings-picker-menu button:hover,
         [data-theme="light"] #layout-picker-menu button:hover {
-            background-color: rgba(0, 120, 212, 0.08);
-            color: #0078d4;
+            background-color: rgba(232, 48, 42, 0.08);
+            color: var(--color-live);
         }
 
         [data-theme="light"] #settings-picker-menu span,
@@ -103,13 +103,13 @@
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.12) 0%, transparent 60%);
+            background: radial-gradient(circle at 50% 0%, rgba(232, 48, 42, 0.12) 0%, transparent 60%);
             z-index: -1;
             pointer-events: none;
         }
 
         [data-theme="light"] .bg-glow::before {
-            background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.05) 0%, transparent 60%);
+            background: radial-gradient(circle at 50% 0%, rgba(232, 48, 42, 0.05) 0%, transparent 60%);
         }
 
         /* Domínio Dinâmico do Host via CSS Grid */
@@ -187,7 +187,7 @@
         }
 
         .device-select-compact:hover {
-            border-color: #0078d4;
+            border-color: var(--color-live);
             color: #efefef;
         }
 
@@ -210,27 +210,27 @@
         @keyframes pulse-queue-border {
             0% {
                 border-color: rgba(255, 255, 255, 0.08);
-                box-shadow: 0 0 0 rgba(0, 120, 212, 0);
+                box-shadow: 0 0 0 rgba(232, 48, 42, 0);
             }
 
             50% {
-                border-color: #0078d4;
-                box-shadow: 0 0 20px rgba(0, 120, 212, 0.4);
+                border-color: var(--color-live);
+                box-shadow: 0 0 20px rgba(232, 48, 42, 0.4);
             }
 
             100% {
                 border-color: rgba(255, 255, 255, 0.08);
-                box-shadow: 0 0 0 rgba(0, 120, 212, 0);
+                box-shadow: 0 0 0 rgba(232, 48, 42, 0);
             }
         }
 
         .queue-alert-active {
             animation: pulse-queue-border 2s infinite ease-in-out;
-            border-color: #0078d480 !important;
+            border-color: rgba(232, 48, 42, 0.5) !important;
         }
 
         .queue-alert-active header {
-            background: linear-gradient(90deg, rgba(0, 120, 212, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
+            background: linear-gradient(90deg, rgba(232, 48, 42, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%) !important;
         }
 
         .queue-alert-active header i {
@@ -305,9 +305,9 @@
             background: rgba(255,255,255,0.3);
             transition: all 0.12s;
         }
-        .pos-dot:hover { background: rgba(0,120,212,0.25); border-color: rgba(0,120,212,0.5); }
+        .pos-dot:hover { background: rgba(232,48,42,0.25); border-color: rgba(232,48,42,0.5); }
         .pos-dot:hover::after { background: rgba(255,255,255,0.7); }
-        .pos-dot.active { background: #0078d4; border-color: #0078d4; box-shadow: 0 0 8px rgba(0,120,212,0.6); }
+        .pos-dot.active { background: var(--color-live); border-color: var(--color-live); box-shadow: 0 0 8px rgba(232,48,42,0.6); }
         .pos-dot.active::after { background: #fff; }
     </style>
 </head>
@@ -576,7 +576,7 @@
             <!-- Language Switcher — hidden on mobile to avoid overflow -->
             <div class="hidden md:flex" style="align-items:center;gap:2px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:3px;margin-left:4px;">
                 <button data-lang-btn="pt" onclick="window.LYNCRO_I18N.setLang('pt')" aria-pressed="true"
-                    style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:800;background:rgba(0,120,212,0.2);color:#0078d4;border:1px solid rgba(0,120,212,0.3);cursor:pointer;transition:all .15s;">🇧🇷 PT</button>
+                    style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:800;background:rgba(232,48,42,0.2);color:var(--color-live);border:1px solid rgba(232,48,42,0.3);cursor:pointer;transition:all .15s;">🇧🇷 PT</button>
                 <button data-lang-btn="en" onclick="window.LYNCRO_I18N.setLang('en')" aria-pressed="false"
                     style="padding:3px 9px;border-radius:7px;font-size:10px;font-weight:700;background:transparent;color:#6b7280;border:1px solid transparent;cursor:pointer;transition:all .15s;">🇺🇸 EN</button>
             </div>
@@ -947,9 +947,9 @@
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            background: #0078d4;
+            background: var(--color-live);
             border: 2px solid rgba(255,255,255,0.25);
-            box-shadow: 0 0 6px rgba(0,120,212,0.55);
+            box-shadow: 0 0 6px rgba(232,48,42,0.55);
             cursor: pointer;
             transition: transform 0.12s, box-shadow 0.12s;
         }
@@ -958,13 +958,13 @@
         }
         .lyncro-slider::-webkit-slider-thumb:hover {
             transform: scale(1.25);
-            box-shadow: 0 0 12px rgba(0,120,212,0.85);
+            box-shadow: 0 0 12px rgba(232,48,42,0.85);
         }
         .lyncro-slider::-moz-range-thumb {
             width: 14px;
             height: 14px;
             border-radius: 50%;
-            background: #0078d4;
+            background: var(--color-live);
             border: 2px solid rgba(255,255,255,0.25);
             cursor: pointer;
         }
@@ -1081,8 +1081,8 @@
         }
 
         .lt-preview-btn:hover {
-            background: rgba(0, 120, 212, 0.1);
-            border-color: rgba(0, 120, 212, 0.3);
+            background: rgba(232, 48, 42, 0.1);
+            border-color: rgba(232, 48, 42, 0.3);
         }
 
         .lt-preview-btn:hover .lt-preview-thumb {
@@ -1090,8 +1090,8 @@
         }
 
         .lt-preview-thumb.lt-selected {
-            border-color: #0078d4;
-            box-shadow: 0 0 0 2px #0078d4, 0 4px 16px rgba(0, 120, 212, 0.4);
+            border-color: var(--color-live);
+            box-shadow: 0 0 0 2px var(--color-live), 0 4px 16px rgba(232, 48, 42, 0.4);
         }
 
         .lt-preview-thumb::before {
@@ -1121,11 +1121,11 @@
         }
 
         .lt-preview-btn:hover .lt-preview-name {
-            color: #0078d4;
+            color: var(--color-live);
         }
 
         .lt-preview-btn.lt-active .lt-preview-name {
-            color: #0078d4;
+            color: var(--color-live);
         }
     </style>
     <div id="settings-modal"
@@ -1208,7 +1208,7 @@
                     <button class="lt-preview-btn" onclick="selectLTStyle('corporate',this)" data-lt="corporate">
                         <div class="lt-preview-thumb">
                             <div class="lt-bar"
-                                style="background:rgba(5,10,20,0.97);border-top:2px solid #0078d4;border-radius:0;">
+                                style="background:rgba(5,10,20,0.97);border-top:2px solid var(--color-live);border-radius:0;">
                             </div>
                         </div><span class="lt-preview-name">Corporate</span>
                     </button>

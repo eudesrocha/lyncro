@@ -2,10 +2,60 @@
    Lyncro Landing Page — Estilos Dedicados
    ============================================= */
 
+/* ── Base Sections — Espaçamento entre seções ── */
+.landing-section {
+    padding: 100px 24px;
+    position: relative;
+}
+
+@media (min-width: 768px) {
+    .landing-section {
+        padding: 120px 48px;
+    }
+}
+
+@media (min-width: 1280px) {
+    .landing-section {
+        padding: 140px 64px;
+    }
+}
+
+.section-heading {
+    font-family: 'Plus Jakarta Sans', 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+}
+
+@media (min-width: 768px) {
+    .section-heading {
+        font-size: 2.5rem;
+    }
+}
+
+.section-label {
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--color-live);
+    margin-bottom: 12px;
+}
+
+.section-desc {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 600px;
+    line-height: 1.7;
+}
+
 /* ── Noise/Grain Texture no Hero ── */
 .hero-section {
     position: relative;
     overflow: hidden;
+    padding-bottom: 80px;
 }
 
 .hero-section::before {
@@ -260,14 +310,14 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0, 120, 212, 0.1);
-    border: 1px solid rgba(0, 120, 212, 0.15);
+    background: rgba(232, 48, 42, 0.1);
+    border: 1px solid rgba(232, 48, 42, 0.15);
     flex-shrink: 0;
 }
 
 .feature-card-secondary .feature-icon-sm i {
     font-size: 1.25rem;
-    color: #0078d4;
+    color: var(--color-live);
 }
 
 .feature-card-secondary h4 {
@@ -284,11 +334,23 @@
     line-height: 1.6;
 }
 
-/* Grid para Grupo B */
+/* Grid para Grupo B — 2 linhas de 4 */
 .features-grid-secondary {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    grid-template-columns: 1fr;
     gap: 16px;
+}
+
+@media (min-width: 640px) {
+    .features-grid-secondary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .features-grid-secondary {
+        grid-template-columns: repeat(4, 1fr);
+    }
 }
 
 /* ── Demo Section ── */

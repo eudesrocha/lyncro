@@ -48,13 +48,13 @@
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.12) 0%, transparent 60%);
+            background: radial-gradient(circle at 50% 0%, rgba(232, 48, 42, 0.12) 0%, transparent 60%);
             z-index: -1;
             pointer-events: none;
         }
 
         [data-theme="light"] .bg-glow::before {
-            background: radial-gradient(circle at 50% 0%, rgba(0, 120, 212, 0.05) 0%, transparent 60%);
+            background: radial-gradient(circle at 50% 0%, rgba(232, 48, 42, 0.05) 0%, transparent 60%);
         }
 
         /* Custom Dropdown Styles (Mobile Touch Friendly) */
@@ -79,7 +79,7 @@
         }
 
         .custom-select-trigger:hover {
-            border-color: #0078d480;
+            border-color: rgba(232, 48, 42, 0.5);
             background-color: rgba(255, 255, 255, 0.05);
         }
 
@@ -120,8 +120,8 @@
         }
 
         .custom-select-option:hover {
-            background-color: rgba(0, 120, 212, 0.2);
-            color: #0078d4;
+            background-color: rgba(232, 48, 42, 0.2);
+            color: var(--color-live);
         }
 
         [data-theme="light"] .custom-select-option {
@@ -483,7 +483,7 @@
         /* 10. Corporate */
         #lt-box.lt-corporate {
             background: rgba(5, 10, 20, .96);
-            border-top: 3px solid #0078d4;
+            border-top: 3px solid var(--color-live);
             padding: 1rem 2rem;
             color: white;
             box-shadow: 0 10px 40px rgba(0, 0, 0, .6);
@@ -498,19 +498,19 @@
         }
 
         .pip-active-speaker {
-            box-shadow: 0 0 0 2px #0078d4, 0 0 16px rgba(0, 120, 212, 0.5) !important;
-            border-color: #0078d4 !important;
+            box-shadow: 0 0 0 2px var(--color-live), 0 0 16px rgba(232, 48, 42, 0.5) !important;
+            border-color: var(--color-live) !important;
         }
 
         @keyframes speaker-pulse {
 
             0%,
             100% {
-                box-shadow: 0 0 0 2px #0078d4, 0 0 12px rgba(0, 120, 212, 0.3);
+                box-shadow: 0 0 0 2px var(--color-live), 0 0 12px rgba(232, 48, 42, 0.3);
             }
 
             50% {
-                box-shadow: 0 0 0 3px #0078d4, 0 0 20px rgba(0, 120, 212, 0.6);
+                box-shadow: 0 0 0 3px var(--color-live), 0 0 20px rgba(232, 48, 42, 0.6);
             }
         }
 
@@ -809,8 +809,8 @@
         <!-- Screen Share Indicator -->
         <div id="screen-share-indicator"
             class="hidden absolute top-20 left-1/2 -translate-x-1/2 glass-panel border border-win-accent/50 px-4 py-2 rounded-full flex items-center gap-3 z-[60] shadow-2xl animate-fade-in transition-all">
-            <div class="w-8 h-8 rounded-full bg-[#0078d4]/20 flex items-center justify-center">
-                <i class="ph ph-monitor text-lg text-[#0078d4]"></i>
+            <div class="w-8 h-8 rounded-full bg-win-accent/20 flex items-center justify-center">
+                <i class="ph ph-monitor text-lg text-win-accent"></i>
             </div>
             <div class="flex flex-col">
                 <span
