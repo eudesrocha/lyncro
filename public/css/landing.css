@@ -4,19 +4,19 @@
 
 /* ── Base Sections — Espaçamento entre seções ── */
 .landing-section {
-    padding: 100px 24px;
+    padding: 80px 24px;
     position: relative;
 }
 
 @media (min-width: 768px) {
     .landing-section {
-        padding: 120px 48px;
+        padding: 96px 48px;
     }
 }
 
 @media (min-width: 1280px) {
     .landing-section {
-        padding: 140px 64px;
+        padding: 112px 64px;
     }
 }
 

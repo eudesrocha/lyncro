@@ -163,6 +163,14 @@
             animation: float 15s infinite ease-in-out 3s;
         }
 
+        /* ── Opcionais de Fundo Claro (Neutro) ── */
+        [data-theme="light"] .ambient-glow {
+            background: radial-gradient(circle at top center, rgba(100, 110, 120, 0.03) 0%, transparent 70%);
+        }
+        [data-theme="light"] .p1 { background: rgba(100, 110, 120, 0.05); }
+        [data-theme="light"] .p2 { background: rgba(100, 110, 120, 0.03); }
+        [data-theme="light"] .p3 { background: rgba(100, 110, 120, 0.04); }
+
         @keyframes float {
             0% {
                 transform: translate(0, 0) scale(1);
@@ -474,7 +482,7 @@
     </header>
 
     <main
-        class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-24 max-w-7xl mx-auto gap-12 lg:gap-16 xl:gap-24 relative z-10 w-full">
+        class="min-h-[90vh] lg:min-h-[85vh] flex flex-col lg:flex-row items-center justify-center p-6 pt-24 max-w-7xl mx-auto gap-12 lg:gap-16 xl:gap-24 relative z-10 w-full mb-12">
 
         <!-- Lado Esquerdo: Hero Copy -->
         <section id="narrative-section" class="flex-1 text-center lg:text-left overflow-hidden hero-section">
@@ -724,7 +732,7 @@
                 <h2 class="section-heading">Por que o Lyncro é <span style="color:var(--color-live)">diferente</span></h2>
             </div>
 
-            <div class="features-grid-primary mb-24">
+            <div class="features-grid-primary mb-32 lg:mb-40">
                 <!-- Card 1: Clean Feed -->
                 <div class="feature-card-primary">
                     <div class="feature-icon">
