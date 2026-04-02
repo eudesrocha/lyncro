@@ -13,14 +13,14 @@
     <meta http-equiv="Expires" content="0">
 
     <!-- SEO & Open Graph -->
-    <title>Lyncro - Conecte. Capture. Transmita.</title>
+    <title>Lyncro — Seu convidado entra pelo celular. Você recebe em 1080p, direto no OBS.</title>
     <meta name="description"
-        content="Conecte-se com convidados em qualquer lugar do planeta através de uma rede de baixa latência. O LYNCRO é a ponte invisível entre a sua mensagem e o resto do mundo.">
+        content="Lyncro conecta apresentadores e convidados remotos com latência ultra-baixa via WebRTC. Clean Feed direto para OBS/vMix. Sem downloads. Sem configuração.">
     <meta name="keywords"
         content="livestream, obs studio, clean feed, latência zero, transmissão ao vivo, rtmp, webrtc, estúdio">
-    <meta property="og:title" content="Lyncro - Conecte. Capture. Transmita.">
+    <meta property="og:title" content="Lyncro — Convidados remotos em 1080p direto no OBS">
     <meta property="og:description"
-        content="Conecte-se com convidados em qualquer lugar do planeta através de uma rede de baixa latência. O LYNCRO é a ponte invisível entre a sua mensagem e o resto do mundo.">
+        content="Lyncro conecta apresentadores e convidados remotos com latência ultra-baixa via WebRTC. Clean Feed direto para OBS/vMix. Sem downloads.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://lyncro.live">
 
@@ -28,11 +28,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
         rel="stylesheet">
 
     <link rel="stylesheet" href="/css/tailwind.css">
     <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/landing.css">
 
     <style>
         /* 1. Splash Screen Animation (Criativa e Minimalista) */
@@ -475,175 +476,44 @@
     <main
         class="min-h-screen flex flex-col lg:flex-row items-center justify-center p-6 pt-24 max-w-7xl mx-auto gap-12 lg:gap-16 xl:gap-24 relative z-10 w-full">
 
-        <!-- Lado Esquerdo: Narrativa Sales Copy -->
-        <section id="narrative-section" class="flex-1 text-center lg:text-left overflow-hidden">
+        <!-- Lado Esquerdo: Hero Copy -->
+        <section id="narrative-section" class="flex-1 text-center lg:text-left overflow-hidden hero-section">
             <div class="animate-reveal delay-2">
-                <span data-i18n="tagline"
-                    class="text-win-accent text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-4 block opacity-90 drop-shadow-md">
-                    Design Minimalista. Performance Máxima
-                </span>
-                <h1
-                    class="font-sync text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-[0.95] mb-8 uppercase theme-text italic">
-                    <span class="hero-line hero-line-1" data-i18n="hero_line1">CONECTE.</span>
-                    <span class="hero-line hero-line-2 text-win-accent not-italic" data-i18n="hero_line2">CAPTURE.</span>
-                    <span class="hero-line hero-line-3 text-win-accent not-italic" data-i18n="hero_line3">TRANSMITA.</span>
-                </h1>
-                <p data-i18n="hero_sub"
-                    class="text-base md:text-lg lg:text-xl theme-text-secondary mb-8 max-w-xl leading-relaxed font-segoe mx-auto lg:mx-0">
-                    Conecte-se com convidados em qualquer lugar do planeta através de uma rede de baixa latência. O LYNCRO é a ponte invisível entre a sua mensagem e o resto do mundo.
-                </p>
-            </div>
-
-            <!-- Slideshow de 10 Funcionalidades -->
-            <div class="features-carousel-outer animate-reveal delay-3">
-                <div class="features-carousel-container" id="carousel-container">
-                    <div class="features-track" id="features-track">
-                        <!-- Slide 1 -->
-                        <div class="feature-slide" data-index="0">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-rocket-launch text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s1_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Mobile First, Sempre</h3>
-                                    <p data-i18n="s1_desc" class="text-[12px] theme-text-secondary leading-relaxed">Convide pessoas de
-                                        qualquer lugar. Eles entram pelo celular e você recebe áudio e vídeo em
-                                        altíssima qualidade — sem burocracias.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 2 -->
-                        <div class="feature-slide" data-index="1">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-broadcast text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s2_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">A Ponte Perfeita (Clean Feed)</h3>
-                                    <p data-i18n="s2_desc" class="text-[12px] theme-text-secondary leading-relaxed">Puxe fontes imaculadas (Clean Feed) diretas para seu OBS Studio ou vMix, sem interfaces ou popups da chamada vazando no ar.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 3 -->
-                        <div class="feature-slide" data-index="2">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-waveform text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s3_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Áudio Quality Studio</h3>
-                                    <p data-i18n="s3_desc" class="text-[12px] theme-text-secondary leading-relaxed">Desabilite cancelamentos agressivos. Transmita o áudio limpo dos microfones como se estivessem no mesmo estúdio.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 4 -->
-                        <div class="feature-slide" data-index="3">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-chats-teardrop text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s4_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Chat Backstage</h3>
-                                    <p data-i18n="s4_desc" class="text-[12px] theme-text-secondary leading-relaxed">Converse em tempo real com sua equipe e convidados de forma privada durante a transmissão.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 5 -->
-                        <div class="feature-slide" data-index="4">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-text-aa text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s5_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Lower Thirds (GCs)</h3>
-                                    <p data-i18n="s5_desc" class="text-[12px] theme-text-secondary leading-relaxed">Injete letreiros animados com nome e profissão diretamente no feed visual dos participantes instantaneamente.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 6 -->
-                        <div class="feature-slide" data-index="5">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-video-camera text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s6_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Multi-Cam Suporte</h3>
-                                    <p data-i18n="s6_desc" class="text-[12px] theme-text-secondary leading-relaxed">Troque fluidamente entre a câmera frontal ou traseira (mobile) e selecione placas de captura (desktop).</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 7 -->
-                        <div class="feature-slide" data-index="6">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-sliders text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s7_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Controle de Mute Total</h3>
-                                    <p data-i18n="s7_desc" class="text-[12px] theme-text-secondary leading-relaxed">O diretor domina o painel. Corte ou libere o áudio dos convidados remotamente.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 8 -->
-                        <div class="feature-slide" data-index="7">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-files text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s8_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Media Drop / Arquivos</h3>
-                                    <p data-i18n="s8_desc" class="text-[12px] theme-text-secondary leading-relaxed">Envie roteiros, pautas, ou imagens arrastando pro painel usando WebRTC (ponto a ponto, sem provedor no meio).</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 9 -->
-                        <div class="feature-slide" data-index="8">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-image-square text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s9_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Fundo Virtual Borrado</h3>
-                                    <p data-i18n="s9_desc" class="text-[12px] theme-text-secondary leading-relaxed">Convidados desorganizados? Use IA em tempo real para desfocar o fundo ou aplicar imagens corporativas.</p>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Slide 10 -->
-                        <div class="feature-slide" data-index="9">
-                            <div
-                                class="w-full flex flex-col md:flex-row items-center md:items-start gap-4 p-5 rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm shadow-xl">
-                                <div
-                                    class="w-12 h-12 rounded-xl bg-win-accent/20 flex items-center justify-center border border-win-accent/30 shrink-0">
-                                    <i class="ph ph-shield-check text-win-accent text-2xl drop-shadow-md"></i>
-                                </div>
-                                <div>
-                                    <h3 data-i18n="s10_title" class="font-bold text-sm uppercase tracking-widest theme-text mb-1">Rotas Criptografadas</h3>
-                                    <p data-i18n="s10_desc" class="text-[12px] theme-text-secondary leading-relaxed">Conexões WebRTC Peer-to-Peer fortemente criptografadas. O que acontece na live, fica na live.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Controls -->
-                    <div class="carousel-dots" id="carousel-dots"></div>
+                <!-- Badge AO VIVO -->
+                <div class="mb-6">
+                    <span class="live-badge-hero">
+                        <span class="live-dot"></span>
+                        AO VIVO
+                    </span>
                 </div>
+
+                <h1 class="hero-headline text-4xl md:text-5xl lg:text-6xl mb-6">
+                    Seu convidado entra pelo celular. Você recebe em <span class="accent">1080p</span>, direto no <span class="accent">OBS</span>.
+                </h1>
+
+                <p class="hero-subtitle text-base md:text-lg lg:text-xl mb-8 mx-auto lg:mx-0">
+                    Lyncro conecta apresentadores e convidados remotos com latência ultra-baixa via WebRTC.
+                    Sem downloads. Sem configuração. Broadcast profissional em minutos.
+                </p>
+
+                <!-- CTAs -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-8 justify-center lg:justify-start">
+                    <button onclick="document.getElementById('card-lobby').scrollIntoView({behavior:'smooth'})" class="cta-primary">
+                        <i class="ph ph-broadcast text-base"></i>
+                        Criar Sala Grátis
+                    </button>
+                    <a href="#demo" class="cta-secondary">
+                        Ver como funciona <i class="ph ph-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Credibility Indicators -->
+                <div class="credibility-bar justify-center lg:justify-start">
+                    <span><span class="check-icon">✓</span> Grátis para começar</span>
+                    <span><span class="check-icon">✓</span> Sem cartão de crédito</span>
+                    <span><span class="check-icon">✓</span> Funciona no navegador</span>
+                </div>
+            </div>
         </section>
 
         <!-- Lado Direito: Ação -->
@@ -844,233 +714,325 @@
         </section>
     </main>
 
-    <!-- Social Proof Section -->
-    <section id="cases" class="py-12 border-y border-white/5 bg-black/5 dark:bg-white/5">
-        <div class="max-w-7xl mx-auto px-6 text-center">
-            <p class="text-[10px] font-black uppercase tracking-[0.3em] theme-text-secondary mb-8 opacity-60">Utilizado por Criadores e Estúdios de todo o mundo</p>
-            <div class="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-40">
-                <i class="ph ph-youtube-logo text-4xl social-logo"></i>
-                <i class="ph ph-twitch-logo text-4xl social-logo"></i>
-                <i class="ph ph-instagram-logo text-4xl social-logo"></i>
-                <i class="ph ph-tiktok-logo text-4xl social-logo"></i>
-                <h3 class="font-logo text-2xl font-black italic social-logo">LIVEHUB</h3>
-                <h3 class="font-logo text-2xl font-black italic social-logo">STREAMPRO</h3>
+    <!-- ═══ FEATURES ═══ -->
+    <section id="features" class="landing-section relative overflow-hidden">
+        <div class="max-w-7xl mx-auto">
+
+            <!-- Grupo A: Diferenciais -->
+            <div class="text-center mb-16">
+                <p class="section-label">Diferenciais</p>
+                <h2 class="section-heading">Por que o Lyncro é <span style="color:var(--color-live)">diferente</span></h2>
+            </div>
+
+            <div class="features-grid-primary mb-24">
+                <!-- Card 1: Clean Feed -->
+                <div class="feature-card-primary">
+                    <div class="feature-icon">
+                        <i class="ph ph-broadcast"></i>
+                    </div>
+                    <h3>Feed Limpo para seu OBS/vMix</h3>
+                    <p>Capture o vídeo do convidado sem nenhuma interface da chamada. Apenas o rosto, enquadrado e pronto para o ar. Compatível com OBS Studio, vMix e qualquer software de captura via navegador.</p>
+                </div>
+
+                <!-- Card 2: Mobile First -->
+                <div class="feature-card-primary">
+                    <div class="feature-icon">
+                        <i class="ph ph-device-mobile-speaker"></i>
+                    </div>
+                    <h3>Convidados entram pelo celular, sem app</h3>
+                    <p>Gere um link ou QR Code. Seu convidado abre no Safari ou Chrome e está ao vivo em segundos. Sem instalar nada, sem criar conta.</p>
+                </div>
+
+                <!-- Card 3: Áudio -->
+                <div class="feature-card-primary">
+                    <div class="feature-icon">
+                        <i class="ph ph-waveform"></i>
+                    </div>
+                    <h3>Áudio limpo como se fossem no mesmo estúdio</h3>
+                    <p>Desative o cancelamento de ruído agressivo e transmita o sinal bruto do microfone. Compatível com interfaces de áudio USB e microfones XLR via adaptador.</p>
+                </div>
+            </div>
+
+            <!-- Grupo B: Mais recursos -->
+            <div class="text-center mb-12">
+                <p class="section-label" style="color: #0078d4;">Mais recursos</p>
+                <h2 class="section-heading text-2xl md:text-3xl">Mais recursos incluídos</h2>
+            </div>
+
+            <div class="features-grid-secondary">
+                <div class="feature-card-secondary">
+                    <div class="feature-icon-sm"><i class="ph ph-text-aa"></i></div>
+                    <div>
+                        <h4>Lower Thirds Animados</h4>
+                        <p>Letreiros com nome e cargo injetados em tempo real no feed visual.</p>
+                    </div>
+                </div>
+                <div class="feature-card-secondary">
+                    <div class="feature-icon-sm"><i class="ph ph-chats-teardrop"></i></div>
+                    <div>
+                        <h4>Chat Backstage</h4>
+                        <p>Conversa privada com equipe e convidados durante a transmissão.</p>
+                    </div>
+                </div>
+                <div class="feature-card-secondary">
+                    <div class="feature-icon-sm"><i class="ph ph-video-camera"></i></div>
+                    <div>
+                        <h4>Multi-Cam</h4>
+                        <p>Troque entre câmera frontal, traseira e placas de captura.</p>
+                    </div>
+                </div>
+                <div class="feature-card-secondary">
+                    <div class="feature-icon-sm"><i class="ph ph-sliders"></i></div>
+                    <div>
+                        <h4>Mute Remoto</h4>
+                        <p>O diretor controla o áudio de cada convidado remotamente.</p>
+                    </div>
+                </div>
+                <div class="feature-card-secondary">
+                    <div class="feature-icon-sm"><i class="ph ph-files"></i></div>
+                    <div>
+                        <h4>Media Drop</h4>
+                        <p>Envie roteiros e imagens via WebRTC ponto a ponto.</p>
+                    </div>
+                </div>
+                <div class="feature-card-secondary">
+                    <div class="feature-icon-sm"><i class="ph ph-image-square"></i></div>
+                    <div>
+                        <h4>Fundo Virtual IA</h4>
+                        <p>Desfoque ou substitua o fundo com IA em tempo real.</p>
+                    </div>
+                </div>
+                <div class="feature-card-secondary">
+                    <div class="feature-icon-sm"><i class="ph ph-shield-check"></i></div>
+                    <div>
+                        <h4>Rotas Criptografadas</h4>
+                        <p>Conexões WebRTC P2P criptografadas de ponta a ponta.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Detailed Features Section -->
-    <section id="features" class="py-24 px-6 md:px-12 relative overflow-hidden">
-        <div class="max-w-7xl mx-auto space-y-32">
-            
-            <!-- Feature 1 -->
-            <div class="flex flex-col lg:flex-row items-center gap-16 lg:gap-32">
-                <div class="flex-1 space-y-8">
-                    <div class="w-14 h-14 bg-win-accent/20 rounded-2xl flex items-center justify-center border border-win-accent/30">
-                        <i class="ph ph-broadcast text-3xl text-win-accent"></i>
-                    </div>
-                    <h2 class="section-title text-4xl md:text-5xl leading-tight theme-text">
-                        A Ponte Invisível para seu <span class="text-win-accent">OBS/vMix</span>
-                    </h2>
-                    <p class="text-lg md:text-xl theme-text-secondary leading-[1.8]">
-                        Esqueça capturas de janela desorganizadas. O Lyncro fornece feeds limpos (Clean Feed) que você injeta diretamente em sua mesa de corte virtual. Sem interface, sem popups, apenas vídeo puro.
-                    </p>
-                    <ul class="space-y-6 pt-6">
-                        <li class="flex items-start gap-4">
-                            <div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 mt-0.5"><i class="ph ph-check text-win-accent font-bold"></i></div>
-                            <span class="theme-text-secondary text-lg">Resolução até 1080p dependendo da largura de banda</span>
-                        </li>
-                        <li class="flex items-start gap-4">
-                            <div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 mt-0.5"><i class="ph ph-check text-win-accent font-bold"></i></div>
-                            <span class="theme-text-secondary text-lg">Latência ultra-baixa via WebRTC Peer-to-Peer</span>
-                        </li>
-                    </ul>
+    <!-- ═══ DEMO ═══ -->
+    <section id="demo" class="landing-section relative">
+        <div class="max-w-4xl mx-auto text-center">
+            <p class="section-label">Demonstração</p>
+            <h2 class="section-heading mb-4">Veja em 30 segundos</h2>
+            <p class="section-desc mx-auto mb-12">Como uma entrevista ao vivo sai do celular do seu convidado direto para o ar.</p>
+
+            <!-- Video Player Placeholder -->
+            <div class="demo-player" id="demo-player-container">
+                <img src="/img/studio_setup.png" alt="Demonstração Lyncro — Estúdio de broadcast">
+                <div class="play-button">
+                    <i class="ph-fill ph-play"></i>
                 </div>
-                <div class="flex-1 relative group w-full">
-                    <div class="absolute -inset-4 bg-win-accent/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
-                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-video relative z-10 p-0 shadow-2xl">
-                        <img src="/img/studio_setup.png" class="w-full h-full object-cover rounded-3xl" alt="Produção Lyncro">
-                    </div>
-                </div>
+                <!-- iframe placeholder: inserir src do YouTube/Vimeo quando disponível -->
+                <iframe id="demo-iframe" style="display:none; position:absolute; inset:0; width:100%; height:100%; border:none;" allowfullscreen></iframe>
             </div>
 
-            <!-- Feature 2 -->
-            <div class="flex flex-col lg:flex-row-reverse items-center gap-16 lg:gap-32 text-right lg:text-left">
-                <div class="flex-1 space-y-8 lg:text-left">
-                    <div class="w-14 h-14 bg-win-accent/20 rounded-2xl flex items-center justify-center border border-win-accent/30 lg:ml-0 mx-auto lg:mr-0">
-                        <i class="ph ph-device-mobile text-3xl text-win-accent"></i>
-                    </div>
-                    <h2 class="section-title text-4xl md:text-5xl leading-tight theme-text">
-                        Convidados entram pelo <span class="text-win-accent">Celular</span>
-                    </h2>
-                    <p class="text-lg md:text-xl theme-text-secondary leading-[1.8]">
-                        Sua pauta não pode esperar. Seus convidados acessam a sala com um clique, direto do navegador do celular. Sem downloads, sem registros frustrantes.
-                    </p>
-                    <div class="bg-black/10 dark:bg-white/5 border border-white/10 p-8 rounded-2xl inline-block mt-6 text-left shadow-lg">
-                        <div class="flex items-center gap-4 text-win-accent font-black text-sm uppercase tracking-widest">
-                            <i class="ph ph-qr-code text-3xl"></i>
-                            Gere um QR Code e pronto.
+            <!-- 3 Etapas -->
+            <div class="demo-steps">
+                <div class="demo-step">
+                    <div class="step-number"><i class="ph ph-monitor"></i></div>
+                    <h4>Você cria a sala</h4>
+                    <p>Em segundos, no navegador</p>
+                </div>
+                <div class="demo-step">
+                    <div class="step-number"><i class="ph ph-device-mobile"></i></div>
+                    <h4>Convidado entra pelo link</h4>
+                    <p>Sem download, sem cadastro</p>
+                </div>
+                <div class="demo-step">
+                    <div class="step-number"><i class="ph ph-broadcast"></i></div>
+                    <h4>Feed limpo chega no seu OBS</h4>
+                    <p>Clean Feed em 1080p</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROVA SOCIAL ═══ -->
+    <section id="cases" class="landing-section social-proof-section">
+        <div class="max-w-5xl mx-auto text-center">
+            <p class="section-label">Comunidade</p>
+            <h2 class="section-heading mb-12">Usado por criadores que levam o ao vivo <span style="color:var(--color-live)">a sério</span></h2>
+
+            <!-- Logos Placeholder -->
+            <div class="flex flex-wrap justify-center items-center gap-6 mb-16">
+                <div class="logo-placeholder">Logo 1</div>
+                <div class="logo-placeholder">Logo 2</div>
+                <div class="logo-placeholder">Logo 3</div>
+                <div class="logo-placeholder">Logo 4</div>
+                <div class="logo-placeholder">Logo 5</div>
+            </div>
+
+            <!-- Testimonial Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                <div class="testimonial-card">
+                    <p class="quote">"[Depoimento real a ser adicionado]"</p>
+                    <div class="author">
+                        <div style="width:44px;height:44px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph ph-user text-xl" style="color:var(--text-muted)"></i></div>
+                        <div>
+                            <span class="name">Nome do Creator</span><br>
+                            <span class="role">Canal / Podcast / Emissora</span>
                         </div>
                     </div>
                 </div>
-                <div class="flex-1 relative group w-full flex justify-center lg:justify-start">
-                    <div class="absolute -inset-4 bg-win-accent/20 rounded-3xl blur-2xl opacity-0 group-hover:opacity-40 transition-opacity"></div>
-                    <div class="glass-card-premium rounded-3xl overflow-hidden aspect-[9/16] w-[280px] md:w-[320px] relative z-10 p-0 shadow-2xl">
-                        <img src="/img/mobile_guest.png" class="w-full h-full object-cover rounded-3xl" alt="Interface Mobile">
+                <div class="testimonial-card">
+                    <p class="quote">"[Depoimento real a ser adicionado]"</p>
+                    <div class="author">
+                        <div style="width:44px;height:44px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ph ph-user text-xl" style="color:var(--text-muted)"></i></div>
+                        <div>
+                            <span class="name">Nome do Creator</span><br>
+                            <span class="role">Canal / Podcast / Emissora</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Pricing Section -->
-    <section id="pricing" class="py-24 px-6 md:px-12 bg-black/5 dark:bg-white/5 border-y border-white/5">
+    <!-- ═══ PRICING ═══ -->
+    <section id="pricing" class="landing-section bg-black/5 dark:bg-white/5 border-y border-white/5">
         <div class="max-w-5xl mx-auto text-center mb-16 space-y-6">
-            <h2 class="section-title text-4xl md:text-6xl theme-text uppercase italic font-black">Planos e <span class="text-win-accent">Preços</span></h2>
-            <p class="text-lg md:text-xl theme-text-secondary max-w-2xl mx-auto leading-relaxed">Escolha o plano ideal para a escala da sua produção, sem surpresas.</p>
-            
+            <h2 class="section-heading">Planos e <span style="color:var(--color-live)">Preços</span></h2>
+            <p class="section-desc mx-auto">Escolha o plano ideal para a escala da sua produção, sem surpresas.</p>
+
             <!-- Toggle Switch -->
-            <div class="flex items-center justify-center gap-4 mt-8">
-                <span class="text-sm font-bold theme-text-secondary cursor-pointer hover:theme-text transition-colors" onclick="togglePricing('semiannual')" id="label-semiannual">Semestral</span>
+            <div class="pricing-toggle-wrapper">
+                <span class="text-sm font-semibold theme-text-secondary cursor-pointer hover:theme-text transition-colors" onclick="togglePricing('semiannual')" id="label-semiannual">Semestral</span>
                 
-                <button id="pricing-toggle" onclick="togglePricing()" class="relative w-16 h-8 rounded-full bg-win-accent/30 border border-win-accent/50 p-1 transition-all duration-300 shadow-inner">
+                <button id="pricing-toggle" onclick="togglePricing()" class="toggle-btn">
                     <!-- Pill Indicator -->
-                    <div id="pricing-pill" class="w-6 h-6 rounded-full bg-win-accent shadow-lg transform translate-x-8 transition-transform duration-300"></div>
+                    <div id="pricing-pill" class="toggle-pill"></div>
                 </button>
                 
                 <div class="flex items-center gap-2 cursor-pointer" onclick="togglePricing('annual')">
-                    <span class="text-sm font-bold theme-text transition-colors" id="label-annual">Anual</span>
-                    <span class="px-2 py-0.5 rounded-full bg-green-500/20 text-green-500 text-[10px] font-black uppercase tracking-widest border border-green-500/30">-40%</span>
+                    <span class="text-sm font-semibold theme-text transition-colors" id="label-annual">Anual</span>
+                    <span class="discount-badge">-40%</span>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch justify-center">
+        <div class="pricing-grid">
             
-            <!-- Grátis -->
-            <div class="pricing-card w-full glass-card-premium p-8 rounded-3xl flex flex-col text-center space-y-8">
-                <div class="text-win-accent font-black text-xs uppercase tracking-[0.3em]">Gratuito</div>
-                <div class="flex items-baseline justify-center gap-1">
-                    <span class="text-5xl font-black theme-text">R$ 0</span>
+            <!-- Grátis (Explorar) -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="pricing-name" style="color: var(--text-secondary)">Explorar</div>
+                    <div class="pricing-price">R$ 0</div>
+                    <p class="pricing-desc">Para testar a plataforma e começar sua jornada.</p>
                 </div>
-                <p class="text-sm theme-text-secondary leading-relaxed px-4">Para testar a plataforma e começar sua jornada.</p>
                 
-                <div class="h-px w-full bg-white/10 my-2"></div>
+                <div class="divider"></div>
                 
-                <ul class="w-full space-y-5 text-left flex-1">
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> 1 Sala Ativa</li>
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> 2 Convidados Simultâneos</li>
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Áudio Standard (Opus)</li>
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-white/5 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> SD Video Feed</li>
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check"></i> 1 Sala Ativa</li>
+                    <li><i class="ph ph-check"></i> 2 Convidados Simultâneos</li>
+                    <li><i class="ph ph-check"></i> Áudio Standard (Opus)</li>
+                    <li class="unavailable"><i class="ph ph-x"></i> SD Video Feed (480p)</li>
+                    <li class="unavailable"><i class="ph ph-x"></i> Sem Clean Feed HD</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl border border-win-accent/30 text-[11px] font-black uppercase tracking-widest hover:bg-win-accent/10 transition-all theme-text mt-8">Começar Grátis</button>
+                <button class="pricing-btn">Começar Grátis</button>
             </div>
 
-            <!-- Mensal -->
-            <div class="pricing-card w-full glass-card-premium p-8 rounded-3xl flex flex-col text-center space-y-8">
-                <div class="text-gray-400 font-black text-xs uppercase tracking-[0.3em]">Mensal</div>
-                <div class="flex items-baseline justify-center gap-1">
-                    <span class="text-5xl font-black theme-text">R$ 59<span class="text-3xl">,90</span></span>
-                    <span class="text-xs theme-text-secondary">/mês</span>
+            <!-- Mensal (Criador) -->
+            <div class="pricing-card">
+                <div class="pricing-header">
+                    <div class="pricing-name" style="color: var(--color-accent-warm)">Criador</div>
+                    <div class="pricing-price">R$ 59<span class="cents">,90</span><span class="period">/mês</span></div>
+                    <p class="pricing-desc">Flexibilidade total para projetos pontuais e mensais.</p>
                 </div>
-                <p class="text-sm theme-text-secondary leading-relaxed px-4">Flexibilidade total para projetos pontuais e mensais.</p>
                 
-                <div class="h-px w-full bg-white/10 my-2"></div>
+                <div class="divider"></div>
 
-                <ul class="w-full space-y-5 text-left flex-1">
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Salas Ilimitadas</li>
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> 8 Convidados Simultâneos</li>
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Áudio High Dynamic</li>
-                    <li class="flex items-center gap-4 text-[13px] theme-text-secondary"><div class="w-5 h-5 rounded-full bg-win-accent/10 flex items-center justify-center shrink-0"><i class="ph ph-check text-win-accent"></i></div> Clean Feed HD</li>
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check"></i> Salas Ilimitadas</li>
+                    <li><i class="ph ph-check"></i> 8 Convidados Simultâneos</li>
+                    <li><i class="ph ph-check"></i> Áudio High Dynamic</li>
+                    <li><i class="ph ph-check"></i> Clean Feed HD</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl bg-white/5 text-white text-[11px] border border-white/10 font-black uppercase tracking-widest hover:bg-white/10 transition-all mt-8">Assinar Mensal</button>
+                <button class="pricing-btn secondary">Assinar Mensal</button>
             </div>
 
-            <!-- Premium (Dinâmico: Semestral/Anual) -->
-            <div class="pricing-card w-full glass-card-premium p-8 rounded-3xl border border-win-accent/80 flex flex-col text-center space-y-8 relative transform scale-100 md:scale-105 z-10 shadow-[0_0_40px_rgba(0,120,212,0.2)] bg-gradient-to-b from-win-accent/10 to-transparent">
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-win-accent text-white px-6 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-[0_0_20px_rgba(0,120,212,0.5)] border border-white/20 whitespace-nowrap">A Escolha Profissional</div>
-                <div id="premium-title" class="text-win-accent font-black text-xs uppercase tracking-[0.3em] mt-2">Plano Anual</div>
-                
-                <div class="flex flex-col items-center justify-center gap-1">
-                    <div class="flex items-baseline justify-center gap-1">
-                        <span id="premium-price" class="text-5xl font-black theme-text">R$ 499<span class="text-3xl">,90</span></span>
-                        <span id="premium-period" class="text-xs theme-text-secondary">/ano</span>
-                    </div>
+            <!-- Premium/Anual (Profissional) -->
+            <div class="pricing-card highlighted">
+                <div class="popular-badge">⭐ MAIS POPULAR</div>
+                <div class="pricing-header">
+                    <div id="premium-title" class="pricing-name" style="color: var(--color-live)">Profissional</div>
+                    <div class="pricing-price" id="premium-price">R$ 499<span class="cents">,90</span><span class="period" id="premium-period">/ano</span></div>
+                    <p class="pricing-desc" id="premium-desc">Equivale a R$41,65/mês — economize R$218,90 por ano.</p>
                 </div>
-
-                <p id="premium-desc" class="text-sm theme-text-secondary leading-relaxed font-semibold px-4">O maior custo-benefício. Leve sua produção adiante.</p>
                 
-                <div class="h-px w-full bg-white/10 my-2"></div>
+                <div class="divider"></div>
 
-                <ul class="w-full space-y-5 text-left flex-1">
-                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Tudo do plano mensal</li>
-                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Fundo Virtual Borrado (IA)</li>
-                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Rotas P2P Criptografadas</li>
-                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Lower Thirds (GCs) Ilimitados</li>
-                    <li class="flex items-center gap-4 text-[13px] font-bold theme-text"><div class="w-6 h-6 rounded-full bg-win-accent/20 flex items-center justify-center shrink-0 border border-win-accent/30"><i class="ph ph-check text-win-accent"></i></div> Suporte Técnico VIP 24/7</li>
+                <ul class="pricing-features">
+                    <li><i class="ph ph-check"></i> Tudo do plano Criador</li>
+                    <li><i class="ph ph-check"></i> Fundo Virtual Borrado (IA)</li>
+                    <li><i class="ph ph-check"></i> Rotas P2P Criptografadas</li>
+                    <li><i class="ph ph-check"></i> Lower Thirds (GCs) Ilimitados</li>
+                    <li><i class="ph ph-check"></i> Suporte Técnico VIP</li>
                 </ul>
-                <button class="w-full py-4 rounded-xl bg-win-accent text-white text-[11px] font-black uppercase tracking-[0.2em] hover:brightness-110 transition-all shadow-[0_0_20px_rgba(0,120,212,0.3)] border border-white/10 mt-8">Assinar Premium</button>
+                <button class="pricing-btn primary">Assinar Anual — Melhor Custo</button>
             </div>
         </div>
     </section>
 
-    <!-- Professional Footer -->
-    <footer id="main-footer" class="bg-black/20 dark:bg-[#03060a] border-t border-white/5 pt-20 pb-10 px-6 md:px-12 mt-20">
-        <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8 mb-16">
+    <!-- ═══ FOOTER ═══ -->
+    <footer id="main-footer" class="landing-footer">
+        <div class="footer-grid">
             
             <!-- Brand Column -->
-            <div class="md:col-span-5 space-y-6">
+            <div class="space-y-6">
                 <a href="/" class="inline-block">
-                    <h3 class="font-logo text-3xl font-black italic theme-text">Lyncro<span class="text-win-accent">.</span></h3>
+                    <h3 class="font-logo text-3xl font-black italic theme-text">Lyncro<span style="color:var(--color-live)">.</span></h3>
                 </a>
                 <p class="text-sm theme-text-secondary leading-[1.8] max-w-sm opacity-80">
                     Construindo o futuro da radiodifusão descentralizada. A ponte flexível entre você, seus convidados e sua plataforma de streaming.
                 </p>
                 <div class="flex gap-3 pt-2">
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-win-accent/20 hover:border-win-accent/50 hover:text-win-accent transition-all"><i class="ph ph-twitter-logo text-lg"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-win-accent/20 hover:border-win-accent/50 hover:text-win-accent transition-all"><i class="ph ph-linkedin-logo text-lg"></i></a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-win-accent/20 hover:border-win-accent/50 hover:text-win-accent transition-all"><i class="ph ph-youtube-logo text-lg"></i></a>
+                    <a href="#" class="social-link" title="Em breve"><i class="ph ph-twitter-logo"></i></a>
+                    <a href="#" class="social-link" title="Em breve"><i class="ph ph-linkedin-logo"></i></a>
+                    <a href="#" class="social-link" title="Em breve"><i class="ph ph-youtube-logo"></i></a>
                 </div>
             </div>
             
-            <!-- Links Columns -->
-            <div class="md:col-span-2 space-y-5">
-                <h4 class="text-[11px] font-black uppercase tracking-[0.25em] text-win-accent">Produto</h4>
+            <!-- Links Columns (Reduzido para 3 colunas) -->
+            <div class="space-y-5">
+                <h4 class="footer-heading">Produto</h4>
                 <ul class="space-y-4">
-                    <li><a href="#features" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Funcionalidades</a></li>
-                    <li><a href="#pricing" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Preços e Planos</a></li>
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Casos de Uso</a></li>
-                    <li><a href="https://docs.lyncro.live" target="_blank" class="text-[13px] theme-text-secondary hover:text-white transition-colors flex items-center gap-1">Docs <i class="ph ph-arrow-up-right text-xs opacity-50"></i></a></li>
+                    <li><a href="#features" class="footer-link">Funcionalidades</a></li>
+                    <li><a href="#pricing" class="footer-link">Preços</a></li>
+                    <li><a href="#" class="footer-link coming-soon" title="Em breve">Casos de Uso</a></li>
+                    <li><a href="https://docs.lyncro.live" target="_blank" class="footer-link flex items-center gap-1">Docs <i class="ph ph-arrow-up-right text-xs opacity-50"></i></a></li>
                 </ul>
             </div>
 
-            <div class="md:col-span-2 space-y-5">
-                <h4 class="text-[11px] font-black uppercase tracking-[0.25em] text-win-accent">Empresa</h4>
+            <div class="space-y-5">
+                <h4 class="footer-heading">Empresa</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Nossa História</a></li>
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Blog</a></li>
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Carreiras</a></li>
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Contato Comercial</a></li>
+                    <li><a href="#" class="footer-link coming-soon" title="Em breve">Sobre Nós</a></li>
+                    <li><a href="#" class="footer-link coming-soon" title="Em breve">Blog</a></li>
+                    <li><a href="#" class="footer-link coming-soon" title="Em breve">Contato Comercial</a></li>
                 </ul>
             </div>
 
-            <div class="md:col-span-3 space-y-5">
-                <h4 class="text-[11px] font-black uppercase tracking-[0.25em] text-win-accent">Suporte</h4>
+            <div class="space-y-5">
+                <h4 class="footer-heading">Suporte</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Central de Ajuda</a></li>
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors">Comunidade Discord</a></li>
-                    <li><a href="#" class="text-[13px] theme-text-secondary hover:text-white transition-colors flex items-center gap-2">Status do Sistema <span class="w-2 h-2 rounded-full bg-green-500 block"></span></a></li>
+                    <li><a href="#" class="footer-link coming-soon" title="Em breve">Central de Ajuda</a></li>
+                    <li><a href="#" class="footer-link coming-soon" title="Em breve">Status do Sistema</a></li>
                 </ul>
             </div>
         </div>
         
-        <div class="max-w-6xl mx-auto pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="text-[11px] font-semibold theme-text-secondary opacity-60 uppercase tracking-widest">
+        <div class="footer-bottom">
+            <div class="copyright">
                 © 2026 LYNCRO. Todos os Direitos Reservados.
             </div>
-            <div class="flex flex-wrap justify-center gap-6 text-[11px] font-bold uppercase tracking-widest opacity-60">
-                <a href="#" class="hover:text-white transition-colors">Aviso de Privacidade</a>
-                <a href="#" class="hover:text-white transition-colors">Termos de Serviço</a>
+            <div class="legal-links">
+                <a href="#" class="coming-soon" title="Em breve">Privacidade</a>
+                <a href="#" class="coming-soon" title="Em breve">Termos</a>
             </div>
         </div>
     </footer>
@@ -1123,61 +1085,7 @@
             }
         }
 
-        // Carousel de Features Lógica
-        let currentSlide = 0;
-        const totalSlides = 10;
-        let slideInterval;
-
-        function initCarousel() {
-            const track = document.getElementById('features-track');
-            const dotsContainer = document.getElementById('carousel-dots');
-
-            // Criar Dots
-            for (let i = 0; i < totalSlides; i++) {
-                const dot = document.createElement('div');
-                dot.className = `dot ${i === 0 ? 'active' : ''}`;
-                dot.onclick = () => goToSlide(i);
-                dotsContainer.appendChild(dot);
-            }
-
-            updateCarouselView();
-            startAutoSlide();
-        }
-
-        function updateCarouselView() {
-            const track = document.getElementById('features-track');
-            const slides = document.querySelectorAll('.feature-slide');
-            const dots = document.querySelectorAll('.dot');
-
-            const offset = -(currentSlide * 10); // Cada slide tem 10% da track total height
-            track.style.transform = `translateY(${offset}%)`;
-
-            slides.forEach((slide, i) => {
-                slide.classList.toggle('active', i === currentSlide);
-            });
-            dots.forEach((dot, i) => {
-                dot.classList.toggle('active', i === currentSlide);
-            });
-        }
-
-        function goToSlide(index) {
-            currentSlide = index;
-            updateCarouselView();
-            resetAutoSlide();
-        }
-
-        function startAutoSlide() {
-            slideInterval = setInterval(() => {
-                currentSlide = (currentSlide + 1) % totalSlides;
-                updateCarouselView();
-            }, 5000); // 5 segundos
-        }
-
-        function resetAutoSlide() {
-            clearInterval(slideInterval);
-            startAutoSlide();
-        }
-
+        // Funções do Carrossel de Features antigo removidas (substituídas por grid estático css)
 
         // Converte o que o usuário digita em slug URL-safe em tempo real
         function slugifyRoomInput(el) {
@@ -1366,7 +1274,6 @@
 
         // Init
         window.addEventListener('DOMContentLoaded', () => {
-            initCarousel();
             // Esperar assets carregarem para medir altura inicial correta
             setTimeout(updateCardHeight, 200);
         });
@@ -1544,10 +1451,11 @@
                 lblSemi.classList.remove('theme-text');
 
                 // Atualizar dados do card
-                pTitle.textContent = 'Plano Anual';
-                pPrice.innerHTML = 'R$ 499<span class="text-3xl">,90</span>';
+                pTitle.textContent = 'Profissional';
+                pTitle.style.color = "var(--color-live)";
+                pPrice.innerHTML = 'R$ 499<span class="cents">,90</span>';
                 pPeriod.textContent = '/ano';
-                pDesc.textContent = 'O maior custo-benefício. Leve sua produção adiante.';
+                pDesc.textContent = 'Equivale a R$41,65/mês — economize R$218,90 por ano.';
             } else {
                 // UI do Toggle
                 pill.style.transform = 'translateX(0px)';
@@ -1557,10 +1465,11 @@
                 lblAnnual.classList.remove('theme-text');
 
                 // Atualizar dados do card
-                pTitle.textContent = 'Plano Semestral';
-                pPrice.innerHTML = 'R$ 299<span class="text-3xl">,90</span>';
+                pTitle.textContent = 'Semestral';
+                pTitle.style.color = "var(--color-live)";
+                pPrice.innerHTML = 'R$ 299<span class="cents">,90</span>';
                 pPeriod.textContent = '/semestre';
-                pDesc.textContent = 'Compromisso flexível. Cobertura completa por 6 meses.';
+                pDesc.textContent = 'Compromisso mais curto. Cobertura completa por 6 meses.';
             }
         }
 

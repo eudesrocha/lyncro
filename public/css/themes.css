@@ -30,8 +30,10 @@
     --toggle-border: rgba(255, 255, 255, 0.1);
     --toggle-icon:   #9a9aa8;
     --footer-text:   rgba(255, 255, 255, 0.25);
-    --gradient-body: radial-gradient(ellipse at 60% 0%, rgba(0,120,212,0.08) 0%, transparent 60%),
-                     radial-gradient(ellipse at 0% 80%, rgba(120,80,220,0.06) 0%, transparent 60%),
+    --color-live:    #E8302A;
+    --color-accent-warm: #FF6B35;
+    --gradient-body: radial-gradient(ellipse at 60% 0%, rgba(232,48,42,0.06) 0%, transparent 60%),
+                     radial-gradient(ellipse at 0% 80%, rgba(255,107,53,0.04) 0%, transparent 60%),
                      #111113;
 }
 
@@ -61,8 +63,10 @@
     --toggle-border: rgba(0, 0, 0, 0.1);
     --toggle-icon:   #5c5c6e;
     --footer-text:   rgba(0, 0, 0, 0.3);
-    --gradient-body: radial-gradient(ellipse at 60% 0%, rgba(0,120,212,0.07) 0%, transparent 55%),
-                     radial-gradient(ellipse at 0% 100%, rgba(100,60,200,0.04) 0%, transparent 55%),
+    --color-live:    #E8302A;
+    --color-accent-warm: #FF6B35;
+    --gradient-body: radial-gradient(ellipse at 60% 0%, rgba(232,48,42,0.05) 0%, transparent 55%),
+                     radial-gradient(ellipse at 0% 100%, rgba(255,107,53,0.03) 0%, transparent 55%),
                      #f4f5f7;
 }
 
