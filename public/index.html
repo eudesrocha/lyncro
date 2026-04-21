@@ -487,31 +487,25 @@
         <!-- Lado Esquerdo: Hero Copy -->
         <section id="narrative-section" class="flex-1 text-center lg:text-left overflow-hidden hero-section">
             <div class="animate-reveal delay-2">
-                <!-- Badge AO VIVO -->
-                <div class="mb-6">
-                    <span class="live-badge-hero">
-                        <span class="live-dot"></span>
-                        AO VIVO
-                    </span>
-                </div>
-
-                <h1 class="hero-headline text-4xl md:text-5xl lg:text-6xl mb-6">
-                    Seu convidado entra pelo celular. Você recebe em <span class="accent">1080p</span>, direto no <span class="accent">OBS</span>.
+                <h1 class="hero-headline text-5xl md:text-6xl lg:text-7xl mb-8">
+                    <span class="hero-line hero-line-1">Seu convidado entra</span>
+                    <span class="hero-line hero-line-2">pelo <span class="accent">celular.</span></span>
+                    <span class="hero-line hero-line-3">Direto no <span class="accent">OBS.</span></span>
                 </h1>
 
-                <p class="hero-subtitle text-base md:text-lg lg:text-xl mb-8 mx-auto lg:mx-0">
-                    Lyncro conecta apresentadores e convidados remotos com latência ultra-baixa via WebRTC.
-                    Sem downloads. Sem configuração. Broadcast profissional em minutos.
+                <p class="hero-subtitle text-base md:text-lg lg:text-xl mb-10 mx-auto lg:mx-0 opacity-80 leading-relaxed font-medium">
+                    A ponte definitiva para broadcast profissional. Capture feeds limpos em 1080p via WebRTC, sem atritos técnicos para você ou seu convidado.
                 </p>
 
                 <!-- CTAs -->
-                <div class="flex flex-col sm:flex-row gap-4 mb-8 justify-center lg:justify-start">
-                    <button onclick="document.getElementById('card-lobby').scrollIntoView({behavior:'smooth'})" class="cta-primary">
-                        <i class="ph ph-broadcast text-base"></i>
-                        Criar Sala Grátis
+                <div class="flex flex-col sm:flex-row gap-5 mb-12 justify-center lg:justify-start">
+                    <button onclick="document.getElementById('card-lobby').scrollIntoView({behavior:'smooth'})" class="cta-primary h-14">
+                        <i class="ph-fill ph-rocket-launch text-xl"></i>
+                        Começar Agora Grátis
                     </button>
-                    <a href="#demo" class="cta-secondary">
-                        Ver como funciona <i class="ph ph-arrow-right"></i>
+                    <a href="#demo" class="cta-secondary h-14">
+                        <i class="ph ph-play-circle text-xl"></i>
+                        Ver Demonstração
                     </a>
                 </div>
 
@@ -993,6 +987,70 @@
         </div>
     </section>
 
+    <!-- ═══ FAQ ═══ -->
+    <section id="faq" class="landing-section faq-section">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-16">
+                <p class="section-label">Suporte</p>
+                <h2 class="section-heading">Perguntas <span style="color:var(--color-live)">Frequentes</span></h2>
+            </div>
+
+            <div class="faq-grid">
+                <!-- Item 1 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Preciso instalar algum software para o convidado entrar?</span>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            Não. O Lyncro funciona totalmente no navegador. O convidado recebe um link, abre no Chrome ou Safari e já está ao vivo.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Como eu recebo o sinal no meu OBS Studio?</span>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            Através de uma "Navegador" (Browser Source). Você copia o link do Clean Feed gerado na sala, cola no OBS e o vídeo chega em 1080p sem nenhuma interface.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>Qual a diferença entre o Lyncro e o Zoom/Meet?</span>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            Zoom e Meet são ferramentas de conferência. O Lyncro é uma ferramenta de **broadcast**. Nós priorizamos a fidelidade de áudio e vídeo (quase sem compressão) e oferecemos saídas separadas para cada convidado, ideal para diretores e produtores.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 4 -->
+                <div class="faq-item">
+                    <button class="faq-question">
+                        <span>O plano gratuito tem limite de tempo?</span>
+                        <i class="ph ph-caret-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <div class="faq-content">
+                            Não. Você pode usar a sala gratuita pelo tempo que desejar. O plano PRO é necessário apenas se você precisar de mais convidados simultâneos, recursos extras de IA ou suporte VIP.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ═══ FOOTER ═══ -->
     <footer id="main-footer" class="landing-footer">
         <div class="footer-grid">
@@ -1437,6 +1495,40 @@
 
             navLinks.forEach(link => {
                 link.classList.toggle('active', link.getAttribute('href') === `#${currentSectionId}`);
+            });
+        });
+
+        // FAQ Accordion Logic
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Fecha todos os outros
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                });
+
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        // FAQ Accordion Logic
+        document.querySelectorAll('.faq-question').forEach(button => {
+            button.addEventListener('click', () => {
+                const item = button.parentElement;
+                const isActive = item.classList.contains('active');
+                
+                // Fecha todos os outros
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    otherItem.classList.remove('active');
+                });
+
+                if (!isActive) {
+                    item.classList.add('active');
+                }
             });
         });
 
